@@ -8,6 +8,9 @@ package br.com.o_tab.agropec.model;
 *  point(local no qual o estande será representado no mapa principal).
 */
 
+import jakarta.persistence.Entity;
 
+@Entity
 public class Stands {
+
 }
