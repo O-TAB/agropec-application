@@ -1,7 +1,7 @@
 package br.com.o_tab.agropec.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import br.com.o_tab.agropec.Models.Users;
+import br.com.o_tab.agropec.model.Users;
 
 public interface UserRepository extends JpaRepository<Users, String>{
 

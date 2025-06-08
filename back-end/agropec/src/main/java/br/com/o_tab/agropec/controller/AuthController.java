@@ -1,4 +1,4 @@
-package br.com.o_tab.agropec.Controllers;
+package br.com.o_tab.agropec.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

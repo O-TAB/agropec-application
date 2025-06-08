@@ -1,4 +1,4 @@
-package br.com.o_tab.agropec.Models;
+package br.com.o_tab.agropec.model;
 
 import java.util.List;
 

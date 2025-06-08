@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.o_tab.agropec.DTO.RegisterDTO;
-import br.com.o_tab.agropec.Models.Users;
+import br.com.o_tab.agropec.model.Users;
 import br.com.o_tab.agropec.Repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
