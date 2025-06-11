@@ -1,6 +1,5 @@
 package br.com.o_tab.agropec.model;
 
-import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

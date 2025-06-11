@@ -5,8 +5,6 @@ package br.com.o_tab.agropec.config.security;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
