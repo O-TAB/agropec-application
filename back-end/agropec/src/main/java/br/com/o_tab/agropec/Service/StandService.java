@@ -35,8 +35,22 @@ public class StandService {
         return ResponseEntity.ok(allStands);
     }
 
-    public ResponseEntity<?> updateStand(Stand stand){
-        Stand standToUpdate = standRepository.findByName(stand.getName());
+    public ResponseEntity<?> getStandByName(String name){
+        Stand foundStand = standRepository.findByName(name);
+
+        if(foundStand == null){
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(foundStand);
+    }
+
+    public ResponseEntity<?> updateStand(String name, Stand stand){
+        Stand standToUpdate = standRepository.findByName(name);
+
+        if(standToUpdate == null){
+            return ResponseEntity.notFound().build();
+        }
 
         standToUpdate.setName(stand.getName());
         standToUpdate.setDescription(stand.getDescription());
@@ -46,6 +60,18 @@ public class StandService {
 
         return ResponseEntity.ok().body("Estande atualizado com sucesso!");
 
+    }
+
+    public ResponseEntity<?> deleteStandByName(String name){
+        Stand standToDelete = standRepository.findByName(name);
+
+        if(standToDelete == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        standRepository.deleteById(standToDelete.getId());
+
+        return ResponseEntity.ok().body("Estande deletado com sucesso");
     }
 
 }
