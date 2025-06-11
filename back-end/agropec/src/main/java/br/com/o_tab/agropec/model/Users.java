@@ -28,7 +28,4 @@ public class Users {
     @Column(length = 100, nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "user")
-    private List<UserShowroom> userShowrooms;
-
 }

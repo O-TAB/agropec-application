@@ -33,7 +33,7 @@ public class Stand {
     @Column(nullable = false)
     String img;
 
-    @Embedded
+    @OneToOne(cascade = CascadeType.ALL)
     Point point;
 
 }
