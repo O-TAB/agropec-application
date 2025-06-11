@@ -14,9 +14,6 @@ public class Showroom {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    // outros campos...
-
-    @OneToMany(mappedBy = "showroom")
-    private List<UserShowroom> userShowrooms;
+   
     
 }
