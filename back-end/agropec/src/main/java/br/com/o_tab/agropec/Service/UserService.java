@@ -1,4 +1,4 @@
-package br.com.o_tab.agropec.Service;
+package br.com.o_tab.agropec.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.o_tab.agropec.DTO.RegisterDTO;
 import br.com.o_tab.agropec.model.Users;
-import br.com.o_tab.agropec.Repository.UserRepository;
+import br.com.o_tab.agropec.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 

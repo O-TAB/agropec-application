@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,8 +27,7 @@ public class Users {
     private String email;
     @Column(length = 100, nullable = false)
     private String password;
-
-    @OneToMany(mappedBy = "user")
-    private List<UserShowroom> userShowrooms;
+    @Column(length = 20, nullable = false)
+    private String role;
 
 }
