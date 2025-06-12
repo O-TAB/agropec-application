@@ -16,7 +16,7 @@ public class StandService {
     StandRepository standRepository;
 
     public ResponseEntity<?> cadastrateStand(Stand stand){
-       if(!standRepository.existsByName(stand.getName())){
+       if(standRepository.existsByName(stand.getName())){
            return ResponseEntity.badRequest().body("Já há um estande registrado com o mesmo nome, tente outro nome.");
        } else {
            standRepository.save(stand);
@@ -58,7 +58,9 @@ public class StandService {
         standToUpdate.setPoint(stand.getPoint());
         standToUpdate.setImg(stand.getImg());
 
-        return ResponseEntity.ok().body("Estande atualizado com sucesso!");
+        Stand updatedStand = standRepository.save(standToUpdate);
+
+        return ResponseEntity.ok(updatedStand);
 
     }
 

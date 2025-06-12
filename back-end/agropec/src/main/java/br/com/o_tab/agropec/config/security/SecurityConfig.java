@@ -31,10 +31,12 @@ public class SecurityConfig{
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll())
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        /*.requestMatchers("/stands/**").permitAll()*/)
                         
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
+
     }
 
     @Bean

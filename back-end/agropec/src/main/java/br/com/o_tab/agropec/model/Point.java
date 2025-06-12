@@ -1,5 +1,10 @@
 package br.com.o_tab.agropec.model;
 
+/*
+Objeto referente aos pontos que serão apresentados no mapa, mostrando onde ficam os
+estandes da feira.
+*/
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
