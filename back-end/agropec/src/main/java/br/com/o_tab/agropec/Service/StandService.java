@@ -2,6 +2,7 @@ package br.com.o_tab.agropec.service;
 
 import br.com.o_tab.agropec.model.Stand;
 import br.com.o_tab.agropec.repository.StandRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class StandService {
 
-    StandRepository standRepository;
+    private StandRepository standRepository;
 
     public ResponseEntity<?> cadastrateStand(Stand stand){
        if(standRepository.existsByName(stand.getName())){
@@ -64,6 +65,7 @@ public class StandService {
 
     }
 
+    @Transactional
     public ResponseEntity<?> deleteStandByName(String name){
         Stand standToDelete = standRepository.findByName(name);
 

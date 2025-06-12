@@ -18,21 +18,21 @@ public class Stand {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
+    private long id;
 
     @Column(nullable = false, unique = true)
-    String name;
+    private String name;
 
     @Column(nullable = false)
-    String description;
+    private String description;
 
     @Column(nullable = false)
-    String descriptionCard;
+    private String descriptionCard;
 
     @Column(nullable = false)
-    String img;
+    private String img;
 
     @OneToOne(cascade = CascadeType.ALL)
-    Point point;
+    private Point point;
 
 }
