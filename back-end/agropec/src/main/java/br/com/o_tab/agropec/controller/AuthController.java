@@ -22,5 +22,10 @@ public class AuthController {
     public ResponseEntity<String> register(@RequestBody @Valid RegisterDTO data){
         return userService.register(data);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody @Valid RegisterDTO data){
+        return userService.register(data);
+    }
     
 }

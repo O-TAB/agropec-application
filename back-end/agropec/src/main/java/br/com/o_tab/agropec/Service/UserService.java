@@ -1,7 +1,11 @@
 package br.com.o_tab.agropec.service;
 
+import java.net.Authenticator;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,8 @@ public class UserService{
     // implementtation of user service methods
     // Create, authenticate, update, delete users
     UserRepository userRepository;
+    AuthenticationManager AuthManager;
+    TokenService tokenService;
     
 
    // u need to specify what u will pass to the body of the http response
@@ -34,6 +40,22 @@ public class UserService{
 
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuário cadastrado com sucesso!");
+    }
+
+    // 
+    public ResponseEntity<String>login(@Valid RegisterDTO data) {
+        var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
+
+        var auth = this.AuthManager.authenticate(usernamePassword);
+
+
+        if(auth == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
+        }
+
+        var token = tokenService.generateToken((Users) auth.getPrincipal());
+
+        return ResponseEntity.ok(token);
     }
     
 }
