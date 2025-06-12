@@ -32,10 +32,17 @@ public class SecurityConfig{
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+<<<<<<< HEAD
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll())
+=======
+//                        .requestMatchers("/stands/**").permitAll()
+//                        .requestMatchers("/map/**").permitAll()
+                )
+>>>>>>> e1f91fe3105249917ba4b759f1d6b2dbc2cc3c2c
                         
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
+
     }
 
     @Bean

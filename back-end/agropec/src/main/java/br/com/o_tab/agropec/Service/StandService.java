@@ -2,6 +2,7 @@ package br.com.o_tab.agropec.service;
 
 import br.com.o_tab.agropec.model.Stand;
 import br.com.o_tab.agropec.repository.StandRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 public class StandService {
 
-    StandRepository standRepository;
+    private StandRepository standRepository;
 
     public ResponseEntity<?> cadastrateStand(Stand stand){
-       if(!standRepository.existsByName(stand.getName())){
+       if(standRepository.existsByName(stand.getName())){
            return ResponseEntity.badRequest().body("Já há um estande registrado com o mesmo nome, tente outro nome.");
        } else {
            standRepository.save(stand);
@@ -58,10 +59,13 @@ public class StandService {
         standToUpdate.setPoint(stand.getPoint());
         standToUpdate.setImg(stand.getImg());
 
-        return ResponseEntity.ok().body("Estande atualizado com sucesso!");
+        Stand updatedStand = standRepository.save(standToUpdate);
+
+        return ResponseEntity.ok(updatedStand);
 
     }
 
+    @Transactional
     public ResponseEntity<?> deleteStandByName(String name){
         Stand standToDelete = standRepository.findByName(name);
 

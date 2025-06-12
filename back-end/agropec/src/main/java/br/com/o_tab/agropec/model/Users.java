@@ -22,10 +22,13 @@ public class Users {
     
     @Column(unique = true, length = 100, nullable = false)
     private String username;
+
     @Column(unique = true, length = 100, nullable = false)
     private String email;
+
     @Column(length = 100, nullable = false)
     private String password;
+
     @Column(length = 20, nullable = false)
     private String role;
 
