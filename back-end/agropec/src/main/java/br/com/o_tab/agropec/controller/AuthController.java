@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.o_tab.agropec.DTO.RegisterDTO;
-import br.com.o_tab.agropec.Service.UserService;
+import br.com.o_tab.agropec.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
@@ -20,6 +20,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody @Valid RegisterDTO data){
+        return userService.register(data);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody @Valid RegisterDTO data){
         return userService.register(data);
     }
     

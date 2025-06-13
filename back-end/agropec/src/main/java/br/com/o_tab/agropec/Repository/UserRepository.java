@@ -1,4 +1,4 @@
-package br.com.o_tab.agropec.Repository;
+package br.com.o_tab.agropec.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.o_tab.agropec.model.Users;
