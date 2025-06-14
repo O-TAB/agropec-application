@@ -28,4 +28,8 @@ public class Map {
 
     @OneToMany(mappedBy = "map", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Point> points = new ArrayList<>();
+
+    public void removePoint(Point point){
+        this.points.remove(point);
+    }
 }

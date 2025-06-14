@@ -33,4 +33,14 @@ public class MapController {
         return mapService.addPoint(mapId, point);
     }
 
+    @PostMapping("/{mapId}/point/{pointId}")
+    public ResponseEntity<?> updatePoint(@PathVariable String mapId, @RequestBody Point point, @PathVariable long pointId){
+        return mapService.updatePoint(mapId, point, pointId);
+    }
+
+    @DeleteMapping("/{mapId}/point/{pointId}")
+    public ResponseEntity<?> deletePoint(@PathVariable String mapId, @PathVariable long pointId){
+        return mapService.deletePoint(mapId, pointId);
+    }
+
 }
