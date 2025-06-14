@@ -1,3 +1,8 @@
 package br.com.o_tab.agropec.DTO;
 
-public record LoginResponseDTO () {}
+public record LoginResponseDTO (
+    String token,
+    String username,
+    String email,
+    String role
+) {}
