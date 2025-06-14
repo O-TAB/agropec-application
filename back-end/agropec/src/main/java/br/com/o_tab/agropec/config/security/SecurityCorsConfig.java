@@ -9,22 +9,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.List;
 
 @Configuration
-public class SecurityCorsConfig{
+public class SecurityCorsConfig {
 
-    @Value("api.cors.allowed.oringin-local")
-    String allowedOrigin;
-
-//    @Value("#{'${api.cors.allowed.origin-React},${api.cors.allowed.origin-local},${api.cors.allowed.origin-TestFront}'.split(',')}")
-//    private List<String> allowedOrigins;
+    @Value("#{'${api.cors.allowed.origin-React},${api.cors.allowed.origin-local},${api.cors.allowed.origin-TestFront}'.split(',')}")
+    private List<String> allowedOrigins;
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Permite todos os endpoints
-//                        .allowedOrigins(allowedOrigins.toArray(new String[0]))
-                        .allowedOrigins(allowedOrigin) // Origem do Angular
+                registry.addMapping("/**")
+                        .allowedOrigins(allowedOrigins.toArray(new String[0]))
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
