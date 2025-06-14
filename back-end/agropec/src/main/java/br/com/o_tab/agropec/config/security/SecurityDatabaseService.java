@@ -26,13 +26,7 @@ public class SecurityDatabaseService implements UserDetailsService {
             throw new UsernameNotFoundException("Usuário não encontrado com o email: " + email);
         }
 
-        UserDetails user = org.springframework.security.core.userdetails.User
-                .withUsername(userEntity.getEmail())
-                .password(userEntity.getPassword())
-                .authorities(getAuthorities(userEntity))
-                .build();
-
-        return user;
+        return userEntity;
     }
 
     // é um metodo auxilixar para saber quais papeis o usuário tem
