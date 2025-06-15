@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import imgMapa from "../assets/MAPA_A1.jpg";
+import imgMapa from "../assets/MAPA-A1.svg";
 import { MapPin } from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import EventPopup from '../components/EventPopup';
