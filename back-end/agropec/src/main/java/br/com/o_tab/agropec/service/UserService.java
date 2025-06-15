@@ -1,6 +1,5 @@
 package br.com.o_tab.agropec.service;
 
-import br.com.o_tab.agropec.config.security.SecurityDatabaseService;
 import br.com.o_tab.agropec.dto.RequestLoginDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import br.com.o_tab.agropec.DTO.LoginResponseDTO;
-import br.com.o_tab.agropec.DTO.RegisterDTO;
+import br.com.o_tab.agropec.dto.LoginResponseDTO;
+import br.com.o_tab.agropec.dto.RegisterDTO;
 import br.com.o_tab.agropec.model.Users;
 import br.com.o_tab.agropec.repository.UserRepository;
 import jakarta.validation.Valid;
