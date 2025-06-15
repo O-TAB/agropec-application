@@ -57,7 +57,7 @@ public class MapService {
         return foundMap.map(map -> {
             point.setMap(map);
             Point savedPoint = pointRepository.save(point);
-            refreshPointList(map);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPoint);
         }).orElse(ResponseEntity.notFound().build());
     }
