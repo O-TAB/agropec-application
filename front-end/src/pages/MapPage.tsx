@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import imgMapa from "../assets/MAPA_A1.jpg";
 import { MapPin } from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
@@ -37,12 +37,16 @@ const allPins = [
   { id: 25, category: 'event', type: 'event', x: 984, y: 1769, title: 'Baia de Animais', image: '', description: 'Exposição de animais de grande porte. Veja de perto os campeões de diversas raças.' }
 ];
 
-const MapPage = () => {
-  const transformWrapperRef = useRef(null);
-  const [visiblePins, setVisiblePins] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+type Pin = typeof allPins[number];
 
-  const handleShowPins = (category) => {
+import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
+
+const MapPage = () => {
+  const transformWrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
+  const [visiblePins, setVisiblePins] = useState<Pin[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Pin | null>(null);
+
+  const handleShowPins = (category:string) => {
     setSelectedEvent(null);
     if (category) {
         const pinsToSet = allPins.filter(pin => pin.category === category);
@@ -54,7 +58,8 @@ const MapPage = () => {
 
   useEffect(() => {
     if (!transformWrapperRef.current) return;
-    const { zoomToElement, resetTransform } = transformWrapperRef.current;
+    const zoomToElement = transformWrapperRef.current.zoomToElement;
+    const resetTransform = transformWrapperRef.current.resetTransform;
     
     const utilityPins = visiblePins.filter(p => p.category === 'banheiros' || p.category === 'ambulancia');
     
@@ -63,10 +68,10 @@ const MapPage = () => {
       const elementId = `pin-${firstPin.id}`;
       
       setTimeout(() => {
-        zoomToElement(elementId, 1.8, 600, "easeOut");
+        if (zoomToElement) zoomToElement(elementId, 1.8, 600, "easeOut");
       }, 100);
     } else {
-      resetTransform(600);
+      if (resetTransform) resetTransform(600);
     }
   }, [visiblePins]);
 
@@ -89,7 +94,7 @@ const MapPage = () => {
             <button className="px-3 py-1.5 text-xs md:text-sm bg-purple-600 text-white rounded hover:bg-purple-700" onClick={() => handleShowPins("event")}>Eventos</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700" onClick={() => handleShowPins("banheiros")}>Banheiros</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-green-600 text-white rounded hover:bg-green-700" onClick={() => handleShowPins("ambulancia")}>Ambulância</button>
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins(null)}>Limpar Filtro</button>
+            <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins('')}>Limpar Filtro</button>
           </div>
 
           <div className="w-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
