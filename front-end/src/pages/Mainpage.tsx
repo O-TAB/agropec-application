@@ -1,9 +1,22 @@
-import React from 'react';
-import {MapPin, Calendar, Users, Phone, Mail, Wheat } from 'lucide-react';
-import oximg from '../assets/ox_img.jpeg'; // Ensure the path is correct
+import React, { useEffect } from 'react';
+import { MapPin, Calendar, Users, Phone, Mail, Wheat } from 'lucide-react';
+import oximg from '../assets/ox_img.jpeg';
+import { useLocation } from 'react-router-dom';
 
-function Mainpage() {
-    return(<div className="min-h-screen bg-gradient-to-b from-green-50 to-yellow-50">
+export default function MainPage() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === "#contato") {
+      const contatoSection = document.getElementById('contato');
+      if (contatoSection) {
+        contatoSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-yellow-50">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-400 overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -36,8 +49,6 @@ function Mainpage() {
           </div>
         </div>
       </section>
-
-      
 
       {/* Features Section */}
       <section className="py-16 bg-gradient-to-b from-green-50 to-white">
@@ -86,7 +97,7 @@ function Mainpage() {
       </section>
 
       {/* Contact Section */}
-      <section className="py-16 bg-green-600">
+      <section id="contato" className="py-16 bg-green-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -206,6 +217,4 @@ function Mainpage() {
       </footer>
     </div>
   );
-
 }
-export default Mainpage;

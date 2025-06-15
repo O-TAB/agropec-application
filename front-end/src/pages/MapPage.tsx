@@ -17,9 +17,9 @@ const ORIGINAL_MAP_HEIGHT = 2481;
 // coordenadas dos pinos no mapa
 const allPins = [
   // banheiros e ambulância
-  { id: 1, category: 'banheiros', type: 'main', x: 1192, y: 786, title: "Banheiro 1" },
+  { id: 1, category: 'banheiros', type: 'main', x: 1030, y: 800, title: "Banheiro 1" },
   { id: 2, category: 'banheiros', type: 'main', x: 2042, y: 1088, title: "Banheiro 2" },
-  { id: 3, category: 'banheiros', type: 'main', x: 2575, y: 2200, title: "Banheiro 3" },
+  { id: 3, category: 'banheiros', type: 'main', x: 2012, y: 1930, title: "Banheiro 3" },
   { id: 4, category: 'ambulancia', type: 'main', x: 1004, y: 684, title: "Ambulância" },
 
   // stands
