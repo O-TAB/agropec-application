@@ -1,7 +1,4 @@
-
 package br.com.o_tab.agropec.config.security;
-
-
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,40 +19,22 @@ public class SecurityDatabaseService implements UserDetailsService {
     UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        
-        Users userEntity = userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Users userEntity = userRepository.findByEmail(email);
 
         if (userEntity == null) {
-            throw new UsernameNotFoundException("Usuário não encontrado");
+            throw new UsernameNotFoundException("Usuário não encontrado com o email: " + email);
         }
 
-        UserDetails user = org.springframework.security.core.userdetails.User
-                .withUsername(userEntity.getUsername())
-                .password(userEntity.getPassword())
-                .authorities(getAuthorities(userEntity))
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .disabled(false)
-                .build();
-
-        return user;
-        
+        return userEntity;
     }
 
     // é um metodo auxilixar para saber quais papeis o usuário tem
     private Set<GrantedAuthority> getAuthorities(Users userEntity) {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        // Example: assuming Users has a getRoles() method returning a collection of roles
         if (userEntity.getRole() != null) {
-            for (String role : userEntity.getRole().split(",")) {
-            authorities.add(new org.springframework.security.core.authority.SimpleGrantedAuthority(role.trim()));
-            }
+            authorities.add(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + userEntity.getRole()));
         }
         return authorities;
     }
-
-    
-
 }
