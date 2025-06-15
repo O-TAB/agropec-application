@@ -34,6 +34,6 @@ export default function NavbarOptions
             <NavLink
               to="/map"
               className={({ isActive }) => isActive ? classActive : classInactive}
-            > mapa</NavLink>
+            > Mapa do evento</NavLink>
         </nav>
     )}
