@@ -18,8 +18,8 @@ public class Point {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "Type of stand", nullable = false)
-    private TypeStand typeStand;
+    @Column(name = "Point type", nullable = false)
+    private TypePoint typePoint;
 
     @Column(name = "Coordenate x", nullable = false)
     private double x;

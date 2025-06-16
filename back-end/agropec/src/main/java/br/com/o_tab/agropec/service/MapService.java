@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +34,23 @@ public class MapService {
         Map savedMap = mapRepository.save(newMap);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMap);
+    }
+
+
+    public ResponseEntity<?> getAllMapsId(){
+        List<Map> allMaps = mapRepository.findAll();
+        List<String> mapsIds = new ArrayList<>();
+
+        if(allMaps.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum mapa cadastrado.");
+        }
+
+        for (Map m : allMaps){
+            mapsIds.add(m.getId());
+        }
+
+        return ResponseEntity.ok(mapsIds);
+
     }
 
 
@@ -64,23 +82,30 @@ public class MapService {
 
 
     @Transactional
-    public ResponseEntity<?> updatePoint(String mapId, Point point, long pointId){
+    public ResponseEntity<?> updatePoint(String mapId, Point point, long pointId) {
         Optional<Map> foundMap = mapRepository.findById(mapId);
         Optional<Point> foundPoint = pointRepository.findById(pointId);
 
-        if (foundMap.isEmpty()){
+        if (foundMap.isEmpty()) {
             return ResponseEntity.badRequest().body("Nenhum mapa cadastrado para o ID informado.");
-        } else if(foundPoint.isEmpty()){
+        } else if (foundPoint.isEmpty()) {
             return ResponseEntity.badRequest().body("Nenhum ponto cadastrado para o ID informado.");
         }
 
-        return foundMap.map(map -> {
-            point.setMap(map);
-            Point savedPoint = pointRepository.save(point);
-            refreshPointList(map);
-            return ResponseEntity.status(HttpStatus.OK).body(savedPoint);
-        }).orElse(ResponseEntity.notFound().build());
+        Map existingMap = foundMap.get();
+        ;
+        Point pointToUpdate = foundPoint.get();
+
+        if (point.getTypePoint() != null){
+            pointToUpdate.setTypePoint(point.getTypePoint());
+        }
+        pointToUpdate.setY(point.getY());
+        pointToUpdate.setX(point.getX());
+        pointToUpdate.setMap(existingMap);
+
+        return ResponseEntity.ok(pointToUpdate);
     }
+
 
     public ResponseEntity<?> deletePoint(String mapId, long pointId){
         Optional<Map> foundMap = mapRepository.findById(mapId);
@@ -99,6 +124,7 @@ public class MapService {
         }).orElse(ResponseEntity.notFound().build());
 
     }
+
 
     private void refreshPointList(Map map){
         List<Point> updatedPointList = pointRepository.findAllByMapId(map.getId());

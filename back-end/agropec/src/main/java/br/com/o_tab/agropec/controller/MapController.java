@@ -23,17 +23,25 @@ public class MapController {
         return mapService.uploadMap(name, Archive);
     }
 
+
+    @GetMapping()
+    public ResponseEntity<?> getAllMapsId(){
+        return mapService.getAllMapsId();
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getMapById(@PathVariable String id){
         return mapService.getMapById(id);
     }
+
 
     @PostMapping("/{mapId}/point")
     public ResponseEntity<?> addPoint(@PathVariable String mapId, @RequestBody Point point){
         return mapService.addPoint(mapId, point);
     }
 
-    @PostMapping("/{mapId}/point/{pointId}")
+    @PutMapping("/{mapId}/point/{pointId}")
     public ResponseEntity<?> updatePoint(@PathVariable String mapId, @RequestBody Point point, @PathVariable long pointId){
         return mapService.updatePoint(mapId, point, pointId);
     }

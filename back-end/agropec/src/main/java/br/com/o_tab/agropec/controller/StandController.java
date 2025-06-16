@@ -16,9 +16,9 @@ public class StandController {
     StandService standService;
 
 
-    @PostMapping
-    public ResponseEntity<?> cadastrateStand(@RequestBody Stand stand){
-        return standService.cadastrateStand(stand);
+    @PostMapping("{mapId}")
+    public ResponseEntity<?> cadastrateStand(@PathVariable String mapId, @RequestBody Stand stand){
+        return standService.cadastrateStand(stand, mapId);
     }
 
     @GetMapping
