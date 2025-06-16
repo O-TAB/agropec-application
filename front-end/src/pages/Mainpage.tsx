@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { MapPin, Calendar, Users, Phone, Mail, Wheat, Code, Mic } from 'lucide-react';
 import oximg from '../assets/ox_img.jpeg';
 import { useLocation, Link } from 'react-router-dom'; // O 'Link' foi importado aqui
-
 
 export default function MainPage() {
   const location = useLocation();
@@ -252,7 +251,7 @@ export default function MainPage() {
               </ul>
             </div>
           </div>
-          
+
           {/* --- SEÇÃO ADICIONADA AQUI --- */}
           <div className="text-center border-t border-green-700 mt-8 pt-8">
             <h4 className="font-semibold uppercase tracking-wider text-green-200 mb-4">Para Funcionários</h4>
@@ -260,7 +259,7 @@ export default function MainPage() {
               Login
             </Link>
           </div>
-
+          
           <div className="border-t border-green-700 mt-8 pt-8 text-center text-green-200">
             <p>&copy; 2025 AGROPEC. Todos os direitos reservados.</p>
           </div>

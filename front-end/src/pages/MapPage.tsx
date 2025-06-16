@@ -22,12 +22,12 @@ export default function MapPage() {
     ? allPins.filter(pin => pin.category === activeCategory)
     : [];
 
-  const handleShowPins = (category:string) => {
+  const handleShowPins = (category:string | null) => { // Ajustado para aceitar null
     setSelectedEvent(null);
     setActiveCategory(category);
   };
   
-  //logica de foco no pin
+  //logica de foco no pin vindo de outra página
   useEffect(() => {
     const pinIdFromUrl = searchParams.get('pinId');
     if (pinIdFromUrl && transformWrapperRef.current) {
@@ -45,26 +45,29 @@ export default function MapPage() {
     }
   }, []); 
 
-  //logica de zoom 
+  // --- LÓGICA DE ZOOM CORRIGIDA AQUI ---
   useEffect(() => {
     if (!transformWrapperRef.current) return;
 
     const { zoomToElement, resetTransform } = transformWrapperRef.current;
 
-    // Defina os pinos a serem usados para o zoom com base na categoria ativa
-    const pinsToZoom = visiblePins;
+    // Apenas estas categorias darão zoom automático
+    const categoriesToZoom = ['ambulancia', 'pracaalimentacao'];
 
-    if (pinsToZoom.length > 0) {
-      // pega o primeiro pino visível da categoria para dar o zoom
-      const firstPinToZoom = pinsToZoom[0]; 
-      const elementId = `pin-${firstPinToZoom.id}`;
-      setTimeout(() => {
-        if (typeof zoomToElement === "function") zoomToElement(elementId, 1.8, 600, "easeOut");
-      }, 100);
+    // Verifica se a categoria ativa é uma das que devem dar zoom
+    if (activeCategory && categoriesToZoom.includes(activeCategory)) {
+      const pinToZoom = visiblePins[0];
+      if (pinToZoom) {
+        const elementId = `pin-${pinToZoom.id}`;
+        setTimeout(() => {
+          if (typeof zoomToElement === "function") zoomToElement(elementId, 1.8, 600, "easeOut");
+        }, 100);
+      }
     } else {
+      // Para todas as outras categorias (stand, event, banheiros) ou ao limpar, reseta o mapa
       if (typeof resetTransform === "function") resetTransform(600, "easeOut");
     }
-  }, [activeCategory, visiblePins]); 
+  }, [activeCategory]); // A dependência de 'visiblePins' foi removida para evitar re-execuções desnecessárias
   
   return (
     <>
@@ -85,7 +88,7 @@ export default function MapPage() {
             <button className="px-3 py-1.5 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700" onClick={() => handleShowPins("banheiros")}>Banheiros</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-green-600 text-white rounded hover:bg-green-700" onClick={() => handleShowPins("ambulancia")}>Ambulância</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700" onClick={() => handleShowPins("pracaalimentacao")}>Praça de Alimentação</button>
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins('')}>Limpar Filtro</button>
+            <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins(null)}>Limpar Filtro</button>
           </div>
           <div className="w-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
             <div className="relative w-full aspect-[3508/2481]">
@@ -117,7 +120,6 @@ export default function MapPage() {
           </div>
         </div>
       </div>
-      {/* Passando o imageMap para o Pop-up */}
       <EventPopup 
         eventData={selectedEvent} 
         onClose={() => setSelectedEvent(null)}
