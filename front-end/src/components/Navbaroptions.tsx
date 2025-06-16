@@ -20,7 +20,7 @@ export default function NavbarOptions
               className={({ isActive }) => isActive ? classActive : classInactive}
             > Home </NavLink>
             <NavLink
-              to="/about"
+              to="/#sobre"
               className={({ isActive }) => isActive ? classActive : classInactive}
             > Sobre </NavLink>
             <NavLink
@@ -31,5 +31,10 @@ export default function NavbarOptions
               to="/mapa"
               className={({ isActive }) => isActive ? classActive : classInactive}
             > Mapa do evento</NavLink>
+            <NavLink 
+              to="/login"
+              className={({ isActive }) => isActive ? classActive : classInactive}
+              >Login</NavLink>
+
         </nav>
     )}

@@ -1,24 +1,25 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom'; // Note que BrowserRouter não é mais importado aqui
-import Mainpage from './pages/Mainpage';
-import Aboutpage from './pages/Aboutpage';
-import StandsPage from './pages/StandsPage';
-import MapPage from "./pages/MapPage";
 import NavbarComponents from './components/NavbarComponents';
+import { Routes, Route } from 'react-router-dom';
+import Mainpage from './pages/Mainpage';
+import StandsPage from './pages/StandsPage';
+import MapPage from './pages/MapPage';
+import AdminLogin from "./pages/AdminLogin";
 
-function App() {
+
+// import AdminLogin from './pages/AdminLogin'; // Só descomente se esse arquivo existir mesmo
+
+export default function App() {
   return (
-    <main className="App">
-      <NavbarComponents/>
+    <>
+      <NavbarComponents />
       <Routes>
-        <Route path="/" element={<Mainpage/>} />
-        <Route path="/about" element={<Aboutpage/>} />
-        <Route path="/stands" element={<StandsPage/>} />
+        <Route path="/" element={<Mainpage />} />
+        <Route path="/stands" element={<StandsPage />} />
         <Route path="/events" element={<h1>Programações</h1>} />
         <Route path="/mapa" element={<MapPage />} />
+        <Route path="/login" element={<AdminLogin />} /> 
       </Routes>
-    </main>
+    </>
   );
 }
-
-export default App;

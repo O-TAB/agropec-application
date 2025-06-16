@@ -9,7 +9,7 @@ export default function NavbarComponents() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const goToContato = () => {
+  const goToContato = () => { {/*Aqui a gnt vai ter o redirecionamento para a seção "Contato":*/}
     if (location.pathname === "/") {
       const contatoSection = document.getElementById('contato');
       if (contatoSection) {
@@ -19,6 +19,7 @@ export default function NavbarComponents() {
       navigate("/#contato");
     }
   };
+  {/*----------*/}
 
   return (
     <header className="bg-green-600 shadow-lg pb-4">
