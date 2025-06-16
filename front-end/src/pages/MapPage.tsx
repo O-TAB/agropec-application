@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { allPins, imageMap } from "../data/pinsData"; 
 import imgMapa from "../assets/MAPA-A1.svg";
@@ -10,10 +10,12 @@ import EventPopup from '../components/EventPopup';
 const ORIGINAL_MAP_WIDTH = 3508;
 const ORIGINAL_MAP_HEIGHT = 2481;
 
+import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
+
 export default function MapPage() {
-  const transformWrapperRef = useRef(null);
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const transformWrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [searchParams] = useSearchParams();
 
   const visiblePins = activeCategory
@@ -49,21 +51,20 @@ export default function MapPage() {
 
     const { zoomToElement, resetTransform } = transformWrapperRef.current;
 
-    const categoriesToZoom = ['ambulancia', 'pracaalimentacao'];
-
-    const pinsToZoom = visiblePins.filter(p => categoriesToZoom.includes(p.category));
+    // Defina os pinos a serem usados para o zoom com base na categoria ativa
+    const pinsToZoom = visiblePins;
 
     if (pinsToZoom.length > 0) {
       // pega o primeiro pino visível da categoria para dar o zoom
       const firstPinToZoom = pinsToZoom[0]; 
       const elementId = `pin-${firstPinToZoom.id}`;
       setTimeout(() => {
-        if (zoomToElement) zoomToElement(elementId, 1.8, 600, "easeOut");
+        if (typeof zoomToElement === "function") zoomToElement(elementId, 1.8, 600, "easeOut");
       }, 100);
     } else {
-      resetTransform(600, "easeOut");
+      if (typeof resetTransform === "function") resetTransform(600, "easeOut");
     }
-  }, [activeCategory]); 
+  }, [activeCategory, visiblePins]); 
   
   return (
     <>
@@ -84,7 +85,7 @@ export default function MapPage() {
             <button className="px-3 py-1.5 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700" onClick={() => handleShowPins("banheiros")}>Banheiros</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-green-600 text-white rounded hover:bg-green-700" onClick={() => handleShowPins("ambulancia")}>Ambulância</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700" onClick={() => handleShowPins("pracaalimentacao")}>Praça de Alimentação</button>
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins(null)}>Limpar Filtro</button>
+            <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins('')}>Limpar Filtro</button>
           </div>
           <div className="w-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
             <div className="relative w-full aspect-[3508/2481]">

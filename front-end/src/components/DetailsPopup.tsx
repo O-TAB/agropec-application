@@ -1,10 +1,22 @@
 // src/components/DetailsPopup.tsx
 
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Map, Clock, X } from 'lucide-react';
 
-const DetailsPopup = ({ itemData, onClose, imageMap }) => {
+interface DetailsPopupProps {
+  itemData: {
+    id: string | number;
+    image: string;
+    title: string;
+    description: string;
+    operatingHours: string;
+    [key: string]: any;
+  } | null;
+  onClose: () => void;
+  imageMap: { [key: string]: string };
+}
+
+const DetailsPopup: React.FC<DetailsPopupProps> = ({ itemData, onClose, imageMap }) => {
   if (!itemData) return null;
 
   const imageSrc = imageMap[itemData.image] || 'https://via.placeholder.com/400x200?text=Sem+Imagem';

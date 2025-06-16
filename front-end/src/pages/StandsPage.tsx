@@ -1,57 +1,22 @@
 // src/pages/StandsPage.tsx
 
-import React, { useState, useMemo } from 'react';
-import { allPins, imageMap } from '../data/pinsData';
-import { Search, Filter, Info } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Search, Filter} from 'lucide-react';
+import {useFilteredItems} from '../functions/FilterData';
+
+import ItemCard from '../components/ItemCard';
+import { imageMap, ItemType } from '../data/pinsData';
 import DetailsPopup from '../components/DetailsPopup'; // Importa o novo pop-up
 
-const normalizeText = (text = '') => 
-  text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 export default function StandsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentFilter, setCurrentFilter] = useState('todos');
-  const [selectedPin, setSelectedPin] = useState(null); // Estado para controlar o pop-up
+  const [selectedPin, setSelectedPin] = useState<ItemType | null>(null); // Estado para controlar o pop-up
 
-  const filteredItems = useMemo(() => {
-    let items = allPins.filter(pin => pin.category === 'stand' || pin.category === 'event');
-    if (currentFilter !== 'todos') {
-      items = items.filter(item => item.category === currentFilter);
-    }
-    if (searchQuery.trim() !== '') {
-      const lowercasedQuery = normalizeText(searchQuery);
-      items = items.filter(item =>
-        normalizeText(item.title).includes(lowercasedQuery) ||
-        normalizeText(item.description).includes(lowercasedQuery)
-      );
-    }
-    return items;
-  }, [searchQuery, currentFilter]);
-
-  const expositoresFiltrados = filteredItems.filter(item => item.category === 'stand');
-  const eventosFiltrados = filteredItems.filter(item => item.category === 'event');
-
-  const ItemCard = ({ item }) => (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
-      <img
-        src={imageMap[item.image] || 'https://via.placeholder.com/400x200?text=Sem+Imagem'}
-        alt={item.title}
-        className="w-full h-48 object-cover rounded-t-xl"
-      />
-      <div className="p-4 flex flex-col flex-grow">
-        <h2 className="text-xl font-semibold text-green-800">{item.title}</h2>
-        <p className="text-sm text-gray-600 mb-4 mt-1 flex-grow">{item.description}</p>
-        <button
-          onClick={() => setSelectedPin(item)} // Abre o pop-up ao clicar
-          className="mt-auto w-full py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
-        >
-          <Info size={18} />
-          Saber Mais
-        </button>
-      </div>
-    </div>
-  );
-
+  const StandsFiltrados = useFilteredItems(searchQuery, currentFilter);
+  const expositoresFiltrados = StandsFiltrados.filter(item => item.type === 'stand');
+  const eventosFiltrados = StandsFiltrados.filter(item => item.type === 'event');
   return (
     <>
       <div className="container mx-auto px-4 py-8 md:py-12 bg-gray-50">
@@ -92,7 +57,9 @@ export default function StandsPage() {
             <h2 className="text-3xl font-bold text-gray-800 mb-6 border-l-4 border-green-600 pl-4">Expositores</h2>
             {expositoresFiltrados.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {expositoresFiltrados.map((item) => <ItemCard key={item.id} item={item} />)}
+                {expositoresFiltrados.map((stand) => 
+                    <ItemCard item={stand} setSelectedPin={setSelectedPin} />
+                )}
               </div>
             ) : (
               <p className="text-gray-500 pl-4">Nenhum expositor encontrado para sua busca.</p>
@@ -105,7 +72,7 @@ export default function StandsPage() {
             <h2 className="text-3xl font-bold text-gray-800 mb-6 border-l-4 border-green-600 pl-4">Eventos</h2>
             {eventosFiltrados.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {eventosFiltrados.map((item) => <ItemCard key={item.id} item={item} />)}
+                {eventosFiltrados.map((item) => <ItemCard item={item} setSelectedPin={setSelectedPin} />)}
               </div>
             ) : (
               <p className="text-gray-500 pl-4">Nenhum evento encontrado para sua busca.</p>

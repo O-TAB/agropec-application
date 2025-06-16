@@ -2,7 +2,19 @@
 
 import React from 'react';
 
-const EventPopup = ({ eventData, onClose, imageMap }) => {
+interface EventData {
+  title: string;
+  description: string;
+  image?: string;
+}
+
+interface EventPopupProps {
+  eventData: EventData | null;
+  onClose: () => void;
+  imageMap: { [key: string]: string };
+}
+
+const EventPopup: React.FC<EventPopupProps> = ({ eventData, onClose, imageMap }) => {
   if (!eventData) return null;
 
   // Usa o imageMap para encontrar a imagem correta
