@@ -1,22 +1,20 @@
-// src/pages/StandsPage.tsx
-
 import { useState, useMemo } from 'react';
 import { Search, Filter} from 'lucide-react';
-import {useFilteredItems} from '../functions/FilterData';
-
+import { useFilteredItems } from '../functions/FilterData';
 import ItemCard from '../components/ItemCard';
 import { imageMap, ItemType } from '../data/pinsData';
-import DetailsPopup from '../components/DetailsPopup'; // Importa o novo pop-up
-
+import DetailsPopup from '../components/DetailsPopup';
 
 export default function StandsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentFilter, setCurrentFilter] = useState('todos');
-  const [selectedPin, setSelectedPin] = useState<ItemType | null>(null); // Estado para controlar o pop-up
+  const [selectedPin, setSelectedPin] = useState<ItemType | null>(null);
 
   const StandsFiltrados = useFilteredItems(searchQuery, currentFilter);
-  const expositoresFiltrados = StandsFiltrados.filter(item => item.type === 'stand');
-  const eventosFiltrados = StandsFiltrados.filter(item => item.type === 'event');
+
+  const expositoresFiltrados = StandsFiltrados.filter(item => item.category === 'stand');
+  const eventosFiltrados = StandsFiltrados.filter(item => item.category === 'event');
+
   return (
     <>
       <div className="container mx-auto px-4 py-8 md:py-12 bg-gray-50">
@@ -58,7 +56,7 @@ export default function StandsPage() {
             {expositoresFiltrados.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {expositoresFiltrados.map((stand) => 
-                    <ItemCard item={stand} setSelectedPin={setSelectedPin} />
+                    <ItemCard key={stand.id} item={stand} setSelectedPin={setSelectedPin} />
                 )}
               </div>
             ) : (
@@ -69,10 +67,10 @@ export default function StandsPage() {
 
         {(currentFilter === 'todos' || currentFilter === 'event') && (
           <section id="eventos">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 border-l-4 border-green-600 pl-4">Eventos</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 border-l-4 border-purple-600 pl-4">Eventos</h2>
             {eventosFiltrados.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {eventosFiltrados.map((item) => <ItemCard item={item} setSelectedPin={setSelectedPin} />)}
+                {eventosFiltrados.map((item) => <ItemCard key={item.id} item={item} setSelectedPin={setSelectedPin} />)}
               </div>
             ) : (
               <p className="text-gray-500 pl-4">Nenhum evento encontrado para sua busca.</p>
@@ -81,7 +79,6 @@ export default function StandsPage() {
         )}
       </div>
 
-      {/* Renderiza o novo pop-up quando um pino for selecionado */}
       <DetailsPopup 
         itemData={selectedPin} 
         onClose={() => setSelectedPin(null)} 
