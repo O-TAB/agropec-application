@@ -1,80 +1,70 @@
-import { useState, useRef, useEffect } from "react";
-import imgMapa from "../assets/MAPA_A1.jpg";
+import React, { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { allPins, imageMap } from "../data/pinsData"; 
+import imgMapa from "../assets/MAPA-A1.svg";
 import { MapPin } from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import EventPopup from '../components/EventPopup';
 
-// imagens dos stands (somente os stands pq fique com preguiça de colocar foto nos eventos)
-import imgDrone from '../assets/imagem_drone.jpg';
-import imgPecuaria from '../assets/imagem_card_sustentavel.jpeg';
-import imgAgroindustria from '../assets/imagem_card_familia.jpg';
-import imgIrrigacao from '../assets/imagem_irrigacao.avif';
-import imgMaquinas from '../assets/imagem_card_maquina.jpeg';
-
+//tamanho do mapa original em pixels
 const ORIGINAL_MAP_WIDTH = 3508;
 const ORIGINAL_MAP_HEIGHT = 2481;
 
-// coordenadas dos pinos no mapa
-const allPins = [
-  // banheiros e ambulância
-  { id: 1, category: 'banheiros', type: 'main', x: 1192, y: 786, title: "Banheiro 1" },
-  { id: 2, category: 'banheiros', type: 'main', x: 2042, y: 1088, title: "Banheiro 2" },
-  { id: 3, category: 'banheiros', type: 'main', x: 2575, y: 2200, title: "Banheiro 3" },
-  { id: 4, category: 'ambulancia', type: 'main', x: 1004, y: 684, title: "Ambulância" },
+export default function MapPage() {
+  const transformWrapperRef = useRef(null);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [searchParams] = useSearchParams();
 
-  // stands
-  { id: 10, category: 'stand', type: 'event', x: 1368, y: 607, title: 'Tecnologia no Campo', image: imgDrone, description: 'Soluções com drones, sensores e automação para produção agrícola.' },
-  { id: 11, category: 'stand', type: 'event', x: 1499, y: 685, title: 'Pecuária Sustentável', image: imgPecuaria, description: 'Inovações na pecuária, bem-estar animal e alimentação de qualidade.' },
-  { id: 12, category: 'stand', type: 'event', x: 1492, y: 905, title: 'Agroindústria Familiar', image: imgAgroindustria, description: 'Produtos e serviços direto da agroindústria local e familiar.' },
-  { id: 13, category: 'stand', type: 'event', x: 1830, y: 1285, title: 'Soluções em Irrigação', image: imgIrrigacao, description: 'Tecnologia eficiente para a irrigação de pequenas e grandes propriedades.' },
-  { id: 14, category: 'stand', type: 'event', x: 1473, y: 1570, title: 'Máquinas e Equipamentos', image: imgMaquinas, description: 'Tratores, colheitadeiras e lançamentos do setor de máquinas agrícolas.' },
-
-  // eventos
-  { id: 20, category: 'event', type: 'event', x: 2079, y: 868, title: 'Área de Shows', image: '', description: 'Palco principal para os grandes shows e atrações noturnas. Consulte a programação do dia!' },
-  { id: 22, category: 'event', type: 'event', x: 2729, y: 1760, title: 'Agropec Banking', image: '', description: 'Ponto de atendimento com soluções financeiras e de crédito para o produtor rural.' },
-  { id: 23, category: 'event', type: 'event', x: 986, y: 1521, title: 'Fazendinha', image: '', description: 'Um espaço para toda a família interagir e conhecer de perto os animais da fazenda.' },
-  { id: 24, category: 'event', type: 'event', x: 1038, y: 308, title: 'Concha Acústica', image: '', description: 'Espaço reservado para palestras, workshops e apresentações musicais durante o dia.' },
-  { id: 25, category: 'event', type: 'event', x: 984, y: 1769, title: 'Baia de Animais', image: '', description: 'Exposição de animais de grande porte. Veja de perto os campeões de diversas raças.' }
-];
-
-type Pin = typeof allPins[number];
-
-import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
-
-const MapPage = () => {
-  const transformWrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
-  const [visiblePins, setVisiblePins] = useState<Pin[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<Pin | null>(null);
+  const visiblePins = activeCategory
+    ? allPins.filter(pin => pin.category === activeCategory)
+    : [];
 
   const handleShowPins = (category:string) => {
     setSelectedEvent(null);
-    if (category) {
-        const pinsToSet = allPins.filter(pin => pin.category === category);
-        setVisiblePins(pinsToSet);
-    } else {
-        setVisiblePins([]);
-    }
+    setActiveCategory(category);
   };
+  
+  //logica de foco no pin
+  useEffect(() => {
+    const pinIdFromUrl = searchParams.get('pinId');
+    if (pinIdFromUrl && transformWrapperRef.current) {
+      const pinToFocus = allPins.find(p => p.id === Number(pinIdFromUrl));
+      if (pinToFocus) {
+        setActiveCategory(pinToFocus.category);
+        setTimeout(() => {
+          if (transformWrapperRef.current) {
+            const { zoomToElement } = transformWrapperRef.current;
+            const elementId = `pin-${pinToFocus.id}`;
+            zoomToElement(elementId, 2.5, 800, "easeOut"); 
+          }
+        }, 200);
+      }
+    }
+  }, []); 
 
+  //logica de zoom 
   useEffect(() => {
     if (!transformWrapperRef.current) return;
-    const zoomToElement = transformWrapperRef.current.zoomToElement;
-    const resetTransform = transformWrapperRef.current.resetTransform;
-    
-    const utilityPins = visiblePins.filter(p => p.category === 'banheiros' || p.category === 'ambulancia');
-    
-    if (utilityPins.length > 0) {
-      const firstPin = utilityPins.reduce((prev, curr) => prev.id < curr.id ? prev : curr);
-      const elementId = `pin-${firstPin.id}`;
-      
+
+    const { zoomToElement, resetTransform } = transformWrapperRef.current;
+
+    const categoriesToZoom = ['ambulancia', 'pracaalimentacao'];
+
+    const pinsToZoom = visiblePins.filter(p => categoriesToZoom.includes(p.category));
+
+    if (pinsToZoom.length > 0) {
+      // pega o primeiro pino visível da categoria para dar o zoom
+      const firstPinToZoom = pinsToZoom[0]; 
+      const elementId = `pin-${firstPinToZoom.id}`;
       setTimeout(() => {
         if (zoomToElement) zoomToElement(elementId, 1.8, 600, "easeOut");
       }, 100);
     } else {
-      if (resetTransform) resetTransform(600);
+      resetTransform(600, "easeOut");
     }
-  }, [visiblePins]);
-
+  }, [activeCategory]); 
+  
   return (
     <>
       <div className="flex justify-center mt-4 md:mt-10 px-4">
@@ -88,25 +78,26 @@ const MapPage = () => {
           <p className="text-sm text-green-700 italic mb-4">
             Selecione um filtro para explorar ou dê um zoom para melhor visualização.
           </p>
-          
           <div className="flex flex-wrap gap-2 md:gap-3 mb-4">
             <button className="px-3 py-1.5 text-xs md:text-sm bg-red-600 text-white rounded hover:bg-red-700" onClick={() => handleShowPins("stand")}>Stands</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-purple-600 text-white rounded hover:bg-purple-700" onClick={() => handleShowPins("event")}>Eventos</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700" onClick={() => handleShowPins("banheiros")}>Banheiros</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-green-600 text-white rounded hover:bg-green-700" onClick={() => handleShowPins("ambulancia")}>Ambulância</button>
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins('')}>Limpar Filtro</button>
+            <button className="px-3 py-1.5 text-xs md:text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700" onClick={() => handleShowPins("pracaalimentacao")}>Praça de Alimentação</button>
+            <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins(null)}>Limpar Filtro</button>
           </div>
-
           <div className="w-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
             <div className="relative w-full aspect-[3508/2481]">
-              <TransformWrapper ref={transformWrapperRef} initialScale={1}>
+              <TransformWrapper ref={transformWrapperRef} initialScale={1} minScale={0.5} maxScale={8}>
                 <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
                   <img src={imgMapa} alt="Mapa do Evento" className="w-full h-full" />
-                  
-                  {visiblePins.map((pin) => {
+                  {allPins.map((pin) => {
+                    const isVisible = visiblePins.some(visiblePin => visiblePin.id === pin.id);
+                    const baseClasses = "transition-opacity duration-500";
+                    const visibilityClass = isVisible ? "opacity-100" : "opacity-0 pointer-events-none";
                     if (pin.type === 'main') {
                       return (
-                        <div key={pin.id} id={`pin-${pin.id}`} className="absolute text-green-800 animate-bounce" style={{ left: `${(pin.x / ORIGINAL_MAP_WIDTH) * 100}%`, top: `${(pin.y / ORIGINAL_MAP_HEIGHT) * 100}%` }}>
+                        <div key={pin.id} id={`pin-${pin.id}`} className={`absolute text-green-800 animate-bounce ${baseClasses} ${visibilityClass}`} style={{ left: `${(pin.x / ORIGINAL_MAP_WIDTH) * 100}%`, top: `${(pin.y / ORIGINAL_MAP_HEIGHT) * 100}%` }}>
                           <MapPin className="w-8 h-8 transform -translate-x-1/2 -translate-y-full" />
                         </div>
                       );
@@ -114,7 +105,7 @@ const MapPage = () => {
                     if (pin.type === 'event') {
                       const pinColor = pin.category === 'stand' ? 'bg-red-500' : 'bg-purple-500';
                       return (
-                        <button key={pin.id} onClick={() => setSelectedEvent(pin)} className={`absolute w-3 h-3 ${pinColor} rounded-full border-2 border-white shadow-md transform -translate-x-1/2 -translate-y-1/2 hover:scale-125 transition-transform`} style={{ left: `${(pin.x / ORIGINAL_MAP_WIDTH) * 100}%`, top: `${(pin.y / ORIGINAL_MAP_HEIGHT) * 100}%` }} title={pin.title} />
+                        <button key={pin.id} id={`pin-${pin.id}`} onClick={() => setSelectedEvent(pin)} className={`absolute w-3 h-3 ${pinColor} rounded-full border-2 border-white shadow-md transform -translate-x-1/2 -translate-y-1/2 hover:scale-125 transition-transform ${baseClasses} ${visibilityClass}`} style={{ left: `${(pin.x / ORIGINAL_MAP_WIDTH) * 100}%`, top: `${(pin.y / ORIGINAL_MAP_HEIGHT) * 100}%` }} title={pin.title} />
                       );
                     }
                     return null;
@@ -125,9 +116,12 @@ const MapPage = () => {
           </div>
         </div>
       </div>
-      <EventPopup eventData={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      {/* Passando o imageMap para o Pop-up */}
+      <EventPopup 
+        eventData={selectedEvent} 
+        onClose={() => setSelectedEvent(null)}
+        imageMap={imageMap} 
+      />
     </>
   );
-};
-
-export default MapPage;
+}

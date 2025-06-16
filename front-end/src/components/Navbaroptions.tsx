@@ -20,19 +20,15 @@ export default function NavbarOptions
               className={({ isActive }) => isActive ? classActive : classInactive}
             > Home </NavLink>
             <NavLink
-              to="/about"
+              to="/#sobre"
               className={({ isActive }) => isActive ? classActive : classInactive}
             > Sobre </NavLink>
             <NavLink
               to="/stands"
               className={({ isActive }) => isActive ? classActive : classInactive}
-            > Standes </NavLink>
+            > Programação </NavLink>
             <NavLink
-              to="/events"
-              className={({ isActive }) => isActive ? classActive : classInactive}
-            > Programações </NavLink>
-            <NavLink
-              to="/map"
+              to="/mapa"
               className={({ isActive }) => isActive ? classActive : classInactive}
             > Mapa do evento</NavLink>
         </nav>

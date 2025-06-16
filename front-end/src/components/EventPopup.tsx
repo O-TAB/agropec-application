@@ -1,8 +1,12 @@
+// src/components/EventPopup.tsx
 
 import React from 'react';
 
-const EventPopup = ({ eventData, onClose }) => {
+const EventPopup = ({ eventData, onClose, imageMap }) => {
   if (!eventData) return null;
+
+  // Usa o imageMap para encontrar a imagem correta
+  const imageSrc = eventData.image ? imageMap[eventData.image] : null;
 
   return (
     <div 
@@ -13,8 +17,9 @@ const EventPopup = ({ eventData, onClose }) => {
         className="bg-white rounded-lg shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {eventData.image && (
-          <img src={eventData.image} alt={eventData.title} className="w-full h-48 md:h-56 object-cover" />
+        {/* Renderiza a imagem apenas se ela for encontrada */}
+        {imageSrc && (
+          <img src={imageSrc} alt={eventData.title} className="w-full h-48 md:h-56 object-cover" />
         )}
         
         <div className="p-4 md:p-6 overflow-y-auto">
