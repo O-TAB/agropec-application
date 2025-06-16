@@ -1,13 +1,12 @@
-// src/pages/MapPage.tsx
-
 import React, { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { allPins } from "../data/pinsData";
+import { allPins, imageMap } from "../data/pinsData"; 
 import imgMapa from "../assets/MAPA-A1.svg";
 import { MapPin } from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import EventPopup from '../components/EventPopup';
 
+//tamanho do mapa original em pixels
 const ORIGINAL_MAP_WIDTH = 3508;
 const ORIGINAL_MAP_HEIGHT = 2481;
 
@@ -26,6 +25,7 @@ export default function MapPage() {
     setActiveCategory(category);
   };
   
+  //logica de foco no pin
   useEffect(() => {
     const pinIdFromUrl = searchParams.get('pinId');
     if (pinIdFromUrl && transformWrapperRef.current) {
@@ -41,55 +41,29 @@ export default function MapPage() {
         }, 200);
       }
     }
-  }, []);
+  }, []); 
 
+  //logica de zoom 
   useEffect(() => {
     if (!transformWrapperRef.current) return;
-    const { zoomToElement, setTransform, resetTransform } = transformWrapperRef.current;
-    const pinIdFromUrl = searchParams.get('pinId');
 
-    if(pinIdFromUrl && visiblePins.length === 1 && visiblePins[0].id === Number(pinIdFromUrl)){
-        return;
-    }
-    const categoriesToIgnore = ['stand', 'event', 'banheiros'];
-    if (categoriesToIgnore.includes(activeCategory)) {
-      return;
-    }
-    if (visiblePins.length === 0) {
-      resetTransform(600, "easeOut");
-      return;
-    }
-    if (visiblePins.length === 1) {
-      const elementId = `pin-${visiblePins[0].id}`;
+    const { zoomToElement, resetTransform } = transformWrapperRef.current;
+
+    const categoriesToZoom = ['ambulancia', 'pracaalimentacao'];
+
+    const pinsToZoom = visiblePins.filter(p => categoriesToZoom.includes(p.category));
+
+    if (pinsToZoom.length > 0) {
+      // pega o primeiro pino visível da categoria para dar o zoom
+      const firstPinToZoom = pinsToZoom[0]; 
+      const elementId = `pin-${firstPinToZoom.id}`;
       setTimeout(() => {
         zoomToElement(elementId, 1.8, 600, "easeOut");
       }, 100);
-      return;
+    } else {
+      resetTransform(600, "easeOut");
     }
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    visiblePins.forEach(pin => {
-      minX = Math.min(minX, pin.x);
-      minY = Math.min(minY, pin.y);
-      maxX = Math.max(maxX, pin.x);
-      maxY = Math.max(maxY, pin.y);
-    });
-    const padding = 200;
-    minX -= padding;
-    minY -= padding;
-    maxX += padding;
-    maxY += padding;
-    const boxWidth = maxX - minX;
-    const boxHeight = maxY - minY;
-    if (boxWidth <= 0 || boxHeight <= 0) return;
-    const scaleX = ORIGINAL_MAP_WIDTH / boxWidth;
-    const scaleY = ORIGINAL_MAP_HEIGHT / boxHeight;
-    const newScale = Math.min(scaleX, scaleY);
-    const boxCenterX = minX + boxWidth / 2;
-    const boxCenterY = minY + boxHeight / 2;
-    const newPositionX = (ORIGINAL_MAP_WIDTH / 2) - (boxCenterX * newScale);
-    const newPositionY = (ORIGINAL_MAP_HEIGHT / 2) - (boxCenterY * newScale);
-    setTransform(newPositionX, newPositionY, newScale, 600, "easeOut");
-  }, [activeCategory]);
+  }, [activeCategory]); 
   
   return (
     <>
@@ -142,7 +116,12 @@ export default function MapPage() {
           </div>
         </div>
       </div>
-      <EventPopup eventData={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      {/* Passando o imageMap para o Pop-up */}
+      <EventPopup 
+        eventData={selectedEvent} 
+        onClose={() => setSelectedEvent(null)}
+        imageMap={imageMap} 
+      />
     </>
   );
 }
