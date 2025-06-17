@@ -8,8 +8,8 @@ type NavbarOptionProps = {
 }
 
 export default function NavbarOptions
-    ({classActive="text-white hover:text-green-200 transition-colors font-medium border-b-2 border-white pb-1"
-    ,classInactive="text-green-100 hover:text-white transition-colors font-medium"
+    ({classActive="text-white hover:text-green-200 transition-colors font-medium border-b-2 border-transparent hover:border-white pb-1"
+    ,classInactive="text-green-100 hover:text-white transition-colors font-medium border-b-2 border-transparent hover:border-white"
     ,ClassName="hidden md:flex space-x-8"}: NavbarOptionProps
     ) {
     return (

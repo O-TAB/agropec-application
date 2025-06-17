@@ -92,77 +92,77 @@ export default function MainPage() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 bg-gradient-to-b from-green-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">O Que Esperar da AGROPEC 2025</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Um evento completo com as melhores oportunidades de negócios e networking do setor agropecuário
-            </p>
-          </div>
+    {/* Features Section */}
+<section className="py-16 bg-gradient-to-b from-green-50 to-white">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-12">
+      <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">O Que Esperar da AGROPEC 2025</h2>
+      <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        Um evento completo com as melhores oportunidades de negócios e networking do setor agropecuário
+      </p>
+    </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Networking */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="bg-green-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <Users className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Networking</h3>
-              <p className="text-gray-600">Conecte-se com os principais players do agronegócio e expanda sua rede de contatos</p>
-            </div>
-
-            {/* Inovação */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="bg-yellow-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <Wheat className="h-8 w-8 text-yellow-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Inovação</h3>
-              <p className="text-gray-600">Descubra as últimas tecnologias e tendências do setor agropecuário</p>
-            </div>
-
-            {/* Oportunidades */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="bg-green-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <MapPin className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Oportunidades</h3>
-              <p className="text-gray-600">Encontre novas oportunidades de negócios e parcerias estratégicas</p>
-            </div>
-          </div>
-
-          {/* Hackathons, Palestras, Expositores */}
-          <div className="flex flex-col md:flex-row justify-center gap-8 mt-8">
-            {/* Hackathons */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="bg-blue-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <Code className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Hackathons</h3>
-              <p className="text-gray-600">Participe de maratonas de programação focadas em soluções para o agronegócio</p>
-            </div>
-
-            {/* Palestras */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="bg-purple-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <Mic className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Palestras</h3>
-              <p className="text-gray-600">Assista a palestras inspiradoras com especialistas do setor agropecuário</p>
-            </div>
-
-            {/* Expositores */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="bg-orange-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <Users className="h-8 w-8 text-orange-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Expositores</h3>
-              <p className="text-gray-600">Visite estandes de empresas líderes do setor agropecuário apresentando seus produtos e serviços</p>
-            </div>
-          </div>
-
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* Networking */}
+      <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out">
+        <div className="bg-green-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+          <Users className="h-8 w-8 text-green-600" />
         </div>
-      </section>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Networking</h3>
+        <p className="text-gray-600">Conecte-se com os principais players do agronegócio e expanda sua rede de contatos</p>
+      </div>
+
+      {/* Inovação */}
+      <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out">
+        <div className="bg-yellow-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+          <Wheat className="h-8 w-8 text-yellow-600" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Inovação</h3>
+        <p className="text-gray-600">Descubra as últimas tecnologias e tendências do setor agropecuário</p>
+      </div>
+
+      {/* Oportunidades */}
+      <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out">
+        <div className="bg-green-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+          <MapPin className="h-8 w-8 text-green-600" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Oportunidades</h3>
+        <p className="text-gray-600">Encontre novas oportunidades de negócios e parcerias estratégicas</p>
+      </div>
+    </div>
+
+    {/* Hackathons, Palestras, Expositores */}
+    <div className="flex flex-col md:flex-row justify-center gap-8 mt-8">
+      {/* Hackathons */}
+      <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out">
+        <div className="bg-blue-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+          <Code className="h-8 w-8 text-blue-600" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Hackathons</h3>
+        <p className="text-gray-600">Participe de maratonas de programação focadas em soluções para o agronegócio</p>
+      </div>
+
+      {/* Palestras */}
+      <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out">
+        <div className="bg-purple-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+          <Mic className="h-8 w-8 text-purple-600" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Palestras</h3>
+        <p className="text-gray-600">Assista a palestras inspiradoras com especialistas do setor agropecuário</p>
+      </div>
+
+      {/* Expositores */}
+      <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out">
+        <div className="bg-orange-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+          <Users className="h-8 w-8 text-orange-600" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Expositores</h3>
+        <p className="text-gray-600">Visite estandes de empresas líderes do setor agropecuário apresentando seus produtos e serviços</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Contact Section */}
       <section id="contato" className="py-16 bg-green-600">

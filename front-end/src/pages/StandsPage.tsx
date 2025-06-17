@@ -1,5 +1,3 @@
-// src/pages/StandsPage.tsx
-
 import React, { useState, useMemo } from 'react';
 import { allPins, imageMap } from '../data/pinsData';
 import { Search, Filter, Info } from 'lucide-react';
@@ -32,7 +30,7 @@ export default function StandsPage() {
   const eventosFiltrados = filteredItems.filter(item => item.category === 'event');
 
   const ItemCard = ({ item }) => (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out flex flex-col h-full">
       <img
         src={imageMap[item.image] || 'https://via.placeholder.com/400x200?text=Sem+Imagem'}
         alt={item.title}
