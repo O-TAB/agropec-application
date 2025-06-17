@@ -7,6 +7,10 @@ import MapPage from './pages/MapPage';
 import AdminLogin from "./pages/AdminLogin";
 import AdminManagerPage from './pages/AdminManagerPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import CadastroUsuarioPage from './pages/Cadastropage';
+import SuperAdminPage from './pages/SuperAdmin';
+import LoginSuperAdmin from './pages/LoginSuperAdmin';
+
 
 export default function App() {
   return (
@@ -18,7 +22,11 @@ export default function App() {
         <Route path="/stands" element={<StandsPage />} />
         <Route path="/events" element={<h1>Programações</h1>} />
         <Route path="/mapa" element={<MapPage />} />
-        <Route path="/login" element={<AdminLogin />} /> 
+        <Route path="/login" element={<AdminLogin />} />
+        <Route path="/cadastro" element={<CadastroUsuarioPage/>}/>
+        <Route path="superadmin" element={<SuperAdminPage/>} /> 
+        <Route path="loginadmin" element={<LoginSuperAdmin/>} />
+      
         
         <Route element={<ProtectedRoute />}>
           <Route path="/admin/gerenciar" element={<AdminManagerPage />} />
