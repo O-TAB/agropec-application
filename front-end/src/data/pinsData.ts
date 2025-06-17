@@ -40,7 +40,11 @@ export const allPins = [
 export type ItemType = {
     id: string | number;
     title: string;
-    description: string;
+    description?: string;
     category: string;
-    image: string;
+    image?: string;
+    x?: number;
+    y?: number;
+    type?: string;
+    operatingHours?: string;
 };
