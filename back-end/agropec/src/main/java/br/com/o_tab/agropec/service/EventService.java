@@ -4,6 +4,7 @@ import br.com.o_tab.agropec.model.Event;
 import br.com.o_tab.agropec.model.Map;
 import br.com.o_tab.agropec.repository.EventRepository;
 import br.com.o_tab.agropec.repository.MapRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class EventService {
 
     private EventRepository eventRepository;
@@ -35,11 +37,18 @@ public class EventService {
     }
 
     public ResponseEntity<?> getAllEvents(){
-        List<Event> foundEvents = eventRepository.findAll();
-        if(foundEvents.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado.");
-        } else {
-            return ResponseEntity.ok(foundEvents);
+        try {
+            List<Event> foundEvents = eventRepository.findAll();
+            if(foundEvents.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado.");
+            } else {
+                return ResponseEntity.ok(foundEvents);
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar eventos: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro interno do servidor ao buscar eventos: " + e.getMessage());
         }
     }
 

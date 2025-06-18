@@ -6,6 +6,7 @@ estandes da feira.
 */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +20,15 @@ public class Point {
     private Long id;
 
     @Column(name = "Point type", nullable = false)
+    @JsonProperty("typePoint")
     private TypePoint typePoint;
 
     @Column(name = "Coordenate x", nullable = false)
+    @JsonProperty("x")
     private double x;
 
     @Column(name = "Coordenate y", nullable = false)
+    @JsonProperty("y")
     private double y;
 
     @ManyToOne(fetch = FetchType.LAZY)

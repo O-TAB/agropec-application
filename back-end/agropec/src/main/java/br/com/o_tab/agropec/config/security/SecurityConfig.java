@@ -33,6 +33,10 @@ public class SecurityConfig{
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/stands").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/event").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/map").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/map/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/stands/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/stands/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/stands/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
