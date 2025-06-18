@@ -253,13 +253,19 @@ export default function MainPage() {
           </div>
 
           {/* --- SEÇÃO ADICIONADA AQUI --- */}
-          <div className="text-center border-t border-green-700 mt-8 pt-8">
+          <div className="text-center border-t border-green-700 mt-8 pt-8 space-x-10">
             <h4 className="font-semibold uppercase tracking-wider text-green-200 mb-4">Para Funcionários</h4>
             <Link to="/login" className="inline-block bg-white text-green-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-200 transition-colors shadow-md">
               Login
             </Link>
+            <Link
+            to="/loginadmin"
+            className="inline-block bg-white text-green-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-200 transition-colors shadow-md"
+            >
+            Super Admin
+            </Link>
           </div>
-          
+
           <div className="border-t border-green-700 mt-8 pt-8 text-center text-green-200">
             <p>&copy; 2025 AGROPEC. Todos os direitos reservados.</p>
           </div>
