@@ -31,8 +31,19 @@ public class SecurityConfig{
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("SUPERADMIN")
+                        .requestMatchers(HttpMethod.POST, "/stands/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/stands/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/stands/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/map").hasAnyRole("SUPERADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/map/{mapId}/point").hasAnyRole("SUPERADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/map/{mapId}/point/{pointId}").hasAnyRole("SUPERADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "map/{mapId}/point/{pointId}").hasAnyRole("SUPERADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/event/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/event/{name}").hasAnyRole("SUPERADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/event/{name}").hasAnyRole("SUPERADMIN", "ADMIN")
+
                         .anyRequest().permitAll())
 
                         

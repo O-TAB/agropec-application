@@ -3,20 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth(); 
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(username, password); 
-    
-    if (success) {
-      navigate('/admin/gerenciar'); 
-    } else {
-      setError('Usuário ou senha inválidos.'); 
+    setError('');
+
+    try {
+      const success = await login(email, password);
+      if (success) {
+        navigate('/admin/gerenciar');
+      } else {
+        setError('Usuário ou senha inválidos.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Ocorreu um erro ao tentar fazer login. Verifique sua conexão.');
     }
   };
 
@@ -26,14 +31,14 @@ const AdminLogin = () => {
         <h2 className="text-2xl font-bold text-center text-green-800 mb-6">Login do Administrador</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Usuário:</label>
+            <label className="block text-gray-700 font-medium mb-1">Email:</label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
-              placeholder="Digite seu usuário"
+              placeholder="Digite seu email"
             />
           </div>
           <div>
