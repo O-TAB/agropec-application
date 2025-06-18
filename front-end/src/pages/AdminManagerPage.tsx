@@ -63,7 +63,7 @@ interface FormItem {
 export default function AdminManagerPage() {
   const { logout, token } = useAuth(); // <--- Get the token here
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  console.log('Token from context:', token); 
   const [newItem, setNewItem] = useState<FormItem>({
     itemType: 'stand',
     name: '',
@@ -250,11 +250,25 @@ export default function AdminManagerPage() {
       // Ensure token is available when fetching data
       const config = getAuthHeaders();
 
-      const standsResponse = await axios.get<Stand[]>(`${BASE_URL}/stands`, config);
-      setStands(standsResponse.data);
-
-      const eventsResponse = await axios.get<Event[]>(`${BASE_URL}/event`, config);
-      setEvents(eventsResponse.data);
+      const standsResponse = await axios.get(`${BASE_URL}/stands`, config);
+      console.log('standsResponse.data:', standsResponse.data);
+      const dataStands = standsResponse.data as unknown;
+      if (Array.isArray(dataStands)) {
+        setStands(dataStands as Stand[]);
+      } else if (typeof dataStands === 'object' && dataStands !== null && Array.isArray((dataStands as any).stands)) {
+        setStands((dataStands as { stands: Stand[] }).stands);
+      } else {
+        setStands([]);
+      }
+      const eventsResponse = await axios.get(`${BASE_URL}/event`, config);
+      const dataEvents = eventsResponse.data as unknown;
+      if (Array.isArray(dataEvents)) {
+        setEvents(dataEvents as Event[]);
+      } else if (typeof dataEvents === 'object' && dataEvents !== null && Array.isArray((dataEvents as any).events)) {
+        setEvents((dataEvents as { events: Event[] }).events);
+      } else {
+        setEvents([]);
+      }
 
       const mapsResponse = await axios.get<MapData[]>(`${BASE_URL}/map`, config);
       setAvailableMaps(mapsResponse.data);
@@ -262,9 +276,15 @@ export default function AdminManagerPage() {
         setSelectedMapId(mapsResponse.data[0].id);
         setNewItem(prev => ({ ...prev, mapId: mapsResponse.data[0].id }));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching data:', error);
-      setMessage('Falha ao recarregar estandes, eventos ou mapas.');
+      if (error.response && error.response.status === 500) {
+        setMessage('Erro interno do servidor. Tente novamente mais tarde ou contate o suporte.');
+      } else {
+        setMessage('Falha ao recarregar estandes, eventos ou mapas.');
+      }
+      setStands([]);
+      setEvents([]);
     }
   };
 
@@ -540,7 +560,7 @@ export default function AdminManagerPage() {
           <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Itens Atuais</h2>
           <div className="max-h-[600px] overflow-y-auto pr-2">
             <h3 className="text-xl font-bold text-green-600 my-2">Stands</h3>
-            {stands.map(stand => (
+            {stands.map((stand) => (
               <ItemstoeditComponent
                 key={stand.id}
                 item={stand}
@@ -548,7 +568,7 @@ export default function AdminManagerPage() {
               />
             ))}
             <h3 className="text-xl font-bold text-green-600 my-2 mt-6">Eventos</h3>
-            {events.map(event => (
+            {events.map((event) => (
               <ItemstoeditComponent
                 key={event.id}
                 item={event}

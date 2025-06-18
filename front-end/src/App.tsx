@@ -28,9 +28,12 @@ export default function App() {
         <Route path="loginadmin" element={<LoginSuperAdmin/>} />
       
         
-        <Route element={<ProtectedRoute />}>
-          <Route path="/admin/gerenciar" element={<AdminManagerPage />} />
-        </Route>
+        <Route path="/gerenciar" element={
+          <ProtectedRoute>
+            <AdminManagerPage />
+          </ProtectedRoute>
+        }/>
+          
       </Routes>
     </>
   );
