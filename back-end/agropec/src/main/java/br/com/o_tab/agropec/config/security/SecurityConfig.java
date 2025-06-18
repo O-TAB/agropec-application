@@ -32,7 +32,7 @@ public class SecurityConfig{
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("SUPERADMIN")
+//                        .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("SUPERADMIN")
                         .requestMatchers(HttpMethod.POST, "/stands/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/stands/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/stands/{mapId}").hasAnyRole("SUPERADMIN", "ADMIN")
