@@ -4,6 +4,7 @@ import br.com.o_tab.agropec.model.Event;
 import br.com.o_tab.agropec.model.Map;
 import br.com.o_tab.agropec.repository.EventRepository;
 import br.com.o_tab.agropec.repository.MapRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class EventService {
 
     private EventRepository eventRepository;
