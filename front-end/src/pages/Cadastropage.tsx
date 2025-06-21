@@ -1,23 +1,68 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
+type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'USER';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole
+}
 
 const CadastroUsuarioPage = () => {
-  const [nome, setNome] = useState("");
+  const {token} = useAuth();
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [mensagem, setMensagem] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("USER");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    setMessage("");
+
+    const userData = {
+      username: userName,
+      email: email,
+      password: password,
+      role: role,
+    };
 
     // Aqui a gnt envia os dados pro backend ou salvar localmente
-    console.log("Dados enviados:", { nome, email, senha });
+    try {
+      const response = await fetch(`http://localhost:8080/auth/login/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type' : 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(userData)
+      });
 
-    setMensagem("Cadastro enviado para aprovação do Super Admin!");
-    
-    // Limpar formulário
-    setNome("");
-    setEmail("");
-    setSenha("");
+      if(!response.ok){
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'ERRO ${response.status}: Falha ao cadastrar usuário.');
+      }
+
+      setMessage("SUCESSO: Usuário cadastrado com sucesso!");
+
+      // Limpar formulário
+      setUserName("");
+      setEmail("");
+      setPassword("");
+      setRole("");
+    } catch(err: any){
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,8 +72,8 @@ const CadastroUsuarioPage = () => {
         <label className="block mb-2 text-gray-700">Nome:</label>
         <input
           type="text"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
           required
           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
         />
@@ -45,22 +90,38 @@ const CadastroUsuarioPage = () => {
         <label className="block mb-2 text-gray-700 mt-4">Senha:</label>
         <input
           type="password"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
         />
 
+        <label className="block mb-2 text-gray-700 mt-4">Tipo de Usuário:</label>
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          required
+          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+        >
+          <option value="USER">Usuário</option>
+          <option value="ADMIN">Admin</option>
+          <option value="SUPER_ADMIN">Super Admin</option>
+        </select>
+
         <button
           type="submit"
-          className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors"
+          disabled={isLoading} 
+          className="mt-6 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400"
         >
-          Enviar Cadastro
+          {isLoading ? 'Cadastrando...' : 'Enviar Cadastro'}
         </button>
       </form>
 
-      {mensagem && (
-        <p className="mt-4 text-green-700 font-medium">{mensagem}</p>
+      {message && (
+        <p className="mt-4 text-green-700 font-medium">{message}</p>
+      )}
+      {error && (
+        <p className="mt-4 text-center text-red-600 font-medium">{error}</p>
       )}
     </div>
   );
