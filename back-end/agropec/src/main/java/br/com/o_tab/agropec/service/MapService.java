@@ -37,20 +37,21 @@ public class MapService {
     }
 
 
-    public ResponseEntity<?> getAllMapsId(){
-        List<Map> allMaps = mapRepository.findAll();
-        List<String> mapsIds = new ArrayList<>();
+    public ResponseEntity<?> getAllMaps(){
+        try {
+            List<Map> allMaps = mapRepository.findAll();
 
-        if(allMaps.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum mapa cadastrado.");
+            if(allMaps.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum mapa cadastrado.");
+            }
+
+            return ResponseEntity.ok(allMaps);
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar mapas: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro interno do servidor ao buscar mapas: " + e.getMessage());
         }
-
-        for (Map m : allMaps){
-            mapsIds.add(m.getId());
-        }
-
-        return ResponseEntity.ok(mapsIds);
-
     }
 
 

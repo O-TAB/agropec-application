@@ -16,7 +16,7 @@ const AdminLogin = () => {
     try {
       const success = await login(email, password);
       if (success) {
-        navigate('/admin/gerenciar');
+        navigate('/gerenciar');
       } else {
         setError('Usuário ou senha inválidos.');
       }

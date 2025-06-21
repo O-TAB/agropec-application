@@ -1,24 +1,28 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 
 const LoginSuperAdmin = () => {
   const navigate = useNavigate();
-
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { LoginSuperAdmin } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
 
-    const superAdminUser = "super";
-    const superAdminPass = "1234";
-
-    if (username === superAdminUser && password === superAdminPass) {
-      navigate("/superadmin");
-    } else {
-      setError("Usuário ou senha inválidos!");
+    try {
+      const success = await LoginSuperAdmin(email, password);
+      if (success) {
+        navigate('/superadmin');
+      } else {
+        setError('Usuário ou senha inválidos.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Ocorreu um erro ao tentar fazer login. Verifique sua conexão.');
     }
   };
 
@@ -32,8 +36,8 @@ const LoginSuperAdmin = () => {
           <label className="block mb-2 text-gray-700">Usuário:</label>
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
           />

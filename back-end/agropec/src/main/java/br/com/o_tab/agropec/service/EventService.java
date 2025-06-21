@@ -37,11 +37,18 @@ public class EventService {
     }
 
     public ResponseEntity<?> getAllEvents(){
-        List<Event> foundEvents = eventRepository.findAll();
-        if(foundEvents.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado.");
-        } else {
-            return ResponseEntity.ok(foundEvents);
+        try {
+            List<Event> foundEvents = eventRepository.findAll();
+            if(foundEvents.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado.");
+            } else {
+                return ResponseEntity.ok(foundEvents);
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar eventos: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro interno do servidor ao buscar eventos: " + e.getMessage());
         }
     }
 

@@ -25,8 +25,8 @@ public class MapController {
 
 
     @GetMapping()
-    public ResponseEntity<?> getAllMapsId(){
-        return mapService.getAllMapsId();
+    public ResponseEntity<?> getAllMaps(){
+        return mapService.getAllMaps();
     }
 
 
