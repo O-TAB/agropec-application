@@ -1,6 +1,13 @@
 import { useMemo } from 'react';
 import { allPins } from '../data/pinsData';
 
+
+// marcado para concertar
+//
+//
+//
+
+
 const normalizeText = (text = '') => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 export const useFilteredItems = (searchQuery: string, currentFilter: string) => {

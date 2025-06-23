@@ -1,65 +1,67 @@
+import axios from 'axios';
+import {StandEventResponse} from '../data/RequestStructures';
 
-// src/services/api.ts
 
-const BASE_URL = 'http://localhost:3000/api'; // Substitua pela URL da sua API
-
-interface RequestOptions extends RequestInit {
-  body?: any; // Permite que o body seja de qualquer tipo
-}
-
-async function request<T>(
-  url: string,
-  method: string,
-  options: RequestOptions = {}
-): Promise<T> {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-
-  const config: RequestInit = {
-    method,
-    headers,
-    ...options,
-  };
-
-  if (options.body && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
-    config.body = JSON.stringify(options.body);
-  }
-
-  try {
-    const response = await fetch(`${BASE_URL}${url}`, config);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Erro na requisição');
-    }
-
-    // Tenta parsear JSON, mas retorna vazio se não houver conteúdo
-    const data = await response.json().catch(() => ({}));
-    return data as T;
-  } catch (error) {
-    console.error('Erro na requisição:', error);
-    throw error;
-  }
-}
-
-export const api = {
-  get: <T>(url: string, options?: RequestOptions) =>
-    request<T>(url, 'GET', options),
-
-  post: <T>(url: string, data: any, options?: RequestOptions) =>
-    request<T>(url, 'POST', { ...options, body: data }),
-
-  put: <T>(url: string, data: any, options?: RequestOptions) =>
-    request<T>(url, 'PUT', { ...options, body: data }),
-
-  delete: <T>(url: string, options?: RequestOptions) =>
-    request<T>(url, 'DELETE', options),
-
-  patch: <T>(url: string, data: any, options?: RequestOptions) =>
-    request<T>(url, 'PATCH', { ...options, body: data }),
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('jwt_token');
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 };
+
+
+const BASE_URL = 'http://localhost:8080';
+let cachedDataStands: StandEventResponse[] | null = null;
+let cachedDataEvents: StandEventResponse[] | null = null;
+let isLoadingData: boolean = false; // Para evitar requisições simultâneas
+
+const config = getAuthHeaders();
+
+
+export const fetchAllStandsData = async (): Promise<StandEventResponse[]> => {
+    try {
+      // Ensure token is available when fetching data
+      const standsResponse = await axios.get(`${BASE_URL}/stands`, config);
+      console.log('standsResponse.data:', standsResponse.data);
+      return standsResponse.data as StandEventResponse[];
+    } catch (error: any) {
+      console.error('Error fetching data:', error);
+      return [];
+    }
+  };
+
+export async function getMyObjects(): Promise<StandEventResponse[]> {
+  if (cachedDataStands) {
+    console.log('Dados recuperados do cache.');
+    return cachedDataStands;
+  }
+
+  if (isLoadingData) {
+    console.log('Dados já sendo carregados, aguardando...');
+    return new Promise(resolve => {
+      const checkInterval = setInterval(() => {
+        if (!isLoadingData && cachedDataStands) {
+          clearInterval(checkInterval);
+          resolve(cachedDataStands);
+        }
+      }, 100);
+    });
+  }
+  isLoadingData = true;
+  console.log('Buscando dados da API pela primeira vez ou cache vazio...');
+  try {
+    const data = await fetchAllStandsData();
+    cachedDataStands = data; // Armazena em cache
+    return data;
+  } finally {
+    isLoadingData = false;
+  }
+}
+
+export const debugdata = () => {
+  console.log('Dados de stands:', cachedDataStands);
+  console.log('Dados de eventos:', cachedDataEvents);
+}
+
+
 
 
 

@@ -1,14 +1,23 @@
 import { useState} from 'react';
 import { Search, Filter} from 'lucide-react';
+
 import { useFilteredItems } from '../functions/FilterData';
 import ItemCard from '../components/ItemCard';
-import { imageMap, ItemType } from '../data/pinsData';
+import { imageMap} from '../data/pinsData';
 import DetailsPopup from '../components/DetailsPopup';
+import { StandEventResponse } from '../data/RequestStructures';
+
+
+//marcado para concertar
+//
+//
+
+
 
 export default function StandsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentFilter, setCurrentFilter] = useState('todos');
-  const [selectedPin, setSelectedPin] = useState<ItemType | null>(null);
+  const [selectedPin, setSelectedPin] = useState<StandEventResponse | null>(null);
 
   const StandsFiltrados = useFilteredItems(searchQuery, currentFilter);
 

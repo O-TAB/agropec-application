@@ -2,7 +2,7 @@
 
 export type point = {
     id: number;
-    name: string;
+    typePoint: string;
     x: number;
     y: number;
 }
@@ -32,23 +32,18 @@ export interface mapPost {
     svg: string;
 }
 
-export interface standPost{
+export interface StandEventstandPost{
     name: string;
     description: string;
     descriptioncard: string;
-    image: string;
-
+    img: string;
     point: point;
+    Date?: string;
 }
 
-export interface standResponse extends standPost {
+export interface StandEventResponse extends StandEventstandPost {
     id: number;
+    
 }
 
-export interface eventPost extends standPost {
-    Date: string;
-}
 
-export interface eventResponse extends eventPost {
-    id: number;
-}

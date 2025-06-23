@@ -36,15 +36,3 @@ export const allPins = [
   { id: 24, category: 'event', type: 'event', x: 1038, y: 308, title: 'Concha Acústica', image: '', description: 'Espaço reservado para palestras, workshops e apresentações musicais durante o dia.', operatingHours: '11:00 - 19:00' },
   { id: 25, category: 'event', type: 'event', x: 984, y: 1769, title: 'Baia de Animais', image: '', description: 'Exposição de animais de grande porte. Veja de perto os campeões de diversas raças.', operatingHours: '09:00 - 19:00' }
 ];
-
-export type ItemType = {
-    id: string | number;
-    title: string;
-    description?: string;
-    category: string;
-    image?: string;
-    x?: number;
-    y?: number;
-    type?: string;
-    operatingHours?: string;
-};
