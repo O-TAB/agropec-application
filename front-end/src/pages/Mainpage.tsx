@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { MapPin, Calendar, Users, Phone, Mail, Wheat, Code, Mic } from 'lucide-react';
 import oximg from '../assets/ox_img.jpeg';
 import { useLocation, Link } from 'react-router-dom'; // O 'Link' foi importado aqui
+import { SvgDimensionReader } from '../components/Testconvertion';
+
 
 export default function MainPage() {
   const location = useLocation();
@@ -26,6 +28,7 @@ export default function MainPage() {
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-400 overflow-hidden">
+        
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         <div 
           className="relative min-h-[500px] bg-cover bg-center flex items-center"
@@ -66,6 +69,7 @@ export default function MainPage() {
                 É a maior feira agropecuária do Norte do Brasil, um evento que movimenta a economia local,
                 fortalece relações comerciais e atrai milhares de visitantes qualificados.
               </p>
+              <SvgDimensionReader/>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                 <div className="bg-green-50 p-6 rounded-lg">
                   <Users className="h-8 w-8 text-green-600 mb-3" />
@@ -259,7 +263,7 @@ export default function MainPage() {
               Login
             </Link>
             <Link
-            to="/loginadmin"
+            to="/loginSuperadmin"
             className="inline-block bg-white text-green-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-200 transition-colors shadow-md"
             >
             Super Admin

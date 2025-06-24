@@ -4,12 +4,11 @@ import { Routes, Route } from 'react-router-dom';
 import Mainpage from './pages/Mainpage';
 import StandsPage from './pages/StandsPage';
 import MapPage from './pages/MapPage';
-import AdminLogin from "./pages/AdminLogin";
+import Login from "./pages/Admin_pages/Login";
 import AdminManagerPage from './pages/AdminManagerPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import CadastroUsuarioPage from './pages/Cadastropage';
-import SuperAdminPage from './pages/SuperAdmin';
-import LoginSuperAdmin from './pages/LoginSuperAdmin';
+import CadastroUsuarioPage from './pages/Admin_pages/RegisterPage';
+import ManagerUsers from './pages/Admin_pages/ManagerUsers';
 
 
 export default function App() {
@@ -22,15 +21,23 @@ export default function App() {
         <Route path="/stands" element={<StandsPage />} />
         <Route path="/events" element={<h1>Programações</h1>} />
         <Route path="/mapa" element={<MapPage />} />
-        <Route path="/login" element={<AdminLogin />} />
-        <Route path="/cadastro" element={<CadastroUsuarioPage/>}/>
-        <Route path="superadmin" element={<SuperAdminPage/>} /> 
-        <Route path="loginadmin" element={<LoginSuperAdmin/>} />
+        <Route path="/login" element={<Login destination="/gerenciar" />} />
+        <Route path="/loginSuperadmin" element={<Login destination="/Users" />} />
       
         
         <Route path="/gerenciar" element={
           <ProtectedRoute>
             <AdminManagerPage />
+          </ProtectedRoute>
+        }/>
+        <Route path="/cadastro" element={
+          <ProtectedRoute>
+            <CadastroUsuarioPage/>
+          </ProtectedRoute>
+        }/>
+        <Route path="/Users" element={
+          <ProtectedRoute>
+            <ManagerUsers/>
           </ProtectedRoute>
         }/>
           

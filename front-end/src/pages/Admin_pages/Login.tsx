@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
-const AdminLogin = () => {
+const AdminLogin = ({ destination = "/" }: { destination?: string }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,7 +16,7 @@ const AdminLogin = () => {
     try {
       const success = await login(email, password);
       if (success) {
-        navigate('/gerenciar');
+        navigate(destination);
       } else {
         setError('Usuário ou senha inválidos.');
       }
@@ -28,7 +28,7 @@ const AdminLogin = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-center text-green-800 mb-6">Login do Administrador</h2>
+        <h2 className="text-2xl font-bold text-center text-green-800 mb-6">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-700 font-medium mb-1">Email:</label>

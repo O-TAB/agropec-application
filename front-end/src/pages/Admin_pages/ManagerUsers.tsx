@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
+import { DeleteUser } from "../../functions/api";
 
 type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'USER';
 
@@ -14,7 +15,6 @@ interface User {
 const SuperAdminPage = () => {
   const navigate = useNavigate();
   const { token, logout } = useAuth();
-
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,17 +69,7 @@ const SuperAdminPage = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/auth/login/delete/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error("Falha ao deletar usuário.");
-      }
-
+      DeleteUser(id);
       setUsers((prev) => prev.filter((user) => user.id !== id));
 
     } catch (err: any) {

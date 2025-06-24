@@ -1,16 +1,22 @@
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { MapPin } from "lucide-react";
+import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+//provisorios
 import { allPins, imageMap } from "../data/pinsData"; 
 import imgMapa from "../assets/MAPA-A1.svg";
-import { MapPin } from "lucide-react";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
+
 import EventPopup from '../components/EventPopup';
+import { getSvgDimensions } from "../functions/SvgDimensionReader";
+
+
 
 //tamanho do mapa original em pixels
-const ORIGINAL_MAP_WIDTH = 3508;
-const ORIGINAL_MAP_HEIGHT = 2481;
+const dimensions = getSvgDimensions(imgMapa);
 
-import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
+
 
 export default function MapPage() {
   const transformWrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
@@ -72,7 +78,7 @@ export default function MapPage() {
   return (
     <>
       <div className="flex justify-center mt-4 md:mt-10 px-4">
-        <div className="bg-yellow-50 rounded-2xl shadow-lg p-4 md:p-6 w-full max-w-5xl">
+        <div className="bg-yellow-50 rounded-2xl shadow-lg p-4 md:p-6 w-full h-full">
           <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
             <MapPin className="w-7 h-7 md:w-8 md:h-8 text-green-800" />
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-green-800">
@@ -90,8 +96,8 @@ export default function MapPage() {
             <button className="px-3 py-1.5 text-xs md:text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700" onClick={() => handleShowPins("pracaalimentacao")}>Praça de Alimentação</button>
             <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins(null)}>Limpar Filtro</button>
           </div>
-          <div className="w-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
-            <div className="relative w-full aspect-[3508/2481]">
+          <div className="w-full h-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
+            <div className="relative w-full h-full aspect-[3508/2481]">
               <TransformWrapper ref={transformWrapperRef} initialScale={1} minScale={0.5} maxScale={8}>
                 <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
                   <img src={imgMapa} alt="Mapa do Evento" className="w-full h-full" />
@@ -101,7 +107,7 @@ export default function MapPage() {
                     const visibilityClass = isVisible ? "opacity-100" : "opacity-0 pointer-events-none";
                     if (pin.type === 'main') {
                       return (
-                        <div key={pin.id} id={`pin-${pin.id}`} className={`absolute text-green-800 animate-bounce ${baseClasses} ${visibilityClass}`} style={{ left: `${(pin.x / ORIGINAL_MAP_WIDTH) * 100}%`, top: `${(pin.y / ORIGINAL_MAP_HEIGHT) * 100}%` }}>
+                        <div key={pin.id} id={`pin-${pin.id}`} className={`absolute text-green-800 animate-bounce ${baseClasses} ${visibilityClass}`} style={{ left: `${(pin.x / (dimensions?.width ?? 1)) * 100}%`, top: `${(pin.y / (dimensions?.height ?? 1)) * 100}%` }}>
                           <MapPin className="w-8 h-8 transform -translate-x-1/2 -translate-y-full" />
                         </div>
                       );
@@ -109,7 +115,7 @@ export default function MapPage() {
                     if (pin.type === 'event') {
                       const pinColor = pin.category === 'stand' ? 'bg-red-500' : 'bg-purple-500';
                       return (
-                        <button key={pin.id} id={`pin-${pin.id}`} onClick={() => setSelectedEvent(pin)} className={`absolute w-3 h-3 ${pinColor} rounded-full border-2 border-white shadow-md transform -translate-x-1/2 -translate-y-1/2 hover:scale-125 transition-transform ${baseClasses} ${visibilityClass}`} style={{ left: `${(pin.x / ORIGINAL_MAP_WIDTH) * 100}%`, top: `${(pin.y / ORIGINAL_MAP_HEIGHT) * 100}%` }} title={pin.title} />
+                        <button key={pin.id} id={`pin-${pin.id}`} onClick={() => setSelectedEvent(pin)} className={`absolute w-3 h-3 ${pinColor} rounded-full border-2 border-white shadow-md transform -translate-x-1/2 -translate-y-1/2 hover:scale-125 transition-transform ${baseClasses} ${visibilityClass}`} style={{ left: `${(pin.x / (dimensions?.width ?? 1)) * 100}%`, top: `${(pin.y / (dimensions?.height ?? 1)) * 100}%` }} title={pin.title} />
                       );
                     }
                     return null;

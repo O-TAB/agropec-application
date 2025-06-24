@@ -1,4 +1,6 @@
 
+export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'USER';
+
 
 export type point = {
     id: number;
@@ -20,10 +22,11 @@ export interface ResponseLogin{
     role: string;
 }
 
-export interface RegisterRequest {
+export interface RegisterUserRequest {
     username: string;
     email: string;
     password: string;
+    role: UserRole;
 }
 
 export interface mapPost {

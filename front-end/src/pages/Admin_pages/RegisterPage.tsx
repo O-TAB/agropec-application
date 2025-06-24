@@ -1,22 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { RegisterNewUser } from "../../functions/api";
+import { RegisterUserRequest, UserRole } from "../../data/RequestStructures";
 
-type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'USER';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole
-}
 
 const CadastroUsuarioPage = () => {
-  const {token} = useAuth();
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("USER");
+  const [role, setRole] = useState<UserRole>("USER");
+  const roles: UserRole[] = ['SUPER_ADMIN', 'ADMIN', 'USER'];
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -28,7 +20,7 @@ const CadastroUsuarioPage = () => {
     setError("");
     setMessage("");
 
-    const userData = {
+    const userData:RegisterUserRequest  = {
       username: userName,
       email: email,
       password: password,
@@ -37,27 +29,14 @@ const CadastroUsuarioPage = () => {
 
     // Aqui a gnt envia os dados pro backend ou salvar localmente
     try {
-      const response = await fetch(`http://localhost:8080/auth/login/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type' : 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(userData)
-      });
-
-      if(!response.ok){
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'ERRO ${response.status}: Falha ao cadastrar usuário.');
-      }
+      RegisterNewUser(userData);
 
       setMessage("SUCESSO: Usuário cadastrado com sucesso!");
-
       // Limpar formulário
       setUserName("");
       setEmail("");
       setPassword("");
-      setRole("");
+      setRole("USER");
     } catch(err: any){
       setError(err.message);
     } finally {
@@ -99,13 +78,15 @@ const CadastroUsuarioPage = () => {
         <label className="block mb-2 text-gray-700 mt-4">Tipo de Usuário:</label>
         <select
           value={role}
-          onChange={(e) => setRole(e.target.value)}
+          onChange={(e) => setRole(e.target.value as UserRole)}
           required
           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
         >
-          <option value="USER">Usuário</option>
-          <option value="ADMIN">Admin</option>
-          <option value="SUPER_ADMIN">Super Admin</option>
+              {roles.map((role_i) => (
+              <option key={role_i} value={role_i}>
+                {role_i.replace('_', ' ')}
+              </option>
+            ))}
         </select>
 
         <button

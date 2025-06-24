@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {StandEventResponse} from '../data/RequestStructures';
+import {StandEventResponse, RegisterUserRequest} from '../data/RequestStructures';
 
 
 const getAuthHeaders = () => {
@@ -15,6 +15,23 @@ let isLoadingData: boolean = false; // Para evitar requisições simultâneas
 
 const config = getAuthHeaders();
 
+export const RegisterNewUser =  async (userData: RegisterUserRequest) => {
+  try{
+    const response = await axios.post(`${BASE_URL}/auth/login/register`,userData ,config);
+    console.log('Resposta do servidor:', response.data);
+  } catch (error: any) {
+      console.error('Error fetching data: ', error);
+  }
+}
+
+export const DeleteUser = async (userID: string)=>{
+  try{
+    const response = await axios.delete(`${BASE_URL}/auth/login/delete/${userID}`, config);
+    console.log('Resposta do servidor:', response.data);
+  } catch (error: any) {
+      console.error('Error Deleting user: ', error);
+  }
+}
 
 export const fetchAllStandsData = async (): Promise<StandEventResponse[]> => {
     try {
@@ -58,6 +75,7 @@ export async function getMyObjects(): Promise<StandEventResponse[]> {
 
 export const debugdata = () => {
   console.log('Dados de stands:', cachedDataStands);
+  console.log('Dados de eventos:', cachedDataEvents);
   console.log('Dados de eventos:', cachedDataEvents);
 }
 

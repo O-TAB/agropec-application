@@ -23,7 +23,7 @@ export const allPins = [
   { id: 26, category: 'pracaalimentacao', type: 'main', x: 984, y: 1283, title: 'Praça de Alimentação', operatingHours: '10:00 - 00:00' },
 
   // Stands
-  { id: 10, category: 'stand', type: 'event', x: 1368, y: 607, title: 'Tecnologia no Campo', image: 'imagem_drone.jpg', description: 'Soluções com drones, sensores e automação para produção agrícola.', operatingHours: '09:00 - 22:00' },
+  { id: 10, category: 'stand', type: 'event', x: 500, y: 607, title: 'Tecnologia no Campo', image: 'imagem_drone.jpg', description: 'Soluções com drones, sensores e automação para produção agrícola.', operatingHours: '09:00 - 22:00' },
   { id: 11, category: 'stand', type: 'event', x: 1499, y: 685, title: 'Pecuária Sustentável', image: 'imagem_card_sustentavel.jpeg', description: 'Inovações na pecuária, bem-estar animal e alimentação de qualidade.', operatingHours: '09:00 - 22:00' },
   { id: 12, category: 'stand', type: 'event', x: 1492, y: 905, title: 'Agroindústria Familiar', image: 'imagem_card_familia.jpg', description: 'Produtos e serviços direto da agroindústria local e familiar.', operatingHours: '09:00 - 22:00' },
   { id: 13, category: 'stand', type: 'event', x: 1830, y: 1285, title: 'Soluções em Irrigação', image: 'imagem_irrigacao.avif', description: 'Tecnologia eficiente para a irrigação de pequenas e grandes propriedades.', operatingHours: '09:00 - 22:00' },
