@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { imageMap } from '../data/pinsData';
 import { useAuth } from '../context/AuthContext';
 import { PlusCircle, AlertCircle, Upload, Save, MousePointer } from 'lucide-react';
 
 import Itemstoedit from '../components/admin_pages_components/IntensToEdit';
-import {debugdata, getMyObjects } from '../functions/api';
+import {debugdata, getMyObjectsStands, getMyObjectsEvent, RegisterNewpin, UpdatePin } from '../functions/api';
 import { StandEventResponse } from '../data/RequestStructures';
 import SelectPointOnMap from '../components/admin_pages_components/SelectPointOnMap';
 
-
+const testidmap = '7fa6db58-91e0-4d58-9408-07050a1604ec';
+const tipo = 'stands';
 export default function AdminManagerPage() {
   const { logout } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -17,11 +17,11 @@ export default function AdminManagerPage() {
     id: 0,
     name: '',
     description: '',
-    descriptioncard: '',
+    descriptionCard: '',
     img: '',
     point: {
         id: 0,
-        typePoint: '',
+        typePoint: 'EMPRESA',
         x: 0,
         y: 0,
     }
@@ -35,14 +35,14 @@ export default function AdminManagerPage() {
   const [showMapModal, setShowMapModal] = useState(false);
 
   const [allstands, setStands]= useState<StandEventResponse[]>([]);
+  const [allevents, setEvents]= useState<StandEventResponse[]>([]);
 
   useEffect(() => {
-    getMyObjects().then((data) => setStands(data));
+    getMyObjectsStands().then((data) => setStands(data));
+    getMyObjectsEvent().then((data) => setEvents(data));
   }, []);
 
-  console.log('esses sao os stands', allstands);
-
-  // Lista de imagens disponíveis para o dropdown
+  
   const availableImages = [
     { value: '', label: 'Sem imagem' },
     { value: 'imagem_drone.jpg', label: 'Tecnologia no Campo' },
@@ -55,7 +55,7 @@ export default function AdminManagerPage() {
   // Auto-preenchimento dos inputs quando um item é selecionado
   useEffect(() => {
     if (itemSelected) {
-      setNewItem(emptyStandEvent);
+      setNewItem(itemSelected);
       setIsEditing(true);
         // Atualizar preview da imagem
         if (itemSelected.img && imageMap[itemSelected.img as keyof typeof imageMap]) {
@@ -71,25 +71,34 @@ export default function AdminManagerPage() {
     }
   }, [itemSelected]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    const finalValue = (name === 'x' || name === 'y') ? Number(value) : value;
-    setNewItem({ ...newItem, [name]: finalValue });
-    
-    // Atualizar preview da imagem quando selecionada no dropdown
-    if (name === 'image') {
-      if (value && imageMap[value as keyof typeof imageMap]) {
-        setImagePreview(imageMap[value as keyof typeof imageMap]);
-      } else {
-        setImagePreview(null);
-      }
-    }
-  };
+  const handleInputChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
 
-  const handleFutureFeatureClick = (action: string) => {
-    setMessage(`Funcionalidade de "${action}" em breve (será implementada pelo back-end).`);
-    setTimeout(() => setMessage(''), 4000);
-  };
+  // Atualizar campos aninhados em point
+  if (name === "x" || name === "y" || name === "typePoint") {
+    setNewItem({
+      ...newItem,
+      point: {
+        ...newItem.point,
+        [name]: name === "x" || name === "y" ? Number(value) : value,
+      },
+    });
+  } 
+  // Atualizar campo de imagem
+  else if (name === "img") {
+    setNewItem({ ...newItem, img: value });
+    if (value && imageMap[value as keyof typeof imageMap]) {
+      setImagePreview(imageMap[value as keyof typeof imageMap]);
+    } else {
+      setImagePreview(null);
+    }
+  } 
+  // Atualizar campos simples
+  else {
+    setNewItem({ ...newItem, [name]: value });
+  }
+};
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -102,9 +111,17 @@ export default function AdminManagerPage() {
 
   const handleSubmit = () => {
     if (isEditing && itemSelected) {
-      handleFutureFeatureClick(`Editar Item '${itemSelected.name}'`);
+      UpdatePin(newItem, newItem.name, tipo);
     } else {
-      handleFutureFeatureClick('Adicionar Item');
+      const standToSend = {
+        ...newItem,
+        descriptionCard: newItem.descriptionCard,
+        point: {
+          ...newItem.point,
+          id: 0
+        }
+      };
+      RegisterNewpin(standToSend, testidmap, tipo);
     }
   };
 
@@ -161,10 +178,16 @@ export default function AdminManagerPage() {
           )}
 
           <div className="space-y-4">
-            <input type="text" name="title" placeholder="Título do Stand/Evento" value={newItem.name} onChange={handleInputChange} className="w-full p-2 border rounded"/>
-            <select name="category" value={newItem.point.typePoint} onChange={handleInputChange} className="w-full p-2 border rounded bg-white">
-              <option value="stand">Stand</option>
-              <option value="event">Evento</option>
+            <input type="text" name="name" placeholder="Título do Stand/Evento" value={newItem.name} onChange={handleInputChange} className="w-full p-2 border rounded"/>
+            <select name="typePoint" value={newItem.point.typePoint} onChange={handleInputChange} className="w-full p-2 border rounded bg-white">
+              <option value="EMPRESA">Empresa</option>
+              <option value="RESTAURANTE">Restaurante</option>
+              <option value="ESPACOSHOW">Espaço de Shows</option>
+              <option value="ESPACOPALESTRA">Espaço de Palestras</option>
+              <option value="BANHEIROS">Banheiros</option>
+              <option value="ESPACORACKATON">Espaço dos Rackatons</option>
+              <option value="EMERGENCIA">Emergência</option>
+              <option value="PARQUEDIVERSAO">Parque de Diversões</option>
             </select>
             <textarea name="description" placeholder="Descrição" value={newItem.description} onChange={handleInputChange} className="w-full p-2 border rounded" rows={3}></textarea>
             
@@ -172,7 +195,7 @@ export default function AdminManagerPage() {
               <label className="block text-sm font-medium text-gray-600">Imagem do Item</label>
               <div className="space-y-3">
                 <select 
-                  name="image" 
+                  name="img" 
                   value={newItem.img} 
                   onChange={handleInputChange} 
                   className="w-full p-2 border rounded bg-white"
@@ -215,7 +238,7 @@ export default function AdminManagerPage() {
                 </div>
                 <div className="relative flex-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-500">Y:</span>
-                  <input type="number" name="y" placeholder="Eixo Y" value={newItem.point.x} onChange={handleInputChange} className="w-full p-2 border rounded pl-8"/>
+                  <input type="number" name="y" placeholder="Eixo Y" value={newItem.point.y} onChange={handleInputChange} className="w-full p-2 border rounded pl-8"/>
                 </div>
                 
                 <button 
@@ -230,7 +253,7 @@ export default function AdminManagerPage() {
             </div>
 
             <button 
-              onClick={handleSubmit}
+              onClick={() => handleSubmit()}
               className={`w-full p-3 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors ${
                 isEditing 
                   ? 'bg-blue-600 text-white hover:bg-blue-700' 
@@ -256,11 +279,13 @@ export default function AdminManagerPage() {
            <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Itens Atuais</h2>
            <div className="max-h-[600px] overflow-y-auto pr-2">
              <h3 className="text-xl font-bold text-green-600 my-2">Stands</h3>
-             {allstands.map(stand => (
-               <Itemstoedit key={stand.id} item={stand} setSelectedPin={setItemSelected} handleFutureFeatureClick={handleFutureFeatureClick} />
+             {allstands.map(pin=> (
+               <Itemstoedit key={pin.id} item={pin} setSelectedPin={setItemSelected} type={'stands'}/>
              ))}
              <h3 className="text-xl font-bold text-green-600 my-2 mt-6">Eventos</h3>
-             
+             {allevents.map(pin => (
+               <Itemstoedit key={pin.id} item={pin} setSelectedPin={setItemSelected} type={'event'}/>
+             ))}
            </div>
         </div>
       </div>

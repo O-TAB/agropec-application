@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/event")
+@RequestMapping("event")
 @AllArgsConstructor
 public class EventController {
 

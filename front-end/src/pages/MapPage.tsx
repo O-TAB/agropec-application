@@ -6,11 +6,12 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 //provisorios
 import { allPins, imageMap } from "../data/pinsData"; 
 import imgMapa from "../assets/MAPA-A1.svg";
-
+//
 
 import EventPopup from '../components/EventPopup';
 import { getSvgDimensions } from "../functions/SvgDimensionReader";
 
+//aqui allpins
 
 
 //tamanho do mapa original em pixels
@@ -24,6 +25,7 @@ export default function MapPage() {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [searchParams] = useSearchParams();
 
+  //fazer o mesmo so que com points/pins
   const visiblePins = activeCategory
     ? allPins.filter(pin => pin.category === activeCategory)
     : [];

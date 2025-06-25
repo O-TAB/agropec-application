@@ -1,14 +1,8 @@
-import React from "react";
+
 import { Link } from "react-router-dom";
+import { StandEventResponse } from "../data/RequestStructures";
 
-interface Props {
-  id: number;
-  nome: string;
-  desc: string;
-  img: string;
-}
-
-export const StandesComponent = ({ id, nome, desc, img }: Props) => {
+export const StandesComponent = (pin: StandEventResponse) => {
   return (
     <div
       className="bg-white rounded-xl border shadow-md 
@@ -16,17 +10,17 @@ export const StandesComponent = ({ id, nome, desc, img }: Props) => {
                  transition-transform duration-300"
     >
       <img
-        src={img}
-        alt={nome}
+        src={pin.img}
+        alt={pin.name}
         className="w-full h-48 object-cover rounded-t-xl"
       />
 
       <div className="p-4">
-        <h2 className="text-xl font-semibold text-green-800">{nome}</h2>
-        <p className="text-sm text-gray-600 mb-4">{desc}</p>
+        <h2 className="text-xl font-semibold text-green-800">{pin.name}</h2>
+        <p className="text-sm text-gray-600 mb-4">{pin.descriptionCard}</p>
 
         <Link
-          to={`/stands/${id}`}
+          to={`/stands/${pin.id}`}
           className="w-full block text-center py-2 
                      bg-green-600 text-white rounded 
                      hover:bg-green-700 transition"

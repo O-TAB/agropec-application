@@ -1,4 +1,4 @@
-import { useState} from 'react';
+import { useEffect, useState} from 'react';
 import { Search, Filter} from 'lucide-react';
 
 import { useFilteredItems } from '../functions/FilterData';
@@ -6,6 +6,7 @@ import ItemCard from '../components/ItemCard';
 import { imageMap} from '../data/pinsData';
 import DetailsPopup from '../components/DetailsPopup';
 import { StandEventResponse } from '../data/RequestStructures';
+import { getMyObjectsStands, getMyObjectsEvent } from '../functions/api';
 
 
 //marcado para concertar
@@ -13,16 +14,23 @@ import { StandEventResponse } from '../data/RequestStructures';
 //
 
 
-
 export default function StandsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentFilter, setCurrentFilter] = useState('todos');
   const [selectedPin, setSelectedPin] = useState<StandEventResponse | null>(null);
+  const [allstands, setStands]= useState<StandEventResponse[]>([]);
+  const [allevents, setEvents]= useState<StandEventResponse[]>([]);
 
-  const StandsFiltrados = useFilteredItems(searchQuery, currentFilter);
+  useEffect(() => {
+    getMyObjectsStands().then((data) => setStands(data));
+    getMyObjectsEvent().then((data) => setEvents(data));
+  }, []);
+  const StandsFiltrados = useFilteredItems(allstands, searchQuery);
+  const EventosFiltrados = useFilteredItems(allevents, searchQuery);
 
-  const expositoresFiltrados = StandsFiltrados.filter(item => item.category === 'stand');
-  const eventosFiltrados = StandsFiltrados.filter(item => item.category === 'event');
+  console.log("stands encontrados:"+StandsFiltrados);
+
+  
 
   return (
     <>
@@ -62,9 +70,9 @@ export default function StandsPage() {
         {(currentFilter === 'todos' || currentFilter === 'stand') && (
           <section id="expositores" className="mb-12">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 border-l-4 border-green-600 pl-4">Expositores</h2>
-            {expositoresFiltrados.length > 0 ? (
+            {StandsFiltrados.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {expositoresFiltrados.map((stand) => 
+                {StandsFiltrados.map((stand) => 
                     <ItemCard key={stand.id} item={stand} setSelectedPin={setSelectedPin} />
                 )}
               </div>
@@ -77,9 +85,9 @@ export default function StandsPage() {
         {(currentFilter === 'todos' || currentFilter === 'event') && (
           <section id="eventos">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 border-l-4 border-purple-600 pl-4">Eventos</h2>
-            {eventosFiltrados.length > 0 ? (
+            {EventosFiltrados.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {eventosFiltrados.map((item) => <ItemCard key={item.id} item={item} setSelectedPin={setSelectedPin} />)}
+                {EventosFiltrados.map((item) => <ItemCard key={item.id} item={item} setSelectedPin={setSelectedPin} />)}
               </div>
             ) : (
               <p className="text-gray-500 pl-4">Nenhum evento encontrado para sua busca.</p>

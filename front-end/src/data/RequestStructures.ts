@@ -35,18 +35,17 @@ export interface mapPost {
     svg: string;
 }
 
-export interface StandEventstandPost{
+export interface StandEventPost{
     name: string;
     description: string;
-    descriptioncard: string;
+    descriptionCard: string;
     img: string;
     point: point;
     Date?: string;
 }
 
-export interface StandEventResponse extends StandEventstandPost {
+export interface StandEventResponse extends StandEventPost {
     id: number;
-    
 }
 
 

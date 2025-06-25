@@ -1,6 +1,7 @@
 package br.com.o_tab.agropec.service;
 
 import br.com.o_tab.agropec.model.Map;
+import br.com.o_tab.agropec.model.Point;
 import br.com.o_tab.agropec.model.Stand;
 import br.com.o_tab.agropec.repository.MapRepository;
 import br.com.o_tab.agropec.repository.StandRepository;
@@ -33,7 +34,13 @@ public class StandService {
        Map map = optionalMap.get();
 
        if(stand.getPoint() != null){
-           stand.getPoint().setMap(map);
+           Point point = stand.getPoint();
+           // Força criação de novo Point se ID for 0 ou nulo
+           if(point.getId() == null || point.getId() == 0) {
+               point.setId(null); // Remove ID para forçar nova entidade
+           }
+           point.setMap(map);
+           stand.setPoint(point);
            standRepository.save(stand);
 
            return ResponseEntity.status(HttpStatus.CREATED).body("Estande cadastrado com sucesso!");
