@@ -16,7 +16,7 @@ public enum TypePoint {
     ESPACOPALESTRA("Espaço de Palestras", "palestras.png"),
     BANHEIROS("Banheiros", "banheiro.png"),
     ESPACORACKATON("Espaço dos Rackatons", "rackatons.png"),
-    EMPRESA("Estande de esposição de uma empresa", "empresas.png"),
+    EXPOSITORES("Estande de esposição de uma empresa", "expositores.png"),
     EMERGENCIA("Posto de atendimento médico", "emergencia.png"),
     PARQUEDIVERSAO("Parque de diversões", "parque.png");
 

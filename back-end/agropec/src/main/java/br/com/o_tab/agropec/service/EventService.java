@@ -46,7 +46,6 @@ public class EventService {
             }
         } catch (Exception e) {
             System.err.println("Erro ao buscar eventos: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Erro interno do servidor ao buscar eventos: " + e.getMessage());
         }

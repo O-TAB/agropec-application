@@ -17,7 +17,7 @@ public class StandController {
 
 
     @PostMapping("/{mapId}")
-    public ResponseEntity<?> cadastrateStand(@PathVariable String mapId, @RequestBody Stand stand){
+    public ResponseEntity<?> cadastrateStand(@PathVariable String mapId, @RequestBody Stand stand) throws InterruptedException {
         return standService.cadastrateStand(stand, mapId);
     }
 
@@ -32,12 +32,12 @@ public class StandController {
     }
 
     @PutMapping("/{name}")
-    public ResponseEntity<?> updateStand(@PathVariable long id, @RequestBody Stand stand){
+    public ResponseEntity<?> updateStand(@PathVariable long id, @RequestBody Stand stand) throws InterruptedException {
         return standService.updateStand(id, stand);
     }
 
     @DeleteMapping("/{name}")
-    public ResponseEntity<?> deleteStandByName(@PathVariable String name){
+    public ResponseEntity<?> deleteStandByName(@PathVariable String name) throws InterruptedException {
         return standService.deleteStandByName(name);
     }
 

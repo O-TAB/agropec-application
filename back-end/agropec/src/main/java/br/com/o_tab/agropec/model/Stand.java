@@ -32,7 +32,7 @@ public class Stand {
     @Column(nullable = false)
     private String img;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne(cascade = CascadeType.ALL)
     private Point point;
 
 }
