@@ -69,8 +69,8 @@ public class StandService {
         return ResponseEntity.ok(foundStand.get());
     }
 
-    public ResponseEntity<?> updateStand(String name, Stand stand){
-        Optional<Stand> foundStand = standRepository.findByName(name);
+    public ResponseEntity<?> updateStand(long id, Stand stand){
+        Optional<Stand> foundStand = standRepository.findById(id);
 
         if(foundStand.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum estande cadastrado com o nome informado.");

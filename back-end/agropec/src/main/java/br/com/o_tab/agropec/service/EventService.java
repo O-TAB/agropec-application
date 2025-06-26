@@ -61,8 +61,8 @@ public class EventService {
         }
     }
 
-    public ResponseEntity<?> updateEvent(Event event, String name){
-        Optional<Event> foundEvent = eventRepository.findByName(name);
+    public ResponseEntity<?> updateEvent(Event event, long id){
+        Optional<Event> foundEvent = eventRepository.findById(id);
         if(foundEvent.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado para o nome informado.");
         }

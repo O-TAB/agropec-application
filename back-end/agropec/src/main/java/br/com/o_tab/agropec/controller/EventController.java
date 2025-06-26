@@ -32,8 +32,8 @@ public class EventController {
 
 
     @PutMapping("/{name}")
-    public ResponseEntity<?> updateEvent(@PathVariable String name, @RequestBody Event event){
-        return eventService.updateEvent(event, name);
+    public ResponseEntity<?> updateEvent(@PathVariable long id, @RequestBody Event event){
+        return eventService.updateEvent(event, id);
     }
 
 

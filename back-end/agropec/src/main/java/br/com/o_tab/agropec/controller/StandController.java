@@ -32,8 +32,8 @@ public class StandController {
     }
 
     @PutMapping("/{name}")
-    public ResponseEntity<?> updateStand(@PathVariable String name, @RequestBody Stand stand){
-        return standService.updateStand(name, stand);
+    public ResponseEntity<?> updateStand(@PathVariable long id, @RequestBody Stand stand){
+        return standService.updateStand(id, stand);
     }
 
     @DeleteMapping("/{name}")
