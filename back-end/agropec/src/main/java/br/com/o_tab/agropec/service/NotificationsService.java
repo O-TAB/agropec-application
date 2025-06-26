@@ -7,6 +7,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 @Service
 @AllArgsConstructor
 public class NotificationsService {
@@ -14,14 +17,22 @@ public class NotificationsService {
     private SimpMessagingTemplate messagingTemplate;
 
     public Notification createNotification (NotificationMessage message){
-        return new Notification("ATUALIZAÇÃO: " + HtmlUtils.htmlEscape(message.getMessage()) + "!");
+        String content = "ATUALIZAÇÃO: " + HtmlUtils.htmlEscape(message.getMessage()) + "!";
+        Instant now = Instant.now();
+        Instant expiresAt = now.plus(2, ChronoUnit.HOURS);
+
+        return new Notification(content, now, expiresAt);
     }
 
     public void newNotificatoin(String modification) throws InterruptedException {
+        try {
 
-        NotificationMessage message = new NotificationMessage("NOTIFICAÇÃO: " + modification);
-        Notification notification = createNotification(message);
+            NotificationMessage message = new NotificationMessage("NOTIFICAÇÃO: " + modification);
+            Notification notification = createNotification(message);
 
-        messagingTemplate.convertAndSend("/topic/greetings", notification);
+            messagingTemplate.convertAndSend("/topic/updates", notification);
+        } catch (Exception e) {
+            System.err.println("Falha ao viar a notificação: " + e.getMessage());
+        }
     }
 }

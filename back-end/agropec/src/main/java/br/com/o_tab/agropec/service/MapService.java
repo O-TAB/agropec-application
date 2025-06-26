@@ -23,8 +23,9 @@ public class MapService {
 
     private MapRepository mapRepository;
     private PointRepository pointRepository;
+    private NotificationsService notificationsService;
 
-    public ResponseEntity<?> uploadMap(String name, MultipartFile archive) throws IOException {
+    public ResponseEntity<?> uploadMap(String name, MultipartFile archive) throws IOException, InterruptedException {
         String svgContent = new String(archive.getBytes(), StandardCharsets.UTF_8);
 
         Map newMap = new Map();
@@ -33,6 +34,7 @@ public class MapService {
 
         Map savedMap = mapRepository.save(newMap);
 
+        notificationsService.newNotificatoin("Um novo mapa foi adicionado!");
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMap);
     }
 
@@ -48,7 +50,6 @@ public class MapService {
             return ResponseEntity.ok(allMaps);
         } catch (Exception e) {
             System.err.println("Erro ao buscar mapas: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Erro interno do servidor ao buscar mapas: " + e.getMessage());
         }
@@ -77,6 +78,11 @@ public class MapService {
             point.setMap(map);
             Point savedPoint = pointRepository.save(point);
 
+            try {
+                notificationsService.newNotificatoin("Um novo ponto para " + point.getName() + " foi adicionado!");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPoint);
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -114,6 +120,12 @@ public class MapService {
         pointToUpdate.setX(point.getX());
         pointToUpdate.setMap(existingMap);
 
+        try {
+            notificationsService.newNotificatoin("O ponto de " + point.getName() + " foi atualizado!");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         return ResponseEntity.ok(pointToUpdate);
     }
 
@@ -131,6 +143,11 @@ public class MapService {
         return foundMap.map(map -> {
             pointRepository.delete(pointToDelete.get());
             refreshPointList(foundMap.get());
+            try {
+                notificationsService.newNotificatoin("O ponto de " + pointToDelete.get().getName() + " foi deletado!");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             return ResponseEntity.ok().body("Mapa deletado com sucesso!");
         }).orElse(ResponseEntity.notFound().build());
     }

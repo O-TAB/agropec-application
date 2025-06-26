@@ -19,7 +19,7 @@ public class MapController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadMap(@RequestParam("name") String name, @RequestParam("archive") MultipartFile Archive)
-    throws IOException {
+            throws IOException, InterruptedException {
         return mapService.uploadMap(name, Archive);
     }
 
