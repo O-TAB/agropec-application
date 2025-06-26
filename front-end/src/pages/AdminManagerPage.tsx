@@ -1,15 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { imageMap } from '../data/pinsData';
 import { useAuth } from '../context/AuthContext';
-import { PlusCircle, AlertCircle, Upload, Save, MousePointer } from 'lucide-react';
+import { AlertCircle, Upload, MousePointer } from 'lucide-react';
 
 import Itemstoedit from '../components/admin_pages_components/IntensToEdit';
-import {debugdata, getMyObjectsStands, getMyObjectsEvent, RegisterNewpin, UpdatePin } from '../functions/api';
+import {debugdata, getMyObjectsStands, getMyObjectsEvent} from '../functions/api';
 import { StandEventResponse } from '../data/RequestStructures';
 import SelectPointOnMap from '../components/admin_pages_components/SelectPointOnMap';
+import RegisterAndEdit from '../components/admin_pages_components/RegisterAndEditBT';
 
-const testidmap = '7fa6db58-91e0-4d58-9408-07050a1604ec';
-const tipo = 'stands';
 export default function AdminManagerPage() {
   const { logout } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -106,22 +105,6 @@ export default function AdminManagerPage() {
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
       setNewItem({ ...newItem, img: file.name });
-    }
-  };
-
-  const handleSubmit = () => {
-    if (isEditing && itemSelected) {
-      UpdatePin(newItem, newItem.name, tipo);
-    } else {
-      const standToSend = {
-        ...newItem,
-        descriptionCard: newItem.descriptionCard,
-        point: {
-          ...newItem.point,
-          id: 0
-        }
-      };
-      RegisterNewpin(standToSend, testidmap, tipo);
     }
   };
 
@@ -252,29 +235,9 @@ export default function AdminManagerPage() {
               </div>
             </div>
 
-            <button 
-              onClick={() => handleSubmit()}
-              className={`w-full p-3 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors ${
-                isEditing 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                  : 'bg-green-600 text-white hover:bg-green-700'
-              }`}
-            >
-              {isEditing ? (
-                <>
-                  <Save size={20} />
-                  Salvar Alterações
-                </>
-              ) : (
-                <>
-                  <PlusCircle size={20} />
-                  Adicionar ao Mapa
-                </>
-              )}
-            </button>
+            <RegisterAndEdit isEditing={isEditing} newItem={newItem}/>
           </div>
         </div>
-
         <div className="bg-white p-6 rounded-lg shadow-md">
            <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Itens Atuais</h2>
            <div className="max-h-[600px] overflow-y-auto pr-2">
