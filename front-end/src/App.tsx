@@ -9,7 +9,7 @@ import AdminManagerPage from './pages/AdminManagerPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import CadastroUsuarioPage from './pages/Admin_pages/RegisterPage';
 import ManagerUsers from './pages/Admin_pages/ManagerUsers';
-
+import SvgUploader from './pages/Admin_pages/SvgUploader';
 
 export default function App() {
   return (
@@ -21,11 +21,15 @@ export default function App() {
         <Route path="/stands" element={<StandsPage />} />
         <Route path="/events" element={<h1>Programações</h1>} />
         <Route path="/mapa" element={<MapPage />} />
-        <Route path="/login" element={<Login destination="/gerenciar" />} />
+        <Route path="/login" element={<Login destination="/uploadmap" />} />
         <Route path="/loginSuperadmin" element={<Login destination="/Users" />} />
       
-        
-        <Route path="/gerenciar" element={
+        <Route path="/uploadmap" element={
+          <ProtectedRoute>
+            <SvgUploader/>
+          </ProtectedRoute>
+        }/>
+        <Route path="/gerenciar/:id" element={
           <ProtectedRoute>
             <AdminManagerPage />
           </ProtectedRoute>

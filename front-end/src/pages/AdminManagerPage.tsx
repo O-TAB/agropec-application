@@ -8,9 +8,18 @@ import {debugdata, getMyObjectsStands, getMyObjectsEvent} from '../functions/api
 import { StandEventResponse } from '../data/RequestStructures';
 import SelectPointOnMap from '../components/admin_pages_components/SelectPointOnMap';
 import RegisterAndEdit from '../components/admin_pages_components/RegisterAndEditBT';
+import { useParams } from 'react-router-dom';
+
+
+
 
 export default function AdminManagerPage() {
   const { logout } = useAuth();
+
+  //id do mapa
+  const { id } = useParams();
+  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const emptyStandEvent: StandEventResponse = {
     id: 0,
@@ -20,7 +29,7 @@ export default function AdminManagerPage() {
     img: '',
     point: {
         id: 0,
-        typePoint: 'EMPRESA',
+        typePoint: 'EXPOSITORES',
         x: 0,
         y: 0,
     }
@@ -32,9 +41,10 @@ export default function AdminManagerPage() {
   const [itemSelected, setItemSelected] = useState<StandEventResponse | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
-
   const [allstands, setStands]= useState<StandEventResponse[]>([]);
   const [allevents, setEvents]= useState<StandEventResponse[]>([]);
+
+
 
   useEffect(() => {
     getMyObjectsStands().then((data) => setStands(data));
@@ -163,7 +173,7 @@ export default function AdminManagerPage() {
           <div className="space-y-4">
             <input type="text" name="name" placeholder="Título do Stand/Evento" value={newItem.name} onChange={handleInputChange} className="w-full p-2 border rounded"/>
             <select name="typePoint" value={newItem.point.typePoint} onChange={handleInputChange} className="w-full p-2 border rounded bg-white">
-              <option value="EMPRESA">Empresa</option>
+              <option value="EXPOSITORES">Empresa</option>
               <option value="RESTAURANTE">Restaurante</option>
               <option value="ESPACOSHOW">Espaço de Shows</option>
               <option value="ESPACOPALESTRA">Espaço de Palestras</option>
