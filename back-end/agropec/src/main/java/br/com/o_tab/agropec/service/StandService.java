@@ -20,9 +20,10 @@ public class StandService {
 
     private StandRepository standRepository;
     private MapRepository mapRepository;
-    private MapService mapService;
+    private NotificationsService notificationsService;
 
-    public ResponseEntity<?> cadastrateStand(Stand stand, String mapId){
+    @Transactional
+    public ResponseEntity<?> cadastrateStand(Stand stand, String mapId) throws InterruptedException {
        if(standRepository.existsByName(stand.getName())){
            return ResponseEntity.badRequest().body("Já há um estande registrado com o mesmo nome, tente outro nome.");
        }
@@ -42,6 +43,7 @@ public class StandService {
            point.setMap(map);
            stand.setPoint(point);
            standRepository.save(stand);
+           notificationsService.newNotificatoin("Um novo estande de nome" + stand.getName() + "foi adicionado!");
 
            return ResponseEntity.status(HttpStatus.CREATED).body("Estande cadastrado com sucesso!");
        } else {
@@ -69,7 +71,8 @@ public class StandService {
         return ResponseEntity.ok(foundStand.get());
     }
 
-    public ResponseEntity<?> updateStand(long id, Stand stand){
+    @Transactional
+    public ResponseEntity<?> updateStand(long id, Stand stand) throws InterruptedException {
         Optional<Stand> foundStand = standRepository.findById(id);
 
         if(foundStand.isEmpty()){
@@ -84,12 +87,13 @@ public class StandService {
         standToUpdate.setImg(stand.getImg());
         Stand updatedStand = standRepository.save(standToUpdate);
 
+        notificationsService.newNotificatoin("O Estande " + standToUpdate.getName() + " foi atualizado!");
         return ResponseEntity.ok(updatedStand);
 
     }
 
     @Transactional
-    public ResponseEntity<?> deleteStandByName(String name){
+    public ResponseEntity<?> deleteStandByName(String name) throws InterruptedException {
         Optional<Stand> foundStand = standRepository.findByName(name);
 
         if(foundStand.isEmpty()){
@@ -99,6 +103,7 @@ public class StandService {
         Stand standToDelete = foundStand.get();
         standRepository.deleteById(standToDelete.getId());
 
+        notificationsService.newNotificatoin("O Estande " + standToDelete.getName() + " foi deletado!");
         return ResponseEntity.ok().body("Estande deletado com sucesso");
     }
 

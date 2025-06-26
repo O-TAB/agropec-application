@@ -19,16 +19,16 @@ public class Point {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "Point type", nullable = false)
-    @JsonProperty("typePoint")
+    @Column(name = "Point_name", nullable = false)
+    private String name;
+
+    @Column(name = "Point_type", nullable = false)
     private TypePoint typePoint;
 
-    @Column(name = "Coordenate x", nullable = false)
-    @JsonProperty("x")
+    @Column(name = "Coordenate_x", nullable = false)
     private double x;
 
-    @Column(name = "Coordenate y", nullable = false)
-    @JsonProperty("y")
+    @Column(name = "Coordenate_y", nullable = false)
     private double y;
 
     @ManyToOne(fetch = FetchType.LAZY)

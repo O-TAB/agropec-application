@@ -81,6 +81,14 @@ public class MapService {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    public ResponseEntity<?> getAllPoints(String mapId){
+        List<Point> foundPoints = pointRepository.findAllByMapId(mapId);
+
+        if(foundPoints.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum ponto cadastrado");
+        }
+        return ResponseEntity.ok(foundPoints);
+    }
 
     @Transactional
     public ResponseEntity<?> updatePoint(String mapId, Point point, long pointId) {
@@ -94,12 +102,14 @@ public class MapService {
         }
 
         Map existingMap = foundMap.get();
-        ;
+
         Point pointToUpdate = foundPoint.get();
 
         if (point.getTypePoint() != null){
             pointToUpdate.setTypePoint(point.getTypePoint());
         }
+
+        pointToUpdate.setName(point.getName());
         pointToUpdate.setY(point.getY());
         pointToUpdate.setX(point.getX());
         pointToUpdate.setMap(existingMap);
@@ -123,7 +133,6 @@ public class MapService {
             refreshPointList(foundMap.get());
             return ResponseEntity.ok().body("Mapa deletado com sucesso!");
         }).orElse(ResponseEntity.notFound().build());
-
     }
 
 

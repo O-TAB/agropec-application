@@ -35,6 +35,10 @@ public class MapController {
         return mapService.getMapById(id);
     }
 
+    @GetMapping("/{mapId}/point")
+    public ResponseEntity<?> getAllPoints(@PathVariable String mapId){
+        return mapService.getAllPoints(mapId);
+    }
 
     @PostMapping("/{mapId}/point")
     public ResponseEntity<?> addPoint(@PathVariable String mapId, @RequestBody Point point){
