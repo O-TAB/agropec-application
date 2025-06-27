@@ -14,7 +14,7 @@ public class EventController {
     private EventService eventService;
 
     @PostMapping("/{mapId}")
-    public ResponseEntity<?> cadastrateEvent(@PathVariable String mapId, @RequestBody Event event){
+    public ResponseEntity<?> cadastrateEvent(@PathVariable String mapId, @RequestBody Event event) throws InterruptedException {
         return eventService.cadastrateEvent(event, mapId);
     }
 
@@ -25,21 +25,21 @@ public class EventController {
     }
 
 
-    @GetMapping("/{name}")
-    public ResponseEntity<?> getEventByName(@PathVariable String name){
-        return eventService.getEventByName(name);
+    @GetMapping("/{eventId}")
+    public ResponseEntity<?> getEventByName(@PathVariable long eventId){
+        return eventService.getEventById(eventId);
     }
 
 
-    @PutMapping("/{name}")
-    public ResponseEntity<?> updateEvent(@PathVariable long id, @RequestBody Event event){
-        return eventService.updateEvent(event, id);
+    @PutMapping("/{eventId}")
+    public ResponseEntity<?> updateEvent(@PathVariable long eventId, @RequestBody Event event) throws InterruptedException {
+        return eventService.updateEvent(event, eventId);
     }
 
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<?> deleteEventByName(@PathVariable String name){
-        return eventService.deleteEventByName(name);
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<?> deleteEventByName(@PathVariable long eventId) throws InterruptedException {
+        return eventService.deleteEventById(eventId);
     }
 
 }

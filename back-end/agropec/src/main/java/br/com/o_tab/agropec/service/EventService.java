@@ -18,8 +18,9 @@ public class EventService {
 
     private EventRepository eventRepository;
     private MapRepository mapRepository;
+    private NotificationsService notificationsService;
 
-    public ResponseEntity<?> cadastrateEvent(Event event, String mapId){
+    public ResponseEntity<?> cadastrateEvent(Event event, String mapId) throws InterruptedException {
         Optional<Map> foundMap = mapRepository.findById(mapId);
         if(foundMap.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum mapa encontrado para o ID informado.");
@@ -30,6 +31,7 @@ public class EventService {
             event.getPoint().setMap(map);
             eventRepository.save(event);
 
+            notificationsService.newNotificatoin("O evento " + event.getName() + " foi adicionado!");
             return ResponseEntity.ok().body("Evento cadastrado com sucesso!");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Os dados do ponto do evento não foram devidamente informados");
@@ -51,8 +53,8 @@ public class EventService {
         }
     }
 
-    public ResponseEntity<?> getEventByName(String name){
-        Optional<Event> foundEvent = eventRepository.findByName(name);
+    public ResponseEntity<?> getEventById(long eventId){
+        Optional<Event> foundEvent = eventRepository.findById(eventId);
         if(foundEvent.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado para o nome informado");
         } else {
@@ -60,8 +62,8 @@ public class EventService {
         }
     }
 
-    public ResponseEntity<?> updateEvent(Event event, long id){
-        Optional<Event> foundEvent = eventRepository.findById(id);
+    public ResponseEntity<?> updateEvent(Event event, long eventId) throws InterruptedException {
+        Optional<Event> foundEvent = eventRepository.findById(eventId);
         if(foundEvent.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado para o nome informado.");
         }
@@ -75,12 +77,13 @@ public class EventService {
         eventToUpdate.setPoint(event.getPoint());
         Event updatedEvent = eventRepository.save(eventToUpdate);
 
+        notificationsService.newNotificatoin("O evento " + eventToUpdate.getName() + " foi atualizado!");
         return ResponseEntity.ok(updatedEvent);
     }
 
 
-    public ResponseEntity<?> deleteEventByName(String name){
-        Optional<Event> foundEvent = eventRepository.findByName(name);
+    public ResponseEntity<?> deleteEventById(long eventId) throws InterruptedException {
+        Optional<Event> foundEvent = eventRepository.findById(eventId);
         if(foundEvent.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado para o nome informado.");
         }
@@ -88,6 +91,7 @@ public class EventService {
         Event eventToDelete = foundEvent.get();
         eventRepository.deleteById(eventToDelete.getId());
 
+        notificationsService.newNotificatoin("O evento " + eventToDelete.getName() + " foi deletado!");
         return ResponseEntity.ok().body("Evento deletado com sucesso!");
     }
 }

@@ -57,8 +57,8 @@ public class StandService {
         return ResponseEntity.ok(allStands);
     }
 
-    public ResponseEntity<?> getStandByName(String name){
-        Optional<Stand> foundStand = standRepository.findByName(name);
+    public ResponseEntity<?> getStandById(long standId){
+        Optional<Stand> foundStand = standRepository.findById(standId);
 
         if(foundStand.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum estande encontrado com o nome informado.");
@@ -89,8 +89,8 @@ public class StandService {
     }
 
     @Transactional
-    public ResponseEntity<?> deleteStandByName(String name) throws InterruptedException {
-        Optional<Stand> foundStand = standRepository.findByName(name);
+    public ResponseEntity<?> deleteStandById(long standId) throws InterruptedException {
+        Optional<Stand> foundStand = standRepository.findById(standId);
 
         if(foundStand.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum estande cadastrado para o nome informado.");

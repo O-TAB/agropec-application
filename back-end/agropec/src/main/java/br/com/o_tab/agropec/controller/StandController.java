@@ -26,19 +26,19 @@ public class StandController {
         return standService.getAllStands();
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<?> getStandByName(@PathVariable String name){
-        return standService.getStandByName(name);
+    @GetMapping("/{standId}")
+    public ResponseEntity<?> getStandById(@PathVariable long standId){
+        return standService.getStandById(standId);
     }
 
-    @PutMapping("/{name}")
-    public ResponseEntity<?> updateStand(@PathVariable long id, @RequestBody Stand stand) throws InterruptedException {
-        return standService.updateStand(id, stand);
+    @PutMapping("/{standId}")
+    public ResponseEntity<?> updateStand(@PathVariable long standId, @RequestBody Stand stand) throws InterruptedException {
+        return standService.updateStand(standId, stand);
     }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<?> deleteStandByName(@PathVariable String name) throws InterruptedException {
-        return standService.deleteStandByName(name);
+    @DeleteMapping("/{standId}")
+    public ResponseEntity<?> deleteStandById(@PathVariable long standId) throws InterruptedException {
+        return standService.deleteStandById(standId);
     }
 
 }
