@@ -1,42 +1,69 @@
 import { useState, useRef, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useParams } from "react-router-dom";
 import { MapPin } from "lucide-react";
 import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-//provisorios
-import { allPins, imageMap } from "../data/pinsData"; 
+// temporários 
+import { imageMap } from "../data/pinsData";
 import imgMapa from "../assets/MAPA-A1.svg";
-//
 
 import EventPopup from '../components/EventPopup';
 import { getSvgDimensions } from "../functions/SvgDimensionReader";
 
-//aqui allpins
-
-
-//tamanho do mapa original em pixels
 const dimensions = getSvgDimensions(imgMapa);
-
-
 
 export default function MapPage() {
   const transformWrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [searchParams] = useSearchParams();
+  
+  // estado para armazenar a lista de todos os pins (pontos) que vêm da api
+  const [allPins, setAllPins] = useState<any[]>([]);
 
-  //fazer o mesmo so que com points/pins
+  // preparação para o futuro: lógica para obter o id do mapa dinamicamente da url
+  // const { mapId } = useParams(); 
+
+  /*
+   efeito para buscar os pins da api assim que o componente é montado
+   atualmente, usa um id de mapa fixo para desenvolvimento
+   no futuro, quando o id for dinâmico (via useparams), a requisição se tornará
+   dependente da variável 'mapid', e o array de dependências deverá ser [mapid]
+   */
+
+  useEffect(() => {
+
+    const mapId = "5f3b1e8f-ca14-4ea1-a2ca-826f8e04dcab";  //id do mapa que a gente tá usando
+
+    // verificação futura: se não houver mapid, não faz a requisição
+    // if (!mapId) return;
+
+    fetch(`http://localhost:8080/map/${mapId}/point`)
+      .then((res) => res.json())
+      .then((data) => {
+        setAllPins(data); // armazena os pins retornados pelo backend no estado
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar os pinos:", err);
+      });
+  }, []);
+
+  // filtra os pins que devem ser exibidos com base na categoria ativa.
   const visiblePins = activeCategory
     ? allPins.filter(pin => pin.category === activeCategory)
     : [];
 
-  const handleShowPins = (category:string | null) => { // Ajustado para aceitar null
+  // função para atualizar a categoria ativa e limpar qualquer evento selecionado
+  const handleShowPins = (category:string | null) => {
     setSelectedEvent(null);
     setActiveCategory(category);
   };
   
-  //logica de foco no pin vindo de outra página
+  // efeito para focar em um pin específico quando o id é passado via url 
   useEffect(() => {
+    // garante que o código só execute após os pins serem carregados da api
+    if (allPins.length === 0) return; 
+
     const pinIdFromUrl = searchParams.get('pinId');
     if (pinIdFromUrl && transformWrapperRef.current) {
       const pinToFocus = allPins.find(p => p.id === Number(pinIdFromUrl));
@@ -51,18 +78,16 @@ export default function MapPage() {
         }, 200);
       }
     }
-  }, []); 
+  }, [allPins, searchParams]);
 
-  // --- LÓGICA DE ZOOM CORRIGIDA AQUI ---
+  // efeito para controlar o zoom automático do mapa ao selecionar certas categorias
   useEffect(() => {
     if (!transformWrapperRef.current) return;
-
     const { zoomToElement, resetTransform } = transformWrapperRef.current;
-
-    // Apenas estas categorias darão zoom automático
+    
+    // categorias que acionam o zoom automático ao serem selecionadas
     const categoriesToZoom = ['ambulancia', 'pracaalimentacao'];
 
-    // Verifica se a categoria ativa é uma das que devem dar zoom
     if (activeCategory && categoriesToZoom.includes(activeCategory)) {
       const pinToZoom = visiblePins[0];
       if (pinToZoom) {
@@ -72,10 +97,10 @@ export default function MapPage() {
         }, 100);
       }
     } else {
-      // Para todas as outras categorias (stand, event, banheiros) ou ao limpar, reseta o mapa
+      // reseta o zoom se nenhuma categoria especial estiver ativa
       if (typeof resetTransform === "function") resetTransform(600, "easeOut");
     }
-  }, [activeCategory]); // A dependência de 'visiblePins' foi removida para evitar re-execuções desnecessárias
+  }, [activeCategory, visiblePins]);
   
   return (
     <>
