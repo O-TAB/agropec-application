@@ -59,3 +59,12 @@ export const emptypoint: point = {
     y: 0,   
 };
 
+export const emptyStandEvent: StandEventResponse = {
+    id: 0,
+    name: '',
+    description: '',
+    descriptionCard: '',
+    img: '',
+    point: emptypoint
+  };
+

@@ -10,14 +10,15 @@ import ProtectedRoute from './components/ProtectedRoute';
 import CadastroUsuarioPage from './pages/Admin_pages/RegisterPage';
 import ManagerUsers from './pages/Admin_pages/ManagerUsers';
 import SvgUploader from './pages/Admin_pages/SvgUploader';
-
+import Registernewpoint from './pages/Admin_pages/RegisterNewpoint';
 export default function App() {
   return (
     <>
       <NavbarComponents />
       <Routes>
-        {/* Rotas Públicas */}
-        <Route path="/" element={<Mainpage />} />
+        {/* <Mainpage /> */}
+
+        <Route path="/" element={<Registernewpoint/>} />
         <Route path="/stands" element={<StandsPage />} />
         <Route path="/events" element={<h1>Programações</h1>} />
         <Route path="/mapa" element={<MapPage />} />

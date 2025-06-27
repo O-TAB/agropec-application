@@ -4,7 +4,7 @@ import { StandEventResponse } from "../../data/ObjectStructures";
 import { DeletePin } from "../../functions/persistence/CrudPins";
 
 interface ItemstoeditProps {
-    item: StandEventResponse;
+    item: StandEventResponse ;
     setSelectedPin: (item: StandEventResponse) => void;
     type: string;
 }

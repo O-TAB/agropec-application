@@ -1,27 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 import { useAuth } from '../../context/AuthContext';
-import { Upload, MousePointer, Save, PlusCircle } from 'lucide-react';
+import { MousePointer, Save, PlusCircle } from 'lucide-react';
 
 import {debugdata, getMypoints, getFirstMapId} from '../../functions/persistence/api';
 import { emptypoint, point } from '../../data/ObjectStructures';
 import SelectPointOnMap from '../../components/admin_pages_components/SelectPointOnMap';
-import RegisterAndEdit from '../../components/admin_pages_components/RegisterAndEditBT';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import { RegisterNewPoint, UpdatePoint } from '../../functions/persistence/CrudPins';
+
+import NameToPin from '../../components/admin_pages_components/NameToPin';
+import ListPoints from '../../components/admin_pages_components/ListPoints';
+
 const navigate = useNavigate();
-
-
 
 export default function Registernewpoint() {
   const { logout } = useAuth();
-
-  
-
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [newItem, setNewItem] = useState<point>(emptypoint);
+
+  const [newPoint, setNewPoint] = useState<point>(emptypoint);
   const [itemSelected, setItemSelected] = useState<point | null>(null);
+
   const [isEditing, setIsEditing] = useState(false);
+
   const [showMapModal, setShowMapModal] = useState(false);
   const [allpoints, setPoints] = useState< point[]>([]);
   const [idmap, setidmap] = useState<string>('');
@@ -41,38 +42,26 @@ export default function Registernewpoint() {
   // Auto-preenchimento dos inputs quando um item é selecionado
   useEffect(() => {
     if (itemSelected) {
-      setNewItem(itemSelected);
+      setNewPoint(itemSelected);
       setIsEditing(true);
-      
     } else {
-      setNewItem(emptypoint);
+      setNewPoint(emptypoint);
       setIsEditing(false);
     }
   }, [itemSelected]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-
-    // Atualizar campos aninhados em point
-    if (name === "x" || name === "y" || name === "typePoint") {
-      setNewItem(
-        {
-          ...newItem,
-          [name]: name === "x" || name === "y" ? Number(value) : value,
-        }
-      );
-    } else {
-      setNewItem({ ...newItem, [name]: value });
-    }
+    setNewPoint({ ...newPoint, [name]: value });
+    
   };
 
   const handleSubmit = async() => {
-    
-
     if (isEditing) {
-      UpdatePoint(item, item.id, idmap);
+      UpdatePoint(newPoint, newPoint.id, idmap);
     } else if(idmap){
-      RegisterNewPoint(pinToSend, idmap);
+      RegisterNewPoint(newPoint, idmap);
+      setNewPoint(emptypoint);
     }else{
       console.log("Erro ")
     }
@@ -81,7 +70,7 @@ export default function Registernewpoint() {
   const handleCancelEdit = () => {
     setItemSelected(null);
     setIsEditing(false);
-    setNewItem(emptypoint);
+    setNewPoint(emptypoint);
   };
 
   debugdata();
@@ -89,7 +78,7 @@ export default function Registernewpoint() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-green-800">Gerenciador de Itens</h1>
+        <h1 className="text-4xl font-bold text-green-800">Gerenciar pontos</h1>
         <button 
           onClick={logout}
           className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
@@ -123,8 +112,10 @@ export default function Registernewpoint() {
           )}
 
           <div className="space-y-4">
-            <input type="text" name="name" placeholder="Título do Stand/Evento" value={newItem.name} onChange={handleInputChange} className="w-full p-2 border rounded"/>
-            <select name="typePoint" value={newItem.typePoint} onChange={handleInputChange} className="w-full p-2 border rounded bg-white">
+
+            <NameToPin title='nome do ponto' value={newPoint.name} handleInputChange={handleInputChange}/>
+            {/*corta*/}
+            <select name="typePoint" value={newPoint.typePoint} onChange={handleInputChange} className="w-full p-2 border rounded bg-white">
               <option value="ESPACOSHOW">Espaço de Shows</option>
               <option value="RESTAURANTE">Restaurante</option>
               <option value="ESPACOPALESTRA">Espaço de Palestras</option>
@@ -133,16 +124,18 @@ export default function Registernewpoint() {
               <option value="EMERGENCIA">Emergência</option>
               <option value="PARQUEDIVERSAO">Parque de Diversões</option>
             </select>
+            {/*corta*/}
+            {/*corta*/}
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">Coordenadas do Pino no Mapa</label>
               <div className='flex items-center gap-4'>
                 <div className="relative flex-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-500">X:</span>
-                  <input type="number" name="x" placeholder="Eixo X" value={newItem.x} onChange={handleInputChange} className="w-full p-2 border rounded pl-8"/>
+                  <input type="number" name="x" placeholder="Eixo X" value={newPoint.x} onChange={handleInputChange} className="w-full p-2 border rounded pl-8"/>
                 </div>
                 <div className="relative flex-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-500">Y:</span>
-                  <input type="number" name="y" placeholder="Eixo Y" value={newItem.y} onChange={handleInputChange} className="w-full p-2 border rounded pl-8"/>
+                  <input type="number" name="y" placeholder="Eixo Y" value={newPoint.y} onChange={handleInputChange} className="w-full p-2 border rounded pl-8"/>
                 </div>
                 
                 <button 
@@ -155,7 +148,8 @@ export default function Registernewpoint() {
                 </button>
               </div>
             </div>
-
+            {/*corta*/}
+            {/*NAOOOOOOOOO corta*/}
             <button 
                 onClick={() => handleSubmit()}
                 className={`w-full p-3 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors ${
@@ -176,27 +170,17 @@ export default function Registernewpoint() {
             </>
             )}
             </button>
+            {/*NAOOOOOOOOO corta*/}
           </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-           <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Itens Atuais</h2>
-           <div className="max-h-[600px] overflow-y-auto pr-2">
-             <h3 className="text-xl font-bold text-green-600 my-2">Stands</h3>
-             {/* {allstands.map(pin=> (
-               <Itemstoedit key={pin.id} item={pin} setSelectedPin={setItemSelected} type={'stands'}/>
-             ))}
-             <h3 className="text-xl font-bold text-green-600 my-2 mt-6">Eventos</h3>
-             {allevents.map(pin => (
-               <Itemstoedit key={pin.id} item={pin} setSelectedPin={setItemSelected} type={'event'}/>
-             ))} */}
-           </div>
-        </div>
+        <ListPoints allItems={allpoints} idmapa={idmap} setSelectedPin={setItemSelected} />
       </div>
+      
       {showMapModal && (<SelectPointOnMap 
         setShowMapModal={setShowMapModal} 
-        setNewpoit={setNewItem} 
-        allpoints={points} 
-        newItem={newItem}  />)}
+        setNewpoint={setNewPoint} 
+        allpoints={allpoints} 
+        newpoint={newPoint}  />)}
     </div>
   );
 }

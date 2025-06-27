@@ -21,20 +21,7 @@ export default function AdminManagerPage() {
   
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const emptyStandEvent: StandEventResponse = {
-    id: 0,
-    name: '',
-    description: '',
-    descriptionCard: '',
-    img: '',
-    point: {
-        id: 0,
-        typePoint: 'EXPOSITORES',
-        x: 0,
-        y: 0,
-    }
-    // Date é opcional, pode omitir
-  };
+  
   const [newItem, setNewItem] = useState<StandEventResponse>(emptyStandEvent);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [itemSelected, setItemSelected] = useState<StandEventResponse | null>(null);
@@ -155,6 +142,7 @@ export default function AdminManagerPage() {
 
           <div className="space-y-4">
             <input type="text" name="name" placeholder="Título do Stand/Evento" value={newItem.name} onChange={handleInputChange} className="w-full p-2 border rounded"/>
+            
             <select name="typePoint" value={newItem.point.typePoint} onChange={handleInputChange} className="w-full p-2 border rounded bg-white">
               <option value="EXPOSITORES">Empresa</option>
               <option value="RESTAURANTE">Restaurante</option>
@@ -167,10 +155,11 @@ export default function AdminManagerPage() {
             </select>
             <textarea name="description" placeholder="Descrição" value={newItem.description} onChange={handleInputChange} className="w-full p-2 border rounded" rows={3}></textarea>
             
+            {/*corta outro*/}
             <div className="p-4 border rounded-lg bg-gray-50 space-y-3">
               <label className="block text-sm font-medium text-gray-600">Imagem do Item</label>
               <div className="space-y-3">
-                <select 
+                {/* <select 
                   name="img" 
                   value={newItem.img} 
                   onChange={handleInputChange} 
@@ -181,7 +170,7 @@ export default function AdminManagerPage() {
                       {img.label}
                     </option>
                   ))}
-                </select>
+                </select> */}
                 
                 <div className="flex items-center gap-4">
                   <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
@@ -203,7 +192,7 @@ export default function AdminManagerPage() {
                   <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover rounded-md border" />
                 </div>
               )}
-            </div>
+            </div>{/*corta ate aq*/}
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">Coordenadas do Pino no Mapa</label>

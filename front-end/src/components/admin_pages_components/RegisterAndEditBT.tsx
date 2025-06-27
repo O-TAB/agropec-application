@@ -11,8 +11,6 @@ interface valuesProps{
     idmap: string | undefined;
 }
 
-
-
 const tipo = 'stands';
 
 const RegisterAndEditBT: React.FC<valuesProps> =({isEditing, item, idmap}) => {

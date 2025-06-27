@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Map, X } from "lucide-react";
-import { StandEventResponse } from '../../data/ObjectStructures';
+import { point} from '../../data/ObjectStructures';
 import Mapa from '../../assets/MAPA-A1.svg';
 
 interface params{    
     setShowMapModal: (show: boolean) => void;
-    setNewItem: (item: StandEventResponse) => void;
-    allpoints: StandEventResponse[];
-    newItem: StandEventResponse;
+    setNewpoint: (item: point) => void;
+    allpoints: point[];
+    newpoint: point;
 }
 
-const SelectPointOnMap: React.FC<params> = ({setShowMapModal, setNewItem, allpoints, newItem }) => { 
+const SelectPointOnMap: React.FC<params> = ({setShowMapModal, setNewpoint, allpoints, newpoint }) => { 
     const [selectedPosition, setSelectedPosition] = useState<{x: number, y: number} | null>(null);
     //tamanho do mapa original em pixels
     const ORIGINAL_MAP_WIDTH = 3508;
@@ -31,15 +31,11 @@ const SelectPointOnMap: React.FC<params> = ({setShowMapModal, setNewItem, allpoi
 
     const confirmPosition = () => {
         if (selectedPosition) {
-        setNewItem({
-            ...newItem,
-            point: {
-                id: newItem.point.id, // Gera um ID único se não houver
-                x: selectedPosition.x,
-                y: selectedPosition.y,
-                typePoint: newItem.point.typePoint 
-            }
-        });
+        setNewpoint({
+              ...newpoint,
+              x: selectedPosition.x,
+              y: selectedPosition.y,              
+            });
         setShowMapModal(false);
         setSelectedPosition(null);
         }
@@ -96,12 +92,12 @@ const SelectPointOnMap: React.FC<params> = ({setShowMapModal, setNewItem, allpoi
                     <div 
                       key={point.id}
                       className={`absolute w-2 h-2 rounded-full border border-white shadow-sm ${
-                        point.point.typePoint === 'stand' ? 'bg-red-400' : 
-                        point.point.typePoint === 'event' ? 'bg-purple-400' : 'bg-green-400'
+                        point.typePoint === 'stand' ? 'bg-red-400' : 
+                        point.typePoint === 'event' ? 'bg-purple-400' : 'bg-green-400'
                       }`}
                       style={{ 
-                        left: `${(point.point.x / ORIGINAL_MAP_WIDTH) * 100}%`, 
-                        top: `${(point.point.y / ORIGINAL_MAP_HEIGHT) * 100}%` 
+                        left: `${(point.x / ORIGINAL_MAP_WIDTH) * 100}%`, 
+                        top: `${(point.y / ORIGINAL_MAP_HEIGHT) * 100}%` 
                       }}
                       title={point.name}
                     />
