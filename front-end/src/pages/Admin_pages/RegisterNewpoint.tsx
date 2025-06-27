@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useAuth } from '../../context/AuthContext';
 import { MousePointer, Save, PlusCircle } from 'lucide-react';
 
 import {debugdata, getMypoints, getFirstMapId} from '../../functions/persistence/api';
-import { emptypoint, point } from '../../data/ObjectStructures';
+import { emptypoint, point, ResponsePoint } from '../../data/ObjectStructures';
 import SelectPointOnMap from '../../components/admin_pages_components/SelectPointOnMap';
 import { useNavigate} from 'react-router-dom';
 import { RegisterNewPoint, UpdatePoint } from '../../functions/persistence/CrudPins';
@@ -12,21 +12,27 @@ import { RegisterNewPoint, UpdatePoint } from '../../functions/persistence/CrudP
 import NameToPin from '../../components/admin_pages_components/NameToPin';
 import ListPoints from '../../components/admin_pages_components/ListPoints';
 
-const navigate = useNavigate();
+
 
 export default function Registernewpoint() {
   const { logout } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [newPoint, setNewPoint] = useState<point>(emptypoint);
-  const [itemSelected, setItemSelected] = useState<point | null>(null);
-
-  const [isEditing, setIsEditing] = useState(false);
-
-  const [showMapModal, setShowMapModal] = useState(false);
-  const [allpoints, setPoints] = useState< point[]>([]);
-  const [idmap, setidmap] = useState<string>('');
+  const [newPoint, setNewPoint] = useState<point | ResponsePoint>(emptypoint);
+  const [itemSelected, setPointSelected] = useState<ResponsePoint | null>(null);
+  //nao é possivel que um item selecionado seja um point simples
   
+  const [isEditing, setIsEditing] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [allpoints, setPoints] = useState< ResponsePoint[]>([]);
+  const [idmap, setidmap] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+
+  const loadPoints = async () => {
+    if (idmap) {
+      const data = await getMypoints(idmap);
+      setPoints(data);
+    }
+  };
 
   useEffect(() => {
     getFirstMapId().then((idmap) => {
@@ -36,10 +42,14 @@ export default function Registernewpoint() {
             navigate('/uploadmap');
           }
         });  
-    getMypoints(idmap).then((data) => setPoints(data));    
-  }, []);
+  }, [navigate]);
 
-  // Auto-preenchimento dos inputs quando um item é selecionado
+  useEffect(() => {
+    loadPoints();
+  }, [idmap]);
+
+  // é necessario ter uma segunda variavel para selecionar item para que não ocorra erros relacionados ao valor 'null'
+  // ex: ao setar como null a função useEffect ativa e set como empty item e logo em seguida ativa como se tivesse editando um elemento.
   useEffect(() => {
     if (itemSelected) {
       setNewPoint(itemSelected);
@@ -57,20 +67,47 @@ export default function Registernewpoint() {
   };
 
   const handleSubmit = async() => {
-    if (isEditing) {
-      UpdatePoint(newPoint, newPoint.id, idmap);
-    } else if(idmap){
-      RegisterNewPoint(newPoint, idmap);
-      setNewPoint(emptypoint);
-    }else{
-      console.log("Erro ")
+    if (!newPoint.name || !newPoint.typePoint) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (isEditing) {
+        if ('id' in newPoint && newPoint.id !== undefined) {
+          const success = await UpdatePoint(newPoint, newPoint.id, idmap);
+          if (success) {
+            alert('Ponto atualizado com sucesso!');
+            setPointSelected(null);
+            await loadPoints(); // Recarrega a lista
+          } else {
+            alert('Erro ao atualizar o ponto. Tente novamente.');
+          }
+        } else {
+          alert("Não é possível editar: ponto sem ID.");
+        }
+      } else if(idmap){
+        const success = await RegisterNewPoint(newPoint, idmap);
+        if (success) {
+          alert('Ponto registrado com sucesso!');
+          setNewPoint(emptypoint);
+          await loadPoints(); // Recarrega a lista
+        } else {
+          alert('Erro ao registrar o ponto. Tente novamente.');
+        }
+      }else{
+        alert("Erro: ID do mapa não encontrado.");
+      }
+    } catch (error) {
+      alert('Erro inesperado. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleCancelEdit = () => {
-    setItemSelected(null);
-    setIsEditing(false);
-    setNewPoint(emptypoint);
+    setPointSelected(null);
   };
 
   debugdata();
@@ -116,6 +153,7 @@ export default function Registernewpoint() {
             <NameToPin title='nome do ponto' value={newPoint.name} handleInputChange={handleInputChange}/>
             {/*corta*/}
             <select name="typePoint" value={newPoint.typePoint} onChange={handleInputChange} className="w-full p-2 border rounded bg-white">
+              <option value="">Selecione o tipo</option>
               <option value="ESPACOSHOW">Espaço de Shows</option>
               <option value="RESTAURANTE">Restaurante</option>
               <option value="ESPACOPALESTRA">Espaço de Palestras</option>
@@ -152,13 +190,19 @@ export default function Registernewpoint() {
             {/*NAOOOOOOOOO corta*/}
             <button 
                 onClick={() => handleSubmit()}
+                disabled={isSubmitting}
                 className={`w-full p-3 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors ${
                 isEditing 
                     ? 'bg-blue-600 text-white hover:bg-blue-700' 
                     : 'bg-green-600 text-white hover:bg-green-700'
-                }`}
+                } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-            {isEditing ? (
+            {isSubmitting ? (
+                <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    {isEditing ? 'Salvando...' : 'Registrando...'}
+                </>
+            ) : isEditing ? (
             <>
                 <Save size={20} />
                 Salvar Alterações
@@ -173,14 +217,14 @@ export default function Registernewpoint() {
             {/*NAOOOOOOOOO corta*/}
           </div>
         </div>
-        <ListPoints allItems={allpoints} idmapa={idmap} setSelectedPin={setItemSelected} />
+        <ListPoints allItems={allpoints} idmapa={idmap} setSelectedPin={setPointSelected} onRefresh={loadPoints} />
       </div>
       
       {showMapModal && (<SelectPointOnMap 
         setShowMapModal={setShowMapModal} 
-        setNewpoint={setNewPoint} 
+        setNewPoint={setNewPoint} 
         allpoints={allpoints} 
-        newpoint={newPoint}  />)}
+      />)}
     </div>
   );
 }

@@ -11,6 +11,7 @@ import CadastroUsuarioPage from './pages/Admin_pages/RegisterPage';
 import ManagerUsers from './pages/Admin_pages/ManagerUsers';
 import SvgUploader from './pages/Admin_pages/SvgUploader';
 import Registernewpoint from './pages/Admin_pages/RegisterNewpoint';
+import RegisterNewpoint from './pages/Admin_pages/RegisterNewpoint';
 export default function App() {
   return (
     <>
@@ -18,7 +19,7 @@ export default function App() {
       <Routes>
         {/* <Mainpage /> */}
 
-        <Route path="/" element={<Registernewpoint/>} />
+        <Route path="/" element={<Mainpage />} />
         <Route path="/stands" element={<StandsPage />} />
         <Route path="/events" element={<h1>Programações</h1>} />
         <Route path="/mapa" element={<MapPage />} />
@@ -32,7 +33,7 @@ export default function App() {
         }/>
         <Route path="/gerenciar/:id" element={
           <ProtectedRoute>
-            <AdminManagerPage />
+            <RegisterNewpoint />
           </ProtectedRoute>
         }/>
         <Route path="/cadastro" element={

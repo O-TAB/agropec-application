@@ -36,10 +36,6 @@ public class StandService {
 
        if(stand.getPoint() != null){
            Point point = stand.getPoint();
-           // Força criação de novo Point se ID for 0 ou nulo
-           if(point.getId() == null || point.getId() == 0) {
-               point.setId(null); // Remove ID para forçar nova entidade
-           }
            point.setMap(map);
            stand.setPoint(point);
            standRepository.save(stand);

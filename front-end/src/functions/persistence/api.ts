@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {point, StandEventResponse} from '../../data/ObjectStructures';
+import {point, ResponsePoint, StandEventResponse} from '../../data/ObjectStructures';
 import { fetchAllStandsData, fetchAllEventData, fetchAllPoints} from './CrudPins';
 
 export const getAuthHeaders = () => {
@@ -8,10 +8,29 @@ export const getAuthHeaders = () => {
 };
 
 export const BASE_URL = 'http://localhost:8080';
-let cachedDataStands: StandEventResponse[] | [];
-let cachedDataEvents: StandEventResponse[] | [];
-let cachedPoints: point[] | [];
+let cachedDataStands: StandEventResponse[] | null = null;
+let cachedDataEvents: StandEventResponse[] | null = null;
+let cachedPoints: ResponsePoint[] | null = null;
 let isLoadingData: boolean = false; // Para evitar requisições simultâneas
+
+// Funções para limpar cache
+export const clearStandsCache = () => {
+  cachedDataStands = null;
+};
+
+export const clearEventsCache = () => {
+  cachedDataEvents = null;
+};
+
+export const clearPointsCache = () => {
+  cachedPoints = null;
+};
+
+export const clearAllCache = () => {
+  cachedDataStands = null;
+  cachedDataEvents = null;
+  cachedPoints = null;
+};
 
 export const uploadMap = async (svgContent: string, name = "Mapa") => {
   try {
@@ -110,8 +129,14 @@ export async function getMyObjectsEvent(): Promise<StandEventResponse[]> {
   }
 }
 
-export async function getMypoints(idmap: string): Promise<point[]> {
-  if (cachedPoints) {
+export async function getMypoints(idmap: string): Promise<ResponsePoint[]> {
+  // Se não temos um idmap válido, retorna array vazio
+  if (!idmap) {
+    return [];
+  }
+
+  // Se temos cache e não estamos carregando, retorna o cache
+  if (cachedPoints && !isLoadingData) {
     console.log('Dados recuperados do cache.');
     return cachedPoints;
   }
@@ -129,6 +154,7 @@ export async function getMypoints(idmap: string): Promise<point[]> {
   }
   isLoadingData = true;
   console.log('Buscando dados da API pela primeira vez ou cache vazio...');
+  
   try {
     const data = await fetchAllPoints(idmap);
     cachedPoints = data; // Armazena em cache

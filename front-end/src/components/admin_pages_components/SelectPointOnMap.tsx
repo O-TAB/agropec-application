@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { Map, X } from "lucide-react";
-import { point, StandEventResponse } from '../../data/ObjectStructures'; 
+import { point, ResponsePoint} from '../../data/ObjectStructures'; 
 import Mapa from '../../assets/MAPA-A1.svg';
 
 interface params {
   setShowMapModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setNewItem: React.Dispatch<React.SetStateAction<StandEventResponse>>; // <-- nome e tipo corrigidos
-  allpoints: point[];
-  newItem: StandEventResponse; // <-- nome e tipo corrigidos
+  setNewPoint: React.Dispatch<React.SetStateAction<ResponsePoint | point>>; // <-- nome e tipo corrigidos
+  allpoints: ResponsePoint[];
 }
 
-const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewItem, allpoints, newItem }) => {
+const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewPoint, allpoints }) => {
   const [selectedPosition, setSelectedPosition] = useState<{ x: number, y: number } | null>(null);
   //tamanho do mapa original em pixels
   const ORIGINAL_MAP_WIDTH = 3508;
@@ -32,13 +31,10 @@ const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewItem, allpo
   const confirmPosition = () => {
     if (selectedPosition) {
       // mexi aqui (sofia)
-      setNewItem(currentItem => ({
-        ...currentItem, 
-        point: {
-          ...currentItem.point, 
+      setNewPoint(currentItem => ({
+          ...currentItem, 
           x: selectedPosition.x, 
           y: selectedPosition.y, 
-        }
       }));
       setShowMapModal(false);
       setSelectedPosition(null);
