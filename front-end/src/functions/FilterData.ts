@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { StandEventResponse } from '../data/RequestStructures';
+import { StandEventResponse } from '../data/ObjectStructures';
 
 
 const normalizeText = (text = '') => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();

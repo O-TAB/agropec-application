@@ -5,7 +5,7 @@ import Mainpage from './pages/Mainpage';
 import StandsPage from './pages/StandsPage';
 import MapPage from './pages/MapPage';
 import Login from "./pages/Admin_pages/Login";
-import AdminManagerPage from './pages/AdminManagerPage';
+import AdminManagerPage from './pages/Admin_pages/AdminManagerPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import CadastroUsuarioPage from './pages/Admin_pages/RegisterPage';
 import ManagerUsers from './pages/Admin_pages/ManagerUsers';

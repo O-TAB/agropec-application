@@ -5,8 +5,8 @@ import { useFilteredItems } from '../functions/FilterData';
 import ItemCard from '../components/ItemCard';
 import { imageMap} from '../data/pinsData';
 import DetailsPopup from '../components/DetailsPopup';
-import { StandEventResponse } from '../data/RequestStructures';
-import { getMyObjectsStands, getMyObjectsEvent } from '../functions/api';
+import { StandEventResponse } from '../data/ObjectStructures';
+import { getMyObjectsStands, getMyObjectsEvent } from '../functions/persistence/api';
 
 
 //marcado para concertar

@@ -1,34 +1,38 @@
 
-import { UpdatePin, RegisterNewpin } from "../../functions/api";
-import { StandEventPost } from "../../data/RequestStructures";
+import { UpdatePin, RegisterNewpin } from "../../functions/persistence/CrudPins";
+import { StandEventPost, StandEventResponse } from "../../data/ObjectStructures";
 
 import React from "react";
 import { PlusCircle, Save } from "lucide-react";
 
 interface valuesProps{
     isEditing: boolean;
-    newItem: StandEventPost;
+    item: StandEventResponse;
+    idmap: string | undefined;
 }
 
 
-const testidmap = '7fa6db58-91e0-4d58-9408-07050a1604ec';
+
 const tipo = 'stands';
 
-const RegisterAndEditBT: React.FC<valuesProps> =({isEditing, newItem}) => {
+const RegisterAndEditBT: React.FC<valuesProps> =({isEditing, item, idmap}) => {
     
     const handleSubmit = () => {
     if (isEditing) {
-      UpdatePin(newItem, newItem.name, tipo);
-    } else {
+
+      UpdatePin(item, item.id, tipo);
+    } else if(idmap){
       const pinToSend = {
-        ...newItem,
-        descriptionCard: newItem.descriptionCard,
+        ...item,
+        descriptionCard: item.descriptionCard,
         point: {
-          ...newItem.point,
+          ...item.point,
           id: 0
         }
       };
-      RegisterNewpin(pinToSend, testidmap, tipo);
+      RegisterNewpin(pinToSend, idmap, tipo);
+    }else{
+      console.log("Erro ")
     }
   };
 
@@ -49,7 +53,7 @@ const RegisterAndEditBT: React.FC<valuesProps> =({isEditing, newItem}) => {
         ) : (
         <>
             <PlusCircle size={20} />
-            Adicionar ao Mapa
+            registrar
         </>
         )}
         </button>)

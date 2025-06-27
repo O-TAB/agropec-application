@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
-import { getFirstMapId } from '../../functions/api';
+import { getFirstMapId } from '../../functions/persistence/api';
 import { useNavigate } from 'react-router-dom';
-import { uploadMap } from '../../functions/api';
+import { uploadMap } from '../../functions/persistence/api';
 
 export default function SvgUploader() {
   const [isDragOver, setIsDragOver] = useState(false);

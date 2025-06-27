@@ -1,7 +1,7 @@
 import { Edit, Trash2 } from "lucide-react";
 import { imageMap} from '../../data/pinsData';
-import { StandEventResponse } from "../../data/RequestStructures";
-import { DeletePin } from "../../functions/api";
+import { StandEventResponse } from "../../data/ObjectStructures";
+import { DeletePin } from "../../functions/persistence/CrudPins";
 
 interface ItemstoeditProps {
     item: StandEventResponse;
@@ -27,7 +27,7 @@ const Itemstoedit: React.FC<ItemstoeditProps>
             <Edit size={18} />
         </button>
         <button 
-            onClick={() => DeletePin(item.name, type)} 
+            onClick={() => DeletePin(item.id, type)} 
             title="Apagar Item" 
             className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-100 rounded-full transition-colors">
             <Trash2 size={18} />

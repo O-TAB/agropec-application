@@ -2,7 +2,7 @@
 
 import { Link } from 'react-router-dom';
 import { Map, Clock, X } from 'lucide-react';
-import { StandEventResponse } from '../data/RequestStructures';
+import { StandEventResponse } from '../data/ObjectStructures';
 interface DetailsPopupProps {
   itemData: StandEventResponse | null;
   onClose: () => void;

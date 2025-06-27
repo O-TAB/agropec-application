@@ -1,6 +1,6 @@
 import { Info } from "lucide-react";
 import { imageMap} from '../data/pinsData';
-import { StandEventResponse } from "../data/RequestStructures";
+import { StandEventResponse } from "../data/ObjectStructures";
 
 
 interface ItemProps {

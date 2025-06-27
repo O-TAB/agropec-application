@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { RegisterNewUser } from "../../functions/api";
-import { RegisterUserRequest, UserRole } from "../../data/RequestStructures";
+import { RegisterNewUser } from "../../functions/persistence/CrudUsers";
+import { RegisterUserRequest, UserRole } from "../../data/ObjectStructures";
 
 
 const CadastroUsuarioPage = () => {

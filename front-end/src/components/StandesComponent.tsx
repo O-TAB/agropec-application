@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { StandEventResponse } from "../data/RequestStructures";
+import { StandEventResponse } from "../data/ObjectStructures";
 
 export const StandesComponent = (pin: StandEventResponse) => {
   return (

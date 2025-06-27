@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Map, X } from "lucide-react";
-import { StandEventResponse } from '../../data/RequestStructures';
+import { StandEventResponse } from '../../data/ObjectStructures';
 import Mapa from '../../assets/MAPA-A1.svg';
 
 interface params{    

@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { imageMap } from '../data/pinsData';
-import { useAuth } from '../context/AuthContext';
-import { AlertCircle, Upload, MousePointer } from 'lucide-react';
+import { imageMap } from '../../data/pinsData';
+import { useAuth } from '../../context/AuthContext';
+import { Upload, MousePointer } from 'lucide-react';
 
-import Itemstoedit from '../components/admin_pages_components/IntensToEdit';
-import {debugdata, getMyObjectsStands, getMyObjectsEvent} from '../functions/api';
-import { StandEventResponse } from '../data/RequestStructures';
-import SelectPointOnMap from '../components/admin_pages_components/SelectPointOnMap';
-import RegisterAndEdit from '../components/admin_pages_components/RegisterAndEditBT';
+import Itemstoedit from '../../components/admin_pages_components/IntensToEdit';
+import {debugdata, getMyObjectsStands, getMyObjectsEvent} from '../../functions/persistence/api';
+import { StandEventResponse } from '../../data/ObjectStructures';
+import SelectPointOnMap from '../../components/admin_pages_components/SelectPointOnMap';
+import RegisterAndEdit from '../../components/admin_pages_components/RegisterAndEditBT';
 import { useParams } from 'react-router-dom';
 
 
@@ -36,7 +36,6 @@ export default function AdminManagerPage() {
     // Date é opcional, pode omitir
   };
   const [newItem, setNewItem] = useState<StandEventResponse>(emptyStandEvent);
-  const [message, setMessage] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [itemSelected, setItemSelected] = useState<StandEventResponse | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -51,15 +50,6 @@ export default function AdminManagerPage() {
     getMyObjectsEvent().then((data) => setEvents(data));
   }, []);
 
-  
-  const availableImages = [
-    { value: '', label: 'Sem imagem' },
-    { value: 'imagem_drone.jpg', label: 'Tecnologia no Campo' },
-    { value: 'imagem_card_sustentavel.jpeg', label: 'Pecuária Sustentável' },
-    { value: 'imagem_card_familia.jpg', label: 'Agroindústria Familiar' },
-    { value: 'imagem_irrigacao.avif', label: 'Soluções em Irrigação' },
-    { value: 'imagem_card_maquina.jpeg', label: 'Máquinas e Equipamentos' },
-  ];
 
   // Auto-preenchimento dos inputs quando um item é selecionado
   useEffect(() => {
@@ -138,13 +128,6 @@ export default function AdminManagerPage() {
           Sair (Logout)
         </button>
       </div>
-
-      {message && (
-        <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 flex items-center gap-3" role="alert">
-          <AlertCircle size={20} />
-          <p>{message}</p>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded-lg shadow-md">
@@ -245,7 +228,7 @@ export default function AdminManagerPage() {
               </div>
             </div>
 
-            <RegisterAndEdit isEditing={isEditing} newItem={newItem}/>
+            <RegisterAndEdit isEditing={isEditing} newItem={newItem} idmap={id}/>
           </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">

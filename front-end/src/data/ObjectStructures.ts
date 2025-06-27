@@ -4,6 +4,7 @@ export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'USER';
 
 export type point = {
     id: number;
+    name: string;
     typePoint: string;
     x: number;
     y: number;
@@ -48,4 +49,13 @@ export interface StandEventResponse extends StandEventPost {
     id: number;
 }
 
+//estruturas vazias para rezetar os inputs
+
+export const emptypoint: point = {
+    id: 0,
+    name: '',
+    typePoint: 'EXPOSITORES',
+    x: 0,
+    y: 0,   
+};
 

@@ -1,16 +1,16 @@
 import axios from 'axios';
-import {StandEventResponse, RegisterUserRequest, StandEventPost} from '../data/RequestStructures';
+import {point, StandEventResponse} from '../../data/ObjectStructures';
+import { fetchAllStandsData, fetchAllEventData, fetchAllPoints} from './CrudPins';
 
-
-const getAuthHeaders = () => {
+export const getAuthHeaders = () => {
   const token = localStorage.getItem('jwt_token');
   return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 };
 
-
-const BASE_URL = 'http://localhost:8080';
-let cachedDataStands: StandEventResponse[] | null = null;
-let cachedDataEvents: StandEventResponse[] | null = null;
+export const BASE_URL = 'http://localhost:8080';
+let cachedDataStands: StandEventResponse[] | [];
+let cachedDataEvents: StandEventResponse[] | [];
+let cachedPoints: point[] | [];
 let isLoadingData: boolean = false; // Para evitar requisições simultâneas
 
 export const uploadMap = async (svgContent: string, name = "Mapa") => {
@@ -38,7 +38,7 @@ export const uploadMap = async (svgContent: string, name = "Mapa") => {
   }
 };
 
-export const getFirstMapId =  async (): Promise<string | null> => {
+export const getFirstMapId =  async (): Promise<string> => {
   try{
     const response = await axios.get(`${BASE_URL}/map`,getAuthHeaders());
     console.log('Resposta do servidor:', response.data);
@@ -46,73 +46,13 @@ export const getFirstMapId =  async (): Promise<string | null> => {
     if(Array.isArray(maps) && maps.length > 0 && maps[0].id){
       return maps[0].id
     }
-    return null;
+    return '';
   } catch (error: any) {
     console.error('Error fetching data: ', error);
-    return null;
+    return '';
   }
 }
-
-export const RegisterNewUser =  async (userData: RegisterUserRequest) => {
-  try{
-    const response = await axios.post(`${BASE_URL}/auth/login/register`,userData ,getAuthHeaders());
-    console.log('Resposta do servidor:', response.data);
-  } catch (error: any) {
-      console.error('Error fetching data: ', error);
-  }
-}
-
-export const DeleteUser = async (userID: string)=>{
-  try{
-    const response = await axios.delete(`${BASE_URL}/auth/login/delete/${userID}`, getAuthHeaders());
-    console.log('Resposta do servidor:', response.data);
-  } catch (error: any) {
-      console.error('Error Deleting user: ', error);
-  }
-}
-
-export const RegisterNewpin =  async (StandData: StandEventPost, mapid: string, type: string) => {
-  try{
-    console.log(JSON.stringify(StandData, null, 2));
-
-    const response = await axios.post(`${BASE_URL}/${type}/${mapid}`,StandData ,getAuthHeaders());
-    console.log('Resposta do servidor:', response.data);
-  } catch (error: any) {
-      console.error('Error fetching data: ', error);
-  }
-}
-
-export const UpdatePin =  async (PinData: StandEventPost, namePin: string, type: string) => {
-  try{
-    const response = await axios.put(`${BASE_URL}/${type}/${namePin}`,PinData ,getAuthHeaders());
-    console.log('Resposta do servidor:', response.data);
-  } catch (error: any) {
-      console.error('Error fetching data: ', error);
-  }
-}
-
-export const DeletePin =  async (namePin: string, type: string) => {
-  try{
-    const response = await axios.delete(`${BASE_URL}/${type}/${namePin}`,getAuthHeaders());
-    console.log('Resposta do servidor:', response.data);
-  } catch (error: any) {
-      console.error('Error fetching data: ', error);
-  }
-}
-
-export const fetchAllStandsData = async (): Promise<StandEventResponse[]> => {
-    try {
-      // Ensure token is available when fetching data
-      const standsResponse = await axios.get(`${BASE_URL}/stands`, getAuthHeaders());
-      console.log('standsResponse.data:', standsResponse.data);
-      if (Array.isArray(standsResponse.data))
-        return standsResponse.data as StandEventResponse[];
-      return [];
-    } catch (error: any) {
-      console.error('Error fetching data:', error);
-      return [];
-    }
-};
+ 
 
 export async function getMyObjectsStands(): Promise<StandEventResponse[]> {
   if (cachedDataStands) {
@@ -142,18 +82,6 @@ export async function getMyObjectsStands(): Promise<StandEventResponse[]> {
   }
 }
 
-export const fetchAllEventData = async (): Promise<StandEventResponse[]> => {
-    try {
-      // Ensure token is available when fetching data
-      const standsResponse = await axios.get(`${BASE_URL}/event`, getAuthHeaders());
-      console.log('standsResponse.data:', standsResponse.data);
-      return standsResponse.data as StandEventResponse[];
-    } catch (error: any) {
-      console.error('Error fetching data:', error);
-      return [];
-    }
-};
-
 export async function getMyObjectsEvent(): Promise<StandEventResponse[]> {
   if (cachedDataEvents) {
     console.log('Dados recuperados do cache.');
@@ -182,11 +110,40 @@ export async function getMyObjectsEvent(): Promise<StandEventResponse[]> {
   }
 }
 
+export async function getMypoints(idmap: string): Promise<point[]> {
+  if (cachedPoints) {
+    console.log('Dados recuperados do cache.');
+    return cachedPoints;
+  }
+
+  if (isLoadingData) {
+    console.log('Dados já sendo carregados, aguardando...');
+    return new Promise(resolve => {
+      const checkInterval = setInterval(() => {
+        if (!isLoadingData && cachedPoints) {
+          clearInterval(checkInterval);
+          resolve(cachedPoints);
+        }
+      }, 100);
+    });
+  }
+  isLoadingData = true;
+  console.log('Buscando dados da API pela primeira vez ou cache vazio...');
+  try {
+    const data = await fetchAllPoints(idmap);
+    cachedPoints = data; // Armazena em cache
+    return data;
+  } finally {
+    isLoadingData = false;
+  }
+}
+
+
 
 export const debugdata = () => {
   console.log('Dados de stands:', cachedDataStands);
   console.log('Dados de eventos:', cachedDataEvents);
-  
+  console.log('Dados de pontos:', cachedPoints);
 }
 
 
