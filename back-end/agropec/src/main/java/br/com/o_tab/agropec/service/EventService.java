@@ -53,8 +53,8 @@ public class EventService {
         }
     }
 
-    public ResponseEntity<?> getEventByName(String name){
-        Optional<Event> foundEvent = eventRepository.findByName(name);
+    public ResponseEntity<?> getEventById(long eventId){
+        Optional<Event> foundEvent = eventRepository.findById(eventId);
         if(foundEvent.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado para o nome informado");
         } else {
@@ -62,8 +62,8 @@ public class EventService {
         }
     }
 
-    public ResponseEntity<?> updateEvent(Event event, long id) throws InterruptedException {
-        Optional<Event> foundEvent = eventRepository.findById(id);
+    public ResponseEntity<?> updateEvent(Event event, long eventId) throws InterruptedException {
+        Optional<Event> foundEvent = eventRepository.findById(eventId);
         if(foundEvent.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado para o nome informado.");
         }
@@ -82,8 +82,8 @@ public class EventService {
     }
 
 
-    public ResponseEntity<?> deleteEventByName(String name) throws InterruptedException {
-        Optional<Event> foundEvent = eventRepository.findByName(name);
+    public ResponseEntity<?> deleteEventById(long eventId) throws InterruptedException {
+        Optional<Event> foundEvent = eventRepository.findById(eventId);
         if(foundEvent.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum evento cadastrado para o nome informado.");
         }
