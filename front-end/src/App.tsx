@@ -1,4 +1,3 @@
-
 import NavbarComponents from './components/NavbarComponents';
 import { Routes, Route } from 'react-router-dom';
 import Mainpage from './pages/Mainpage';
@@ -12,6 +11,8 @@ import ManagerUsers from './pages/Admin_pages/ManagerUsers';
 import SvgUploader from './pages/Admin_pages/SvgUploader';
 import RegisterNewpoint from './pages/Admin_pages/RegisterNewpoint';
 import RegisterNewStand from './pages/Admin_pages/RegisterNewStand';
+import RegisterNewEvents from './pages/Admin_pages/RegisterNewEvents';
+
 export default function App() {
   return (
     <>
@@ -23,17 +24,33 @@ export default function App() {
         <Route path="/stands" element={<StandsPage />} />
         <Route path="/events" element={<h1>Programações</h1>} />
         <Route path="/mapa" element={<MapPage />} />
-        <Route path="/login" element={<Login destination="/uploadmap" />} />
+        <Route path="/login" element={<Login destination="/admin" />} />
         <Route path="/loginSuperadmin" element={<Login destination="/Users" />} />
       
+        {/* Rotas Administrativas */}
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <AdminManagerPage />
+          </ProtectedRoute>
+        }/>
         <Route path="/uploadmap" element={
           <ProtectedRoute>
             <SvgUploader/>
           </ProtectedRoute>
         }/>
-        <Route path="/gerenciar" element={
+        <Route path="/registerpoint" element={
+          <ProtectedRoute>
+            <RegisterNewpoint />
+          </ProtectedRoute>
+        }/>
+        <Route path="/registerstand" element={
           <ProtectedRoute>
             <RegisterNewStand />
+          </ProtectedRoute>
+        }/>
+        <Route path="/registerevents" element={
+          <ProtectedRoute>
+            <RegisterNewEvents />
           </ProtectedRoute>
         }/>
         <Route path="/cadastro" element={

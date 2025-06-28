@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { MousePointer, Save, PlusCircle, ArrowLeft } from 'lucide-react';
+import { MousePointer, Save, PlusCircle, Calendar, MapPin, ArrowLeft } from 'lucide-react';
 
 import {
   StandEventPost,
@@ -12,7 +12,7 @@ import {
   ResponsePoint
 } from "../../data/ObjectStructures";
 
-import { getFirstMapId, getMyObjectsStands, getMypoints } from "../../functions/persistence/api";
+import { getFirstMapId, getMyObjectsEvent, getMypoints } from "../../functions/persistence/api";
 import { RegisterNewpin, UpdatePin } from "../../functions/persistence/CrudPins";
 
 import NameToPin from "../../components/admin_pages_components/NameToPin";
@@ -20,27 +20,37 @@ import SelectPointOnMap from "../../components/admin_pages_components/SelectPoin
 import ImageUploadBlock from "../../components/admin_pages_components/ImageUploadBlock";
 import ListToStandsAndEvents from "../../components/admin_pages_components/ListToStandsAndEvents";
 
-const RegisterNewStand: React.FC = () => {
+const RegisterNewEvents: React.FC = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
   const [idmap, setidmap] = useState<string>("");
-  const [allStands, setAllStands] = useState<StandEventResponse[]>([]);
+  const [allEvents, setAllEvents] = useState<StandEventResponse[]>([]);
   const [allpoints, setAllpoints] = useState<ResponsePoint[]>([]);
+  const [availablePoints, setAvailablePoints] = useState<ResponsePoint[]>([]);
 
-  const [newStand, setNewStand] = useState<StandEventPost | StandEventResponse>(emptyStandEvent);
+  const [newEvent, setNewEvent] = useState<StandEventPost | StandEventResponse>(emptyStandEvent);
   const [itemSelected, setItemSelected] = useState<StandEventResponse | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
+  const [showPointSelector, setShowPointSelector] = useState(false);
 
-  const loadStands = async () => {
+  const loadEvents = async () => {
     if (!idmap) return;
-    const data = await getMyObjectsStands();
-    setAllStands(data);
+    const data = await getMyObjectsEvent();
+    setAllEvents(data);
     const dataPoints = await getMypoints(idmap);
     setAllpoints(dataPoints);
+    
+    // Filtra apenas pontos que podem ser usados para eventos
+    const eventPoints = dataPoints.filter(point => 
+      point.typePoint === 'ESPACOSHOW' || 
+      point.typePoint === 'ESPACORACKATON' || 
+      point.typePoint === 'ESPACOPALESTRA'
+    );
+    setAvailablePoints(eventPoints);
   };
 
   useEffect(() => {
@@ -54,15 +64,16 @@ const RegisterNewStand: React.FC = () => {
   }, [navigate]);
 
   useEffect(() => {
-    loadStands();
+    loadEvents();
   }, [idmap]);
 
+  // é necessario ter uma segunda variavel para selecionar item para que não ocorra erros relacionados ao valor 'null'
   useEffect(() => {
     if (itemSelected) {
-      setNewStand(itemSelected);
+      setNewEvent(itemSelected);
       setIsEditing(true);
     } else {
-      setNewStand({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EXPOSITORES'}});
+      setNewEvent({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EVENTO'}});
       setIsEditing(false);
     }
   }, [itemSelected]);
@@ -70,40 +81,58 @@ const RegisterNewStand: React.FC = () => {
   const handleInputChange = ( e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === "x" || name === "y" || name === "typePoint") {
-      setNewStand({
-        ...newStand,
-        point: { ...newStand.point, [name]: name === "x" || name === "y" ? Number(value) : value },
+      setNewEvent({
+        ...newEvent,
+        point: { ...newEvent.point, [name]: name === "x" || name === "y" ? Number(value) : value },
       });
+    } else if (name === "date") {
+      // Converte para formato ISO 8601
+      const date = new Date(value);
+      const isoDate = date.toISOString();
+      setNewEvent({ ...newEvent, Date: isoDate });
     } else {
-      setNewStand({ ...newStand, [name]: value });
+      setNewEvent({ ...newEvent, [name]: value });
     }
   };
 
+  const handlePointSelection = (point: ResponsePoint) => {
+    setNewEvent(prev => ({
+      ...prev,
+      point: {
+        name: point.name,
+        typePoint: point.typePoint,
+        x: point.x,
+        y: point.y
+      }
+    }));
+    setShowPointSelector(false);
+  };
+
   const handleSubmit = async () => {
-    if (!newStand.name || !newStand.description || !newStand.descriptionCard || !newStand.img) {
-      alert("Preencha todos os campos.");
+    if (!newEvent.name || !newEvent.description || !newEvent.descriptionCard || !newEvent.img || !newEvent.Date) {
+      alert("Preencha todos os campos obrigatórios.");
       return;
     }
 
     setIsSubmitting(true);
     try {
       if (isEditing && itemSelected?.id !== undefined) {
-        const success = await UpdatePin(newStand, itemSelected.id, 'stands');
+        const success = await UpdatePin(newEvent, itemSelected.id, 'events');
         if (success) {
-          alert("Stand atualizado com sucesso!");
+          alert("Evento atualizado com sucesso!");
           setItemSelected(null);
-          await loadStands();
+          await loadEvents();
         } else {
-          alert("Erro ao atualizar o stand. Tente novamente.");
+          alert("Erro ao atualizar o evento. Tente novamente.");
         }
       } else {
-        const success = await RegisterNewpin(newStand, idmap, 'stands');
+        const success = await RegisterNewpin(newEvent, idmap, 'events');
         if (success) {
-          alert("Stand registrado com sucesso!");
-          setNewStand({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EXPOSITORES'}});
-          await loadStands();
+          alert("Evento registrado com sucesso!");
+          setNewEvent({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EVENTO'}});
+          await loadEvents();
         } else {
-          alert("Erro ao registrar o stand. Tente novamente.");
+          alert("Erro ao registrar o evento. Tente novamente.");
         }
       }
     } catch (err) {
@@ -117,12 +146,23 @@ const RegisterNewStand: React.FC = () => {
     setItemSelected(null);
   };
 
-  // Função para atualizar o ponto do stand ao selecionar no mapa
+  // Função para atualizar o ponto do evento ao selecionar no mapa
   const setNewPoint = (point: point) => {
-    setNewStand(prev => ({
+    setNewEvent(prev => ({
       ...prev,
       point: { ...point }
     }));
+  };
+
+  // Formata a data para exibição no input
+  const formatDateForInput = (isoDate: string | undefined) => {
+    if (!isoDate) return '';
+    try {
+      const date = new Date(isoDate);
+      return date.toISOString().slice(0, 16); // Formato YYYY-MM-DDTHH:MM
+    } catch {
+      return '';
+    }
   };
 
   return (
@@ -136,7 +176,7 @@ const RegisterNewStand: React.FC = () => {
             <ArrowLeft size={20} />
             Voltar ao Painel
           </button>
-          <h1 className="text-4xl font-bold text-green-800">Gerenciar Stands</h1>
+          <h1 className="text-4xl font-bold text-green-800">Gerenciar Eventos</h1>
         </div>
         <button
           onClick={logout}
@@ -150,7 +190,7 @@ const RegisterNewStand: React.FC = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4 border-b pb-2">
             <h2 className="text-2xl font-semibold">
-              {isEditing ? 'Editar Stand' : 'Adicionar Novo Stand'}
+              {isEditing ? 'Editar Evento' : 'Adicionar Novo Evento'}
             </h2>
             {isEditing && (
               <button 
@@ -172,15 +212,15 @@ const RegisterNewStand: React.FC = () => {
 
           <div className="space-y-4">
             <NameToPin
-              title="Nome do Stand"
-              value={newStand.name}
+              title="Nome do Evento"
+              value={newEvent.name}
               handleInputChange={handleInputChange}
             />
 
             <textarea
               name="description"
               placeholder="Descrição Completa"
-              value={newStand.description}
+              value={newEvent.description}
               onChange={handleInputChange}
               className="w-full p-2 border rounded"
             />
@@ -188,18 +228,75 @@ const RegisterNewStand: React.FC = () => {
             <textarea
               name="descriptionCard"
               placeholder="Descrição do Cartão"
-              value={newStand.descriptionCard}
+              value={newEvent.descriptionCard}
               onChange={handleInputChange}
               className="w-full p-2 border rounded"
             />
             
             <ImageUploadBlock
-              Value={newStand.img}
-              onImageChange={base64 => setNewStand({ ...newStand, img: base64 || "" })}
+              Value={newEvent.img}
+              onImageChange={base64 => setNewEvent({ ...newEvent, img: base64 || "" })}
             />
 
+            {/* Campo de Data */}
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">Coordenadas do Stand no Mapa</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Data e Hora do Evento</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                <input
+                  type="datetime-local"
+                  name="date"
+                  value={formatDateForInput(newEvent.Date)}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded pl-10"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Seleção de Ponto Existente */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Local do Evento</label>
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPointSelector(!showPointSelector)}
+                  className="w-full p-2 border rounded flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <MapPin size={16} />
+                    {newEvent.point.name || "Selecionar ponto existente"}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {newEvent.point.typePoint || "Nenhum ponto selecionado"}
+                  </span>
+                </button>
+                
+                {showPointSelector && (
+                  <div className="border rounded-lg p-3 bg-gray-50 max-h-40 overflow-y-auto">
+                    <p className="text-sm text-gray-600 mb-2">Pontos disponíveis para eventos:</p>
+                    {availablePoints.length > 0 ? (
+                      availablePoints.map((point) => (
+                        <button
+                          key={point.id}
+                          onClick={() => handlePointSelection(point)}
+                          className="w-full text-left p-2 hover:bg-white rounded transition-colors"
+                        >
+                          <div className="font-medium">{point.name}</div>
+                          <div className="text-sm text-gray-500">{point.typePoint}</div>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">Nenhum ponto disponível para eventos</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Coordenadas (apenas para visualização/edição manual) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Coordenadas do Evento no Mapa</label>
               <div className='flex items-center gap-4'>
                 <div className="relative flex-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-500">X:</span>
@@ -207,7 +304,7 @@ const RegisterNewStand: React.FC = () => {
                     type="number" 
                     name="x" 
                     placeholder="Eixo X" 
-                    value={newStand.point.x} 
+                    value={newEvent.point.x} 
                     onChange={handleInputChange} 
                     className="w-full p-2 border rounded pl-8"
                   />
@@ -218,7 +315,7 @@ const RegisterNewStand: React.FC = () => {
                     type="number" 
                     name="y" 
                     placeholder="Eixo Y" 
-                    value={newStand.point.y} 
+                    value={newEvent.point.y} 
                     onChange={handleInputChange} 
                     className="w-full p-2 border rounded pl-8"
                   />
@@ -257,7 +354,7 @@ const RegisterNewStand: React.FC = () => {
               ) : (
                 <>
                   <PlusCircle size={20} />
-                  Registrar Stand
+                  Registrar Evento
                 </>
               )}
             </button>
@@ -265,10 +362,10 @@ const RegisterNewStand: React.FC = () => {
         </div>
         
         <ListToStandsAndEvents 
-          allItems={allStands} 
+          allItems={allEvents} 
           setSelectedPin={setItemSelected} 
-          onRefresh={loadStands}
-          type="stands"
+          onRefresh={loadEvents}
+          type="events"
         />
       </div>
 
@@ -276,7 +373,7 @@ const RegisterNewStand: React.FC = () => {
         <SelectPointOnMap
           setShowMapModal={setShowMapModal}
           setNewPoint={setNewPoint}
-          currentpoint={newStand.point}
+          currentpoint={newEvent.point}
           allpoints={allpoints}
         />
       )}
@@ -284,4 +381,4 @@ const RegisterNewStand: React.FC = () => {
   );
 };
 
-export default RegisterNewStand;
+export default RegisterNewEvents; 

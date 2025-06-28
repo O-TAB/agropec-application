@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { useAuth } from '../../context/AuthContext';
-import { MousePointer, Save, PlusCircle } from 'lucide-react';
+import { MousePointer, Save, PlusCircle, ArrowLeft } from 'lucide-react';
 
 import {debugdata, getMypoints, getFirstMapId} from '../../functions/persistence/api';
 import { emptypoint, point, ResponsePoint } from '../../data/ObjectStructures';
@@ -115,7 +115,16 @@ export default function Registernewpoint() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-green-800">Gerenciar pontos</h1>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate('/admin')}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            <ArrowLeft size={20} />
+            Voltar ao Painel
+          </button>
+          <h1 className="text-4xl font-bold text-green-800">Gerenciar pontos</h1>
+        </div>
         <button 
           onClick={logout}
           className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"

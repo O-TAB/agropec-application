@@ -1,226 +1,170 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import {MousePointer, Save, PlusCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { MapPin, Store, Calendar, Settings, LogOut } from 'lucide-react';
 
-import ListToStandsAndEvents from '../../components/admin_pages_components/ListToStandsAndEvents';
-import { debugdata, getMyObjectsStands, getMyObjectsEvent } from '../../functions/persistence/api';
-import { StandEventResponse, emptyStandEvent, StandEventPost } from '../../data/ObjectStructures';
-import SelectPointOnMap from '../../components/admin_pages_components/SelectPointOnMap';
-import ImageUploadBlock from '../../components/admin_pages_components/ImageUploadBlock';
-import { RegisterNewpin, UpdatePin } from '../../functions/persistence/CrudPins';
-
-export default function AdminManagerPage() {
+const AdminManagerPage: React.FC = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
-  const [newItem, setNewItem] = useState<StandEventPost | StandEventResponse>(emptyStandEvent);
-  const [itemSelected, setItemSelected] = useState<StandEventResponse | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [showMapModal, setShowMapModal] = useState(false);
-  const [allstands, setStands] = useState<StandEventResponse[]>([]);
-  const [allevents, setEvents] = useState<StandEventResponse[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentType, setCurrentType] = useState<'stands' | 'events'>('stands');
-  
-  // Função para buscar/atualizar os dados, evitando repetição de código
-  const fetchAllData = () => {
-    getMyObjectsStands().then((data) => setStands(data));
-    getMyObjectsEvent().then((data) => setEvents(data));
-  }
-
-  useEffect(() => {
-    fetchAllData();
-  }, []);
-
-  useEffect(() => {
-    if (itemSelected) {
-      setNewItem(itemSelected);
-      setIsEditing(true);
-    } else {
-      setNewItem(emptyStandEvent);
-      setIsEditing(false);
+  const adminPages = [
+    {
+      title: 'Gerenciar Pontos',
+      description: 'Adicionar, editar e remover pontos no mapa',
+      icon: MapPin,
+      path: '/registerpoint',
+      color: 'bg-blue-500 hover:bg-blue-600',
+      bgColor: 'bg-blue-50',
+      iconColor: 'text-blue-600'
+    },
+    {
+      title: 'Gerenciar Stands',
+      description: 'Criar e gerenciar stands de expositores',
+      icon: Store,
+      path: '/registerstand',
+      color: 'bg-green-500 hover:bg-green-600',
+      bgColor: 'bg-green-50',
+      iconColor: 'text-green-600'
+    },
+    {
+      title: 'Gerenciar Eventos',
+      description: 'Agendar e gerenciar eventos e palestras',
+      icon: Calendar,
+      path: '/registerevents',
+      color: 'bg-purple-500 hover:bg-purple-600',
+      bgColor: 'bg-purple-50',
+      iconColor: 'text-purple-600'
     }
-  }, [itemSelected]);
+  ];
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    if (name === "x" || name === "y" || name === "typePoint") {
-      setNewItem({
-        ...newItem,
-        point: { ...newItem.point, [name]: name === "x" || name === "y" ? Number(value) : value },
-      });
-    } else {
-      setNewItem({ ...newItem, [name]: value });
-    }
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
-
-  // nova função para receber a imagem 
-  const handleImageChangeFromChild = (base64: string | null) => {
-    setNewItem({ ...newItem, img: base64 || "" });
-  };
-  
-  const handleCancelEdit = () => {
-    setItemSelected(null);
-  };
-
-  const handleSubmit = async () => {
-    if (!newItem.name || !newItem.description || !newItem.img) {
-      alert("Preencha todos os campos obrigatórios.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      if (isEditing && itemSelected?.id !== undefined) {
-        const success = await UpdatePin(newItem, itemSelected.id, currentType);
-        if (success) {
-          alert(`${currentType === 'stands' ? 'Stand' : 'Evento'} atualizado com sucesso!`);
-          setItemSelected(null);
-          fetchAllData();
-        } else {
-          alert(`Erro ao atualizar o ${currentType === 'stands' ? 'stand' : 'evento'}. Tente novamente.`);
-        }
-      } else {
-        const success = await RegisterNewpin(newItem, '', currentType);
-        if (success) {
-          alert(`${currentType === 'stands' ? 'Stand' : 'Evento'} registrado com sucesso!`);
-          setNewItem(emptyStandEvent);
-          fetchAllData();
-        } else {
-          alert(`Erro ao registrar o ${currentType === 'stands' ? 'stand' : 'evento'}. Tente novamente.`);
-        }
-      }
-    } catch (err) {
-      alert("Erro inesperado. Tente novamente.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  debugdata();
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
-
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-green-800">Gerenciador de Itens</h1>
-        <button onClick={logout} className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors">
-          Sair (Logout)
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-
-          <div className="flex justify-between items-center mb-4 border-b pb-2">
-            <h2 className="text-2xl font-semibold">{isEditing ? 'Editar Item' : 'Adicionar Novo Item'}</h2>
-            {isEditing && (
-              <button onClick={handleCancelEdit} className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors">
-                Cancelar
-              </button>
-            )}
-          </div>
-          
-          {isEditing && itemSelected && (
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-700"><strong>Editando:</strong> {itemSelected.name} (ID: {itemSelected.id})</p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <input type="text" name="name" placeholder="Título do Stand/Evento" value={newItem.name} onChange={handleInputChange} className="w-full p-2 border rounded"/>
-            <select name="typePoint" value={newItem.point.typePoint} onChange={handleInputChange} className="w-full p-2 border rounded bg-white">
-              <option value="EXPOSITORES">Empresa</option>
-            </select>
-            <textarea name="description" placeholder="Descrição" value={newItem.description} onChange={handleInputChange} className="w-full p-2 border rounded" rows={3}></textarea>
-            
-            {/* componente qi eu coloque*/}
-            <ImageUploadBlock 
-              Value={newItem.img}
-              onImageChange={handleImageChangeFromChild}
-            />
-
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">Coordenadas do Pino no Mapa</label>
-              <div className='flex items-center gap-4'>
-                <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-500">X:</span>
-                  <input type="number" name="x" placeholder="Eixo X" value={newItem.point.x} onChange={handleInputChange} className="w-full p-2 border rounded pl-8"/>
-                </div>
-                <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-500">Y:</span>
-                  <input type="number" name="y" placeholder="Eixo Y" value={newItem.point.y} onChange={handleInputChange} className="w-full p-2 border rounded pl-8"/>
-                </div>
-                <button onClick={() => setShowMapModal(true)} className="flex-shrink-0 p-2.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition flex items-center gap-2">
-                  <MousePointer size={16} />
-                  <span className="text-sm">Escolher Posição</span>
-                </button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <Settings className="text-green-600" size={32} />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Painel Administrativo</h1>
+                <p className="text-gray-600">Gerencie pontos, stands e eventos do evento</p>
               </div>
             </div>
-
             <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className={`w-full p-3 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors ${
-                isEditing 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                  : 'bg-green-600 text-white hover:bg-green-700'
-              } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
             >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  {isEditing ? 'Salvando...' : 'Registrando...'}
-                </>
-              ) : isEditing ? (
-                <>
-                  <Save size={20} />
-                  Salvar Alterações
-                </>
-              ) : (
-                <>
-                  <PlusCircle size={20} />
-                  Registrar
-                </>
-              )}
+              <LogOut size={20} />
+              Sair
             </button>
           </div>
         </div>
-        
-        <div className="space-y-6">
-          <ListToStandsAndEvents 
-            allItems={allstands} 
-            idmapa="" 
-            setSelectedPin={(item) => {
-              setItemSelected(item);
-              setCurrentType('stands');
-            }} 
-            onRefresh={fetchAllData}
-            type="stands"
-          />
-          
-          <ListToStandsAndEvents 
-            allItems={allevents} 
-            idmapa="" 
-            setSelectedPin={(item) => {
-              setItemSelected(item);
-              setCurrentType('events');
-            }} 
-            onRefresh={fetchAllData}
-            type="events"
-          />
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Welcome Section */}
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+              Bem-vindo ao Painel de Controle
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Selecione uma das opções abaixo para gerenciar diferentes aspectos do evento. 
+              Cada seção permite criar, editar e remover itens específicos.
+            </p>
+          </div>
+
+          {/* Navigation Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {adminPages.map((page, index) => {
+              const IconComponent = page.icon;
+              return (
+                <div
+                  key={index}
+                  className={`${page.bgColor} rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer group`}
+                  onClick={() => navigate(page.path)}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`p-3 rounded-lg ${page.color} text-white group-hover:scale-110 transition-transform duration-300`}>
+                      <IconComponent size={24} />
+                    </div>
+                    <div className={`${page.iconColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    {page.title}
+                  </h3>
+                  
+                  <p className="text-gray-600 mb-4">
+                    {page.description}
+                  </p>
+                  
+                  <div className="flex items-center text-sm text-gray-500">
+                    <span>Clique para acessar</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Quick Stats */}
+          <div className="mt-12 bg-white rounded-xl p-6 shadow-sm border">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Informações Rápidas</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <MapPin className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-blue-600">Pontos</p>
+                <p className="text-sm text-gray-600">Gerenciar localizações</p>
+              </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <Store className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-green-600">Stands</p>
+                <p className="text-sm text-gray-600">Expositores e empresas</p>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <Calendar className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-purple-600">Eventos</p>
+                <p className="text-sm text-gray-600">Palestras e shows</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Help Section */}
+          <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Precisa de ajuda?</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+              <div>
+                <p className="font-medium mb-1">📍 Pontos:</p>
+                <p>Adicione localizações importantes como banheiros, emergências e espaços de lazer.</p>
+              </div>
+              <div>
+                <p className="font-medium mb-1">🏢 Stands:</p>
+                <p>Crie espaços para expositores com imagens e descrições detalhadas.</p>
+              </div>
+              <div>
+                <p className="font-medium mb-1">📅 Eventos:</p>
+                <p>Agende palestras e shows em locais específicos com data e hora.</p>
+              </div>
+              <div>
+                <p className="font-medium mb-1">🗺️ Mapa:</p>
+                <p>Todos os itens aparecerão no mapa interativo para os visitantes.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      
-      {showMapModal && (
-        <SelectPointOnMap 
-          setShowMapModal={setShowMapModal} 
-          setNewPoint={(point) => setNewItem(prev => ({...prev, point}))} 
-          currentpoint={newItem.point} 
-          allpoints={allstands.map(stand => stand.point)} 
-        />
-      )}
     </div>
   );
-}
+};
+
+export default AdminManagerPage;
