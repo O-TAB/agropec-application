@@ -1,21 +1,24 @@
-gimport React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { MousePointer, Save, PlusCircle } from 'lucide-react';
 
 import {
   StandEventPost,
   StandEventResponse,
   emptypoint,
   emptyStandEvent,
-  point
+  point,
+  ResponsePoint
 } from "../../data/ObjectStructures";
 
-import { getFirstMapId, getMyObjectsStands } from "../../functions/persistence/api";
-import { RegisterNewStand, UpdateStand } from "../../functions/persistence/CrudStands";
+import { getFirstMapId, getMyObjectsStands, getMypoints } from "../../functions/persistence/api";
+import { RegisterNewpin, UpdatePin } from "../../functions/persistence/CrudPins";
 
 import NameToPin from "../../components/admin_pages_components/NameToPin";
 import SelectPointOnMap from "../../components/admin_pages_components/SelectPointOnMap";
-import ListStands from "../../components/admin_pages_components/ListStands";
+import ImageUploadBlock from "../../components/admin_pages_components/ImageUploadBlock";
+import ListToStandsAndEvents from "../../components/admin_pages_components/ListToStandsAndEvents";
 
 const RegisterNewStand: React.FC = () => {
   const { logout } = useAuth();
@@ -23,8 +26,9 @@ const RegisterNewStand: React.FC = () => {
 
   const [idmap, setidmap] = useState<string>("");
   const [allStands, setAllStands] = useState<StandEventResponse[]>([]);
+  const [allpoints, setAllpoints] = useState<ResponsePoint[]>([]);
 
-  const [newStand, setNewStand] = useState<StandEventPost>(emptyStandEvent);
+  const [newStand, setNewStand] = useState<StandEventPost | StandEventResponse>(emptyStandEvent);
   const [itemSelected, setItemSelected] = useState<StandEventResponse | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -33,8 +37,10 @@ const RegisterNewStand: React.FC = () => {
 
   const loadStands = async () => {
     if (!idmap) return;
-    const data = await getMyObjectsStands(); // aqui deve vir a lista de stands do back-end
+    const data = await getMyObjectsStands();
     setAllStands(data);
+    const dataPoints = await getMypoints(idmap);
+    setAllpoints(dataPoints);
   };
 
   useEffect(() => {
@@ -56,16 +62,21 @@ const RegisterNewStand: React.FC = () => {
       setNewStand(itemSelected);
       setIsEditing(true);
     } else {
-      setNewStand(emptyStandEvent);
+      setNewStand({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EXPOSITORES'}});
       setIsEditing(false);
     }
   }, [itemSelected]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = ( e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewStand({ ...newStand, [name]: value });
+    if (name === "x" || name === "y" || name === "typePoint") {
+      setNewStand({
+        ...newStand,
+        point: { ...newStand.point, [name]: name === "x" || name === "y" ? Number(value) : value },
+      });
+    } else {
+      setNewStand({ ...newStand, [name]: value });
+    }
   };
 
   const handleSubmit = async () => {
@@ -77,141 +88,187 @@ const RegisterNewStand: React.FC = () => {
     setIsSubmitting(true);
     try {
       if (isEditing && itemSelected?.id !== undefined) {
-        const success = await UpdateStand(newStand, itemSelected.id, idmap);
+        const success = await UpdatePin(newStand, itemSelected.id, 'stands');
         if (success) {
-          alert("Stand atualizado!");
+          alert("Stand atualizado com sucesso!");
           setItemSelected(null);
           await loadStands();
         } else {
-          alert("Erro ao atualizar.");
+          alert("Erro ao atualizar o stand. Tente novamente.");
         }
       } else {
-        const success = await RegisterNewStand(newStand, idmap);
+        const success = await RegisterNewpin(newStand, idmap, 'stands');
         if (success) {
-          alert("Stand registrado!");
-          setNewStand(emptyStandEvent);
+          alert("Stand registrado com sucesso!");
+          setNewStand({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EXPOSITORES'}});
           await loadStands();
         } else {
-          alert("Erro ao registrar.");
+          alert("Erro ao registrar o stand. Tente novamente.");
         }
       }
     } catch (err) {
-      alert("Erro inesperado.");
+      alert("Erro inesperado. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleCancelEdit = () => {
+    setItemSelected(null);
+  };
+
+  // Função para atualizar o ponto do stand ao selecionar no mapa
+  const setNewPoint = (point: point) => {
+    setNewStand(prev => ({
+      ...prev,
+      point: { ...point }
+    }));
+  };
+
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-green-800">Gerenciar Stands</h1>
+    <div className="container mx-auto p-4 md:p-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold text-green-800">Gerenciar Stands</h1>
         <button
           onClick={logout}
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
         >
-          Sair
+          Sair (Logout)
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded shadow space-y-4">
-          <h2 className="text-xl font-semibold">
-            {isEditing ? "Editar Stand" : "Novo Stand"}
-          </h2>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4 border-b pb-2">
+            <h2 className="text-2xl font-semibold">
+              {isEditing ? 'Editar Stand' : 'Adicionar Novo Stand'}
+            </h2>
+            {isEditing && (
+              <button 
+                onClick={handleCancelEdit}
+                className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
+              >
+                Cancelar
+              </button>
+            )}
+          </div>
+          
+          {isEditing && itemSelected && (
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">
+                <strong>Editando:</strong> {itemSelected.name} (ID: {itemSelected.id})
+              </p>
+            </div>
+          )}
 
-          <NameToPin
-            title="Nome do Stand"
-            value={newStand.name}
-            handleInputChange={handleInputChange}
-          />
+          <div className="space-y-4">
+            <NameToPin
+              title="Nome do Stand"
+              value={newStand.name}
+              handleInputChange={handleInputChange}
+            />
 
-          <textarea
-            name="description"
-            placeholder="Descrição Completa"
-            value={newStand.description}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-          />
-          <textarea
-            name="descriptionCard"
-            placeholder="Descrição do Cartão"
-            value={newStand.descriptionCard}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-          />
-          <input
-            type="text"
-            name="img"
-            placeholder="URL da Imagem"
-            value={newStand.img}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-          />
-
-          <div className="flex gap-2">
-            <input
-              type="number"
-              name="x"
-              placeholder="X"
-              value={newStand.point.x}
-              onChange={(e) =>
-                setNewStand({ ...newStand, point: { ...newStand.point, x: +e.target.value } })
-              }
+            <textarea
+              name="description"
+              placeholder="Descrição Completa"
+              value={newStand.description}
+              onChange={handleInputChange}
               className="w-full p-2 border rounded"
             />
-            <input
-              type="number"
-              name="y"
-              placeholder="Y"
-              value={newStand.point.y}
-              onChange={(e) =>
-                setNewStand({ ...newStand, point: { ...newStand.point, y: +e.target.value } })
-              }
+            
+            <textarea
+              name="descriptionCard"
+              placeholder="Descrição do Cartão"
+              value={newStand.descriptionCard}
+              onChange={handleInputChange}
               className="w-full p-2 border rounded"
             />
+            
+            <ImageUploadBlock
+              Value={newStand.img}
+              onImageChange={base64 => setNewStand({ ...newStand, img: base64 || "" })}
+            />
+
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Coordenadas do Stand no Mapa</label>
+              <div className='flex items-center gap-4'>
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-500">X:</span>
+                  <input 
+                    type="number" 
+                    name="x" 
+                    placeholder="Eixo X" 
+                    value={newStand.point.x} 
+                    onChange={handleInputChange} 
+                    className="w-full p-2 border rounded pl-8"
+                  />
+                </div>
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-500">Y:</span>
+                  <input 
+                    type="number" 
+                    name="y" 
+                    placeholder="Eixo Y" 
+                    value={newStand.point.y} 
+                    onChange={handleInputChange} 
+                    className="w-full p-2 border rounded pl-8"
+                  />
+                </div>
+                
+                <button 
+                  onClick={() => setShowMapModal(true)}
+                  className="flex-shrink-0 p-2.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition flex items-center gap-2"
+                  title="Escolher posição no mapa"
+                >
+                  <MousePointer size={16} />
+                  <span className="text-sm">Escolher Posição</span>
+                </button>
+              </div>
+            </div>
+
             <button
-              onClick={() => setShowMapModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className={`w-full p-3 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors ${
+                isEditing 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                  : 'bg-green-600 text-white hover:bg-green-700'
+              } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              Ponto no Mapa
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  {isEditing ? 'Salvando...' : 'Registrando...'}
+                </>
+              ) : isEditing ? (
+                <>
+                  <Save size={20} />
+                  Salvar Alterações
+                </>
+              ) : (
+                <>
+                  <PlusCircle size={20} />
+                  Registrar Stand
+                </>
+              )}
             </button>
           </div>
-
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className={`w-full py-2 font-semibold rounded ${
-              isSubmitting
-                ? "bg-gray-400 cursor-not-allowed"
-                : isEditing
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-green-600 hover:bg-green-700"
-            } text-white`}
-          >
-            {isSubmitting
-              ? "Salvando..."
-              : isEditing
-              ? "Salvar Alterações"
-              : "Registrar Stand"}
-          </button>
         </div>
-
-        <ListStands
-          allItems={allStands}
-          idmapa={idmap}
-          setSelectedItem={setItemSelected}
+        
+        <ListToStandsAndEvents 
+          allItems={allStands}  
+          setSelectedPin={setItemSelected} 
           onRefresh={loadStands}
+          type="stands"
         />
       </div>
 
       {showMapModal && (
         <SelectPointOnMap
           setShowMapModal={setShowMapModal}
-          setNewPoint={(point: point) =>
-            setNewStand({ ...newStand, point })
-          }
-          allpoints={allStands.map((s) => s.point)}
+          setNewPoint={setNewPoint}
+          currentpoint={newStand.point}
+          allpoints={allpoints}
         />
       )}
     </div>

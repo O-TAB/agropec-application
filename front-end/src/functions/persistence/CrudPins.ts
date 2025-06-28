@@ -1,34 +1,46 @@
 import axios from 'axios';
 
-import { point, ResponsePoint, StandEventResponse } from '../../data/ObjectStructures';
-import { getAuthHeaders, BASE_URL, clearPointsCache } from './api';
+import { point, ResponsePoint, StandEventPost, StandEventResponse } from '../../data/ObjectStructures';
+import { getAuthHeaders, BASE_URL, clearPointsCache, clearStandsCache } from './api';
 
 
 
-export const RegisterNewpin =  async (PinData: StandEventResponse, mapid: string, type: string) => {
+export const RegisterNewpin =  async (PinData: StandEventPost, mapid: string, type: string): Promise<boolean> => {
   try{
     const response = await axios.post(`${BASE_URL}/${type}/${mapid}`,PinData ,getAuthHeaders());
     console.log('Resposta do servidor:', response.data);
+    clearStandsCache();
+    clearPointsCache();
+    return true;
   } catch (error: any) {
       console.error('Error fetching data: ', error);
+      return false;
   }
 }
 
-export const UpdatePin =  async (PinData: StandEventResponse, idpin: number, type: string) => {
+export const UpdatePin =  async (PinData: StandEventResponse | StandEventPost, idpin: number, type: string): Promise<boolean> => {
   try{
     const response = await axios.put(`${BASE_URL}/${type}/${idpin}`,PinData ,getAuthHeaders());
     console.log('Resposta do servidor:', response.data);
+    clearStandsCache();
+    clearPointsCache();
+    return true;
   } catch (error: any) {
       console.error('Error fetching data: ', error);
+      return false;
   }
 }
 
-export const DeletePin =  async (idpin: number, type: string) => {
+export const DeletePin =  async (idpin: number, type: string): Promise<boolean> => {
   try{
     const response = await axios.delete(`${BASE_URL}/${type}/${idpin}`,getAuthHeaders());
     console.log('Resposta do servidor:', response.data);
+    clearStandsCache();
+    clearPointsCache();
+    return true;
   } catch (error: any) {
       console.error('Error fetching data: ', error);
+      return false;
   }
 }
 
@@ -98,7 +110,7 @@ export const fetchAllPoints = async (idmapa: string): Promise<ResponsePoint[]> =
     try {
       // Ensure token is available when fetching data
       const standsResponse = await axios.get(`${BASE_URL}/map/${idmapa}/point`, getAuthHeaders());
-      console.log('standsResponse.data:', standsResponse.data);
+      console.log('ResponsePoint.data:', standsResponse.data);
       if (Array.isArray(standsResponse.data))
         return standsResponse.data as ResponsePoint[];
       return [];

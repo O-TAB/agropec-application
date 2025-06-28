@@ -54,6 +54,7 @@ export interface StandEventPost{
 
 export interface StandEventResponse extends StandEventPost {
     id: number;
+    point: ResponsePoint;
 }
 
 //estruturas vazias para rezetar os inputs

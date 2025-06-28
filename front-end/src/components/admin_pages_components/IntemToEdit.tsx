@@ -1,5 +1,4 @@
 import { Edit, Trash2 } from "lucide-react";
-import { imageMap} from '../../data/pinsData';
 import { StandEventResponse } from "../../data/ObjectStructures";
 import { DeletePin } from "../../functions/persistence/CrudPins";
 
@@ -9,13 +8,15 @@ interface ItemstoeditProps {
     type: string;
 }
 
+
+//concertar
 const Itemstoedit: React.FC<ItemstoeditProps>
 = ({ item, setSelectedPin, type}) => (
     <div key={item.id} className="flex justify-between items-center p-2 border-b group">
         <div className="w-3/4">
             <div className="w-full h-20 overflow-hidden rounded-t-2xl">
                 <img
-                    src={imageMap[item.img as keyof typeof imageMap]}
+                    src={item.img}
                     alt={item.name}
                     className="w-full rounded-t-xl"
                 />

@@ -3,10 +3,11 @@ import { Upload } from 'lucide-react';
 import { handleFileChange } from '../../functions/Covertion';
 
 interface ImageUploadBlockProps {
-  SetImage: (base64Img: string | null) => void;
+  Value: string;
+  onImageChange: (base64: string | null) => void;
 }
 
-export default function ImageUploadBlock({ SetImage }: ImageUploadBlockProps) {
+export default function ImageUploadBlock({ Value, onImageChange }: ImageUploadBlockProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [base64Image, setBase64Image] = useState<string | null>(null);
@@ -14,8 +15,16 @@ export default function ImageUploadBlock({ SetImage }: ImageUploadBlockProps) {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const base64: string | ArrayBuffer | null | undefined  = await handleFileChange(event);
     setBase64Image(base64 ?? null);
-    SetImage(base64Image)
+    onImageChange(base64 ?? null);
+    // Limpa o input de arquivo após o upload
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
+
+  useEffect(() => {
+    setBase64Image(Value || null);
+  }, [Value]);
  
 
   return (

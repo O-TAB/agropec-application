@@ -11,6 +11,7 @@ import CadastroUsuarioPage from './pages/Admin_pages/RegisterPage';
 import ManagerUsers from './pages/Admin_pages/ManagerUsers';
 import SvgUploader from './pages/Admin_pages/SvgUploader';
 import RegisterNewpoint from './pages/Admin_pages/RegisterNewpoint';
+import RegisterNewStand from './pages/Admin_pages/RegisterNewStand';
 export default function App() {
   return (
     <>
@@ -30,9 +31,9 @@ export default function App() {
             <SvgUploader/>
           </ProtectedRoute>
         }/>
-        <Route path="/gerenciar/:id" element={
+        <Route path="/gerenciar" element={
           <ProtectedRoute>
-            <RegisterNewpoint />
+            <RegisterNewStand />
           </ProtectedRoute>
         }/>
         <Route path="/cadastro" element={

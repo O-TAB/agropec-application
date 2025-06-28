@@ -14,7 +14,7 @@ export default function SvgUploader() {
    getFirstMapId().then((idmap) => {
       if (idmap) {
         console.log(idmap);
-        navigate(`/gerenciar/${idmap}`); // troque para a rota que quiser, ex: '/admin/mapas'
+        navigate(`/gerenciar`); // troque para a rota que quiser, ex: '/admin/mapas'
       }
     });
   }, [navigate]);

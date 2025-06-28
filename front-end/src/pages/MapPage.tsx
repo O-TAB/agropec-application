@@ -3,8 +3,7 @@ import { useSearchParams, useParams } from "react-router-dom";
 import { MapPin } from "lucide-react";
 import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-// temporários 
-import { imageMap } from "../data/pinsData";
+// temporários
 import imgMapa from "../assets/MAPA-A1.svg";
 
 import EventPopup from '../components/EventPopup';
@@ -153,11 +152,11 @@ export default function MapPage() {
           </div>
         </div>
       </div>
-      <EventPopup 
+      {/* <EventPopup 
         eventData={selectedEvent} 
         onClose={() => setSelectedEvent(null)}
-        imageMap={imageMap} 
-      />
+        imageMap={imgMapa} 
+      /> */}
     </>
   );
 }

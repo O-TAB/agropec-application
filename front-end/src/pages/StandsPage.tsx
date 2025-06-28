@@ -3,7 +3,6 @@ import { Search, Filter} from 'lucide-react';
 
 import { useFilteredItems } from '../functions/FilterData';
 import ItemCard from '../components/ItemCard';
-import { imageMap} from '../data/pinsData';
 import DetailsPopup from '../components/DetailsPopup';
 import { StandEventResponse } from '../data/ObjectStructures';
 import { getMyObjectsStands, getMyObjectsEvent } from '../functions/persistence/api';
@@ -96,11 +95,11 @@ export default function StandsPage() {
         )}
       </div>
 
-      <DetailsPopup 
+      {/* <DetailsPopup 
         itemData={selectedPin} 
         onClose={() => setSelectedPin(null)} 
         imageMap={imageMap} 
-      />
+      /> */}
     </>
   );
 }

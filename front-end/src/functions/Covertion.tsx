@@ -21,7 +21,3 @@ export const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement
       }
     }
 };
-
-export function renderBase64Image(base64String:string, altText = "Imagem", style="" ) {
-    return <img src={base64String} alt={altText} className={style} />;
-}

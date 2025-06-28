@@ -1,5 +1,4 @@
 import { Info } from "lucide-react";
-import { imageMap} from '../data/pinsData';
 import { StandEventResponse } from "../data/ObjectStructures";
 
 
@@ -11,7 +10,7 @@ interface ItemProps {
 const ItemCard: React.FC<ItemProps> = ({ item, setSelectedPin }) => (
     <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
         <img
-            src={imageMap[item.img as keyof typeof imageMap] || 'https://via.placeholder.com/400x200?text=Sem+Imagem'}
+            src={item.img || 'https://via.placeholder.com/400x200?text=Sem+Imagem'}
             alt={item.name}
             className="w-full h-48 object-cover rounded-t-xl"
         />

@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Map, X } from "lucide-react";
 import { point, ResponsePoint} from '../../data/ObjectStructures'; 
 import Mapa from '../../assets/MAPA-A1.svg';
 
 interface params {
   setShowMapModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setNewPoint: React.Dispatch<React.SetStateAction<ResponsePoint | point>>; // <-- nome e tipo corrigidos
+  setNewPoint: (point: point) => void;
+  currentpoint: point;
   allpoints: ResponsePoint[];
 }
 
-const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewPoint, allpoints }) => {
-  const [selectedPosition, setSelectedPosition] = useState<{ x: number, y: number } | null>(null);
+const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewPoint,currentpoint, allpoints }) => {
+  const [selectedPosition, setSelectedPosition] = useState<point | null>(currentpoint);
+  //para nao mostrar pontos zerados
+  useEffect(() => {
+  if (currentpoint.x === 0 && currentpoint.y === 0) {
+    setSelectedPosition(null);
+  } else {
+    setSelectedPosition(currentpoint);
+  }
+}, [currentpoint]);
   //tamanho do mapa original em pixels
   const ORIGINAL_MAP_WIDTH = 3508;
   const ORIGINAL_MAP_HEIGHT = 2481;
@@ -25,17 +34,17 @@ const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewPoint, allp
     const absoluteX = Math.round((x / rect.width) * ORIGINAL_MAP_WIDTH);
     const absoluteY = Math.round((y / rect.height) * ORIGINAL_MAP_HEIGHT);
 
-    setSelectedPosition({ x: absoluteX, y: absoluteY });
+    setSelectedPosition({...currentpoint, x: absoluteX, y: absoluteY });
   };
 
   const confirmPosition = () => {
     if (selectedPosition) {
       // mexi aqui (sofia)
-      setNewPoint(currentItem => ({
-          ...currentItem, 
+      setNewPoint({
+          ...currentpoint, 
           x: selectedPosition.x, 
           y: selectedPosition.y, 
-      }));
+      });
       setShowMapModal(false);
       setSelectedPosition(null);
     }

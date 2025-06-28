@@ -223,6 +223,7 @@ export default function Registernewpoint() {
       {showMapModal && (<SelectPointOnMap 
         setShowMapModal={setShowMapModal} 
         setNewPoint={setNewPoint} 
+        currentpoint={newPoint}
         allpoints={allpoints} 
       />)}
     </div>
