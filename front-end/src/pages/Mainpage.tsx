@@ -195,7 +195,7 @@ export default function MainPage() {
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-xl shadow-xl">
+            <div className="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition duration-300 transform">
               <h3 className="text-xl font-semibold text-gray-800 mb-6">Envie sua Mensagem</h3>
               <form className="space-y-4">
                 <input type="text" placeholder="Seu nome" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
