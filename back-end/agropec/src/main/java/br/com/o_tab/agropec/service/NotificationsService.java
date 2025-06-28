@@ -32,7 +32,7 @@ public class NotificationsService {
 
             messagingTemplate.convertAndSend("/topic/updates", notification);
         } catch (Exception e) {
-            System.err.println("Falha ao viar a notificação: " + e.getMessage());
+            System.err.println("Falha ao enviar a notificação: " + e.getMessage());
         }
     }
 }

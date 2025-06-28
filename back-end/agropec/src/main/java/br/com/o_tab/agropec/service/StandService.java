@@ -47,60 +47,75 @@ public class StandService {
        }
     }
 
-    public ResponseEntity<List<Stand>> getAllStands(){
-        List<Stand> allStands = standRepository.findAll();
+    public ResponseEntity<?> getAllStands(){
+        try {
+            List<Stand> allStands = standRepository.findAll();
 
-        if(allStands.isEmpty()){
-            return ResponseEntity.noContent().build();
+            if (allStands.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            return ResponseEntity.ok(allStands);
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok(allStands);
     }
 
     public ResponseEntity<?> getStandById(long standId){
-        Optional<Stand> foundStand = standRepository.findById(standId);
+        try {
+            Optional<Stand> foundStand = standRepository.findById(standId);
 
-        if(foundStand.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum estande encontrado com o nome informado.");
+            if (foundStand.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum estande encontrado com o nome informado.");
+            }
+
+            return ResponseEntity.ok(foundStand.get());
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok(foundStand.get());
     }
 
     @Transactional
     public ResponseEntity<?> updateStand(long id, Stand stand) throws InterruptedException {
-        Optional<Stand> foundStand = standRepository.findById(id);
+        try {
+            Optional<Stand> foundStand = standRepository.findById(id);
 
-        if(foundStand.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum estande cadastrado com o nome informado.");
+            if (foundStand.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum estande cadastrado com o nome informado.");
+            }
+
+            Stand standToUpdate = foundStand.get();
+            standToUpdate.setName(stand.getName());
+            standToUpdate.setDescription(stand.getDescription());
+            standToUpdate.setDescriptionCard(stand.getDescriptionCard());
+            standToUpdate.setPoint(stand.getPoint());
+            standToUpdate.setImg(stand.getImg());
+            Stand updatedStand = standRepository.save(standToUpdate);
+
+            notificationsService.newNotificatoin("O Estande " + standToUpdate.getName() + " foi atualizado!");
+            return ResponseEntity.ok(updatedStand);
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        Stand standToUpdate = foundStand.get();
-        standToUpdate.setName(stand.getName());
-        standToUpdate.setDescription(stand.getDescription());
-        standToUpdate.setDescriptionCard(stand.getDescriptionCard());
-        standToUpdate.setPoint(stand.getPoint());
-        standToUpdate.setImg(stand.getImg());
-        Stand updatedStand = standRepository.save(standToUpdate);
-
-        notificationsService.newNotificatoin("O Estande " + standToUpdate.getName() + " foi atualizado!");
-        return ResponseEntity.ok(updatedStand);
-
     }
 
     @Transactional
     public ResponseEntity<?> deleteStandById(long standId) throws InterruptedException {
-        Optional<Stand> foundStand = standRepository.findById(standId);
+        try {
+            Optional<Stand> foundStand = standRepository.findById(standId);
 
-        if(foundStand.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum estande cadastrado para o nome informado.");
+            if (foundStand.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum estande cadastrado para o nome informado.");
+            }
+
+            Stand standToDelete = foundStand.get();
+            standRepository.deleteById(standToDelete.getId());
+
+            notificationsService.newNotificatoin("O Estande " + standToDelete.getName() + " foi deletado!");
+            return ResponseEntity.ok().body("Estande deletado com sucesso");
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        Stand standToDelete = foundStand.get();
-        standRepository.deleteById(standToDelete.getId());
-
-        notificationsService.newNotificatoin("O Estande " + standToDelete.getName() + " foi deletado!");
-        return ResponseEntity.ok().body("Estande deletado com sucesso");
     }
 
 }

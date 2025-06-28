@@ -26,16 +26,20 @@ public class MapService {
     private NotificationsService notificationsService;
 
     public ResponseEntity<?> uploadMap(String name, MultipartFile archive) throws IOException, InterruptedException {
-        String svgContent = new String(archive.getBytes(), StandardCharsets.UTF_8);
+        try {
+            String svgContent = new String(archive.getBytes(), StandardCharsets.UTF_8);
 
-        Map newMap = new Map();
-        newMap.setName(name);
-        newMap.setSvg(svgContent);
+            Map newMap = new Map();
+            newMap.setName(name);
+            newMap.setSvg(svgContent);
 
-        Map savedMap = mapRepository.save(newMap);
+            Map savedMap = mapRepository.save(newMap);
 
-        notificationsService.newNotificatoin("Um novo mapa foi adicionado!");
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedMap);
+            notificationsService.newNotificatoin("Um novo mapa foi adicionado!");
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedMap);
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 
@@ -57,13 +61,17 @@ public class MapService {
 
 
     public ResponseEntity<?> getMapById(String id){
-        Optional<Map> foundMap = mapRepository.findById(id);
+        try {
+            Optional<Map> foundMap = mapRepository.findById(id);
 
-        if(foundMap.isEmpty()){
-            return ResponseEntity.notFound().build();
+            if (foundMap.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(foundMap);
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return ResponseEntity.ok(foundMap);
     }
 
 
@@ -95,6 +103,7 @@ public class MapService {
         }
         return ResponseEntity.ok(foundPoints);
     }
+
 
     @Transactional
     public ResponseEntity<?> updatePoint(String mapId, Point point, long pointId) {
@@ -131,25 +140,29 @@ public class MapService {
 
 
     public ResponseEntity<?> deletePoint(String mapId, long pointId){
-        Optional<Map> foundMap = mapRepository.findById(mapId);
-        Optional<Point> pointToDelete = pointRepository.findById(pointId);
+        try {
+            Optional<Map> foundMap = mapRepository.findById(mapId);
+            Optional<Point> pointToDelete = pointRepository.findById(pointId);
 
-        if(foundMap.isEmpty()){
-            return ResponseEntity.badRequest().body("Nenhum mapa cadastrado para o ID informado.");
-        } else if(pointToDelete.isEmpty()){
-            return ResponseEntity.badRequest().body("Nenhum mapa cadastrado para o ID informado.");
-        }
-
-        return foundMap.map(map -> {
-            pointRepository.delete(pointToDelete.get());
-            refreshPointList(foundMap.get());
-            try {
-                notificationsService.newNotificatoin("O ponto de " + pointToDelete.get().getName() + " foi deletado!");
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            if (foundMap.isEmpty()) {
+                return ResponseEntity.badRequest().body("Nenhum mapa cadastrado para o ID informado.");
+            } else if (pointToDelete.isEmpty()) {
+                return ResponseEntity.badRequest().body("Nenhum mapa cadastrado para o ID informado.");
             }
-            return ResponseEntity.ok().body("Mapa deletado com sucesso!");
-        }).orElse(ResponseEntity.notFound().build());
+
+            return foundMap.map(map -> {
+                pointRepository.delete(pointToDelete.get());
+                refreshPointList(foundMap.get());
+                try {
+                    notificationsService.newNotificatoin("O ponto de " + pointToDelete.get().getName() + " foi deletado!");
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return ResponseEntity.ok().body("Mapa deletado com sucesso!");
+            }).orElse(ResponseEntity.notFound().build());
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 

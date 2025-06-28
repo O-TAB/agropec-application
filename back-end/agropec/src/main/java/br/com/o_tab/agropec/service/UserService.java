@@ -33,21 +33,24 @@ public class UserService{
 
    // u need to specify what u will pass to the body of the http response
     public ResponseEntity<String> register(@Valid RegisterDTO data) {
-        // check if its ok to register
-        if(this.userRepository.findByEmail(data.email()) != null)
-        return  ResponseEntity.badRequest().body("Email já cadastrado");
+        try {
+            if (this.userRepository.findByEmail(data.email()) != null)
+                return ResponseEntity.badRequest().body("Email já cadastrado");
 
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        
-        Users user = new Users();
-        user.setUsername(data.username());
-        user.setEmail(data.email());
-        user.setPassword(encryptedPassword);
-        user.setRole(data.role());
+            String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
 
-        userRepository.save(user);
+            Users user = new Users();
+            user.setUsername(data.username());
+            user.setEmail(data.email());
+            user.setPassword(encryptedPassword);
+            user.setRole(data.role());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário cadastrado com sucesso!");
+            userRepository.save(user);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Usuário cadastrado com sucesso!");
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     // 
@@ -104,41 +107,53 @@ public class UserService{
     }
 
     public ResponseEntity<?> getAllUsers(){
-        List<Users> foundUsers = userRepository.findAll();
+        try {
+            List<Users> foundUsers = userRepository.findAll();
 
-        if(foundUsers.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum usuário cadastrado.");
-        } else {
-            return ResponseEntity.ok(foundUsers);
+            if (foundUsers.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum usuário cadastrado.");
+            } else {
+                return ResponseEntity.ok(foundUsers);
+            }
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     public ResponseEntity<?> updateUserById(String userId, Users user){
-        Optional<Users> foundUser = userRepository.findById(userId);
+        try {
+            Optional<Users> foundUser = userRepository.findById(userId);
 
-        if(foundUser.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum usuário cadastrado para o id informado.");
-        } else {
-            Users userUpdated = foundUser.get();
+            if (foundUser.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum usuário cadastrado para o id informado.");
+            } else {
+                Users userUpdated = foundUser.get();
 
-            userUpdated.setUsername(user.getUsername());
-            userUpdated.setEmail(user.getEmail());
-            userUpdated.setPassword(user.getPassword());
-            userUpdated.setRole(user.getRole());
+                userUpdated.setUsername(user.getUsername());
+                userUpdated.setEmail(user.getEmail());
+                userUpdated.setPassword(user.getPassword());
+                userUpdated.setRole(user.getRole());
 
-            return ResponseEntity.ok(userUpdated);
+                return ResponseEntity.ok(userUpdated);
+            }
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     public ResponseEntity<?> deleteUserById(String userId){
-        Optional<Users> foundUser = userRepository.findById(userId);
+        try {
+            Optional<Users> foundUser = userRepository.findById(userId);
 
-        if(foundUser.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum usuário encontrado para o id informado.");
-        } else {
-            userRepository.deleteById(userId);
+            if(foundUser.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum usuário encontrado para o id informado.");
+            } else {
+                userRepository.deleteById(userId);
 
-            return ResponseEntity.ok().body("Usuário deletado com sucesso!");
+                return ResponseEntity.ok().body("Usuário deletado com sucesso!");
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
