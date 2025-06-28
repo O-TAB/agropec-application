@@ -107,7 +107,7 @@ export default function MainPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Networking */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
               <div className="bg-green-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
                 <Users className="h-8 w-8 text-green-600" />
               </div>
@@ -116,7 +116,7 @@ export default function MainPage() {
             </div>
 
             {/* Inovação */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
               <div className="bg-yellow-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
                 <Wheat className="h-8 w-8 text-yellow-600" />
               </div>
@@ -125,7 +125,7 @@ export default function MainPage() {
             </div>
 
             {/* Oportunidades */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
               <div className="bg-green-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
                 <MapPin className="h-8 w-8 text-green-600" />
               </div>
@@ -137,7 +137,7 @@ export default function MainPage() {
           {/* Hackathons, Palestras, Expositores */}
           <div className="flex flex-col md:flex-row justify-center gap-8 mt-8">
             {/* Hackathons */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
               <div className="bg-blue-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
                 <Code className="h-8 w-8 text-blue-600" />
               </div>
@@ -146,7 +146,7 @@ export default function MainPage() {
             </div>
 
             {/* Palestras */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
               <div className="bg-purple-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
                 <Mic className="h-8 w-8 text-purple-600" />
               </div>
@@ -155,7 +155,7 @@ export default function MainPage() {
             </div>
 
             {/* Expositores */}
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
               <div className="bg-orange-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
                 <Users className="h-8 w-8 text-orange-600" />
               </div>
