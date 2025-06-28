@@ -19,11 +19,11 @@ export default function Registernewpoint() {
   const [newPoint, setNewPoint] = useState<point | ResponsePoint>(emptypoint);
   const [itemSelected, setPointSelected] = useState<ResponsePoint | null>(null);
   //nao é possivel que um item selecionado seja um point simples
-  
+  const [idmap, setidmap] = useState<string>('');
+
   const [isEditing, setIsEditing] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
   const [allpoints, setPoints] = useState< ResponsePoint[]>([]);
-  const [idmap, setidmap] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 

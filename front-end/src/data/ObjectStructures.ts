@@ -60,7 +60,7 @@ export interface StandEventResponse extends StandEventPost {
 
 export const emptypoint: point = {
     name: '',
-    typePoint: 'EXPOSITORES',
+    typePoint: '',
     x: 0,
     y: 0,   
 };

@@ -1,39 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload } from 'lucide-react';
-import { imageMap } from '../../data/pinsData'; // Supondo que precise para futuras implementações
+import { handleFileChange } from '../../functions/Covertion';
 
 interface ImageUploadBlockProps {
-  currentImageUrl: string;
-  onImageChange: (imageName: string, previewUrl: string) => void;
+  SetImage: (base64Img: string | null) => void;
 }
 
-export default function ImageUploadBlock({ currentImageUrl, onImageChange }: ImageUploadBlockProps) {
+export default function ImageUploadBlock({ SetImage }: ImageUploadBlockProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // Efeito para sincronizar o preview quando um item existente é selecionado
-  useEffect(() => {
-    if (currentImageUrl && imageMap[currentImageUrl as keyof typeof imageMap]) {
-      setImagePreview(imageMap[currentImageUrl as keyof typeof imageMap]);
-    } else if (currentImageUrl) {
-      // Se não for uma imagem do map, pode ser uma URL de um upload anterior
-      // Para este exemplo, vamos resetar se não for conhecida.
-      // Em um caso real, você poderia tentar exibir a URL diretamente.
-      setImagePreview(null);
-    } else {
-      setImagePreview(null);
-    }
-  }, [currentImageUrl]);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-      // Avisa o componente pai sobre a nova imagem
-      onImageChange(file.name, previewUrl);
-    }
+  const [base64Image, setBase64Image] = useState<string | null>(null);
+  
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const base64: string | ArrayBuffer | null | undefined  = await handleFileChange(event);
+    setBase64Image(base64 ?? null);
+    SetImage(base64Image)
   };
+ 
 
   return (
     <div className="p-4 border rounded-lg bg-gray-50 space-y-3">
@@ -50,14 +33,13 @@ export default function ImageUploadBlock({ currentImageUrl, onImageChange }: Ima
             <Upload size={16} />
             <span className="text-sm">Nova Imagem</span>
           </button>
-          <span className="text-xs text-gray-500">ou selecione uma imagem existente</span>
         </div>
       </div>
       
-      {imagePreview && (
+      {base64Image && (
         <div className='mt-4'>
           <p className='text-xs text-gray-500 mb-2'>Pré-visualização:</p>
-          <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover rounded-md border" />
+          <img src={base64Image} alt="Preview" className="w-full h-32 object-cover rounded-md border" />
         </div>
       )}
     </div>

@@ -10,7 +10,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import CadastroUsuarioPage from './pages/Admin_pages/RegisterPage';
 import ManagerUsers from './pages/Admin_pages/ManagerUsers';
 import SvgUploader from './pages/Admin_pages/SvgUploader';
-import Registernewpoint from './pages/Admin_pages/RegisterNewpoint';
 import RegisterNewpoint from './pages/Admin_pages/RegisterNewpoint';
 export default function App() {
   return (

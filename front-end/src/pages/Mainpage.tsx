@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { MapPin, Calendar, Users, Phone, Mail, Wheat, Code, Mic } from 'lucide-react';
 import oximg from '../assets/ox_img.jpeg';
 import { useLocation, Link } from 'react-router-dom'; // O 'Link' foi importado aqui

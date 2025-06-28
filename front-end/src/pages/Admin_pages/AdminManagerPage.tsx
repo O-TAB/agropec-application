@@ -1,20 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { imageMap } from '../../data/pinsData';
 import { useAuth } from '../../context/AuthContext';
-import { Upload, MousePointer } from 'lucide-react';
+import {MousePointer } from 'lucide-react';
 
 import Itemstoedit from '../../components/admin_pages_components/IntensToEdit';
 import { debugdata, getMyObjectsStands, getMyObjectsEvent } from '../../functions/persistence/api';
 import { StandEventResponse, emptyStandEvent } from '../../data/ObjectStructures';
 import SelectPointOnMap from '../../components/admin_pages_components/SelectPointOnMap';
 import RegisterAndEdit from '../../components/admin_pages_components/RegisterAndEditBT';
-import { useParams } from 'react-router-dom';
 import ImageUploadBlock from '../../components/admin_pages_components/ImageUploadBlock'; //novo componente que eu criei (sofia)
 
 export default function AdminManagerPage() {
   const { logout } = useAuth();
-  const { id } = useParams();
-
 
   const [newItem, setNewItem] = useState<StandEventResponse>(emptyStandEvent);
   const [itemSelected, setItemSelected] = useState<StandEventResponse | null>(null);
