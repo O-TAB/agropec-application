@@ -7,6 +7,7 @@ import Login from "./pages/Admin_pages/Login";
 import AdminManagerPage from './pages/Admin_pages/AdminManagerPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import CadastroUsuarioPage from './pages/Admin_pages/RegisterPage';
+import EditUserPage from './pages/Admin_pages/EditUserPage';
 import ManagerUsers from './pages/Admin_pages/ManagerUsers';
 import SvgUploader from './pages/Admin_pages/SvgUploader';
 import RegisterNewpoint from './pages/Admin_pages/RegisterNewpoint';
@@ -56,6 +57,11 @@ export default function App() {
         <Route path="/cadastro" element={
           <ProtectedRoute>
             <CadastroUsuarioPage/>
+          </ProtectedRoute>
+        }/>
+        <Route path="/edit-user/:userId" element={
+          <ProtectedRoute>
+            <EditUserPage/>
           </ProtectedRoute>
         }/>
         <Route path="/Users" element={

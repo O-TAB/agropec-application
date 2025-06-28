@@ -22,7 +22,7 @@ public class StandController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Stand>> getAllStands(){
+    public ResponseEntity<?> getAllStands(){
         return standService.getAllStands();
     }
 

@@ -6,7 +6,6 @@ import { MousePointer, Save, PlusCircle, ArrowLeft } from 'lucide-react';
 import {
   StandEventPost,
   StandEventResponse,
-  emptypoint,
   emptyStandEvent,
   point,
   ResponsePoint

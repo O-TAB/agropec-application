@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { DeleteUser } from "../../functions/persistence/CrudUsers";
+import { DeleteUser, GetAllUsers } from "../../functions/persistence/CrudUsers";
 
 type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'USER';
 
 interface User {
   id: string;
-  name: string;
+  username: string;
   email: string;
   role: UserRole
 }
@@ -19,43 +19,30 @@ const SuperAdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (!token) {
-        setError("Token de autenticação não encontrado.");
-        setLoading(false);
+  const fetchUsers = async () => {
+    if (!token) {
+      setError("Token de autenticação não encontrado.");
+      setLoading(false);
+      logout();
+      return;
+    }
+
+    try {
+      const data = await GetAllUsers();
+      setUsers(data as User[]); 
+      setError(null);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Erro ao buscar usuários");
+      if (err.message?.includes('401') || err.message?.includes('403')) {
         logout();
-        return;
       }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      try {
-        const response = await fetch('http://localhost:8080/auth/login/users', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`Falha ao buscar usuários: ${response.statusText}`);
-        }
-
-        const data: User[] = await response.json();
-        setUsers(data); 
-        setError(null);
-
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message);
-        if (err.message.includes('401') || err.message.includes('403')) {
-          logout();
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
+  useEffect(() => {
     fetchUsers();
   }, [token, logout]);
 
@@ -69,12 +56,11 @@ const SuperAdminPage = () => {
     }
 
     try {
-      DeleteUser(id);
+      await DeleteUser(id);
       setUsers((prev) => prev.filter((user) => user.id !== id));
-
     } catch (err: any) {
       console.error(err);
-      alert(err.message);
+      alert(err.message || "Erro ao deletar usuário");
     }
   };
 
@@ -117,19 +103,20 @@ const SuperAdminPage = () => {
             className="border p-4 rounded-md flex items-center justify-between bg-gray-50"
           >
             <div>
-              <p className="font-semibold">{user.name}</p>
+              <p className="font-semibold">{user.username}</p>
               <p className="text-sm text-gray-600">{user.email}</p>
+              <p className="text-xs text-gray-500">Role: {user.role.replace('_', ' ')}</p>
             </div>
             <div className="flex space-x-2">
               <button
                 onClick={() => handleEdit(user.id)}
-                className="bg-yellow-500 text-white px-3 py-1 rounded-md"
+                className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600"
               >
                 Editar
               </button>
               <button
                 onClick={() => handleDelete(user.id)}
-                className="bg-red-500 text-white px-3 py-1 rounded-md"
+                className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
               >
                 Deletar
               </button>
@@ -137,7 +124,6 @@ const SuperAdminPage = () => {
           </div>
         ))}
       </div>
-
 
       {/* Logout */}
       <button

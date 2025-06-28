@@ -168,3 +168,4 @@ const AdminManagerPage: React.FC = () => {
 };
 
 export default AdminManagerPage;
+
