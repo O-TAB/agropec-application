@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {point, ResponsePoint, StandEventResponse} from '../../data/ObjectStructures';
+import {Map, ResponsePoint, StandEventResponse} from '../../data/ObjectStructures';
 import { fetchAllStandsData, fetchAllEventData, fetchAllPoints} from './CrudPins';
 
 export const getAuthHeaders = () => {
@@ -54,6 +54,17 @@ export const uploadMap = async (svgContent: string, name = "Mapa") => {
     return response.data;
   } catch (error: any) {
     throw error;
+  }
+};
+
+export const getMapById = async (mapId: string): Promise<Map | null> => {
+  try {
+    const response = await axios.get(`${BASE_URL}/map/${mapId}`, getAuthHeaders());
+    console.log('Resposta do servidor - mapa específico:', response.data);
+    return response.data as Map;
+  } catch (error: any) {
+    console.error('Error fetching map by id: ', error);
+    return null;
   }
 };
 

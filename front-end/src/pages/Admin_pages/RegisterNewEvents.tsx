@@ -375,6 +375,7 @@ const RegisterNewEvents: React.FC = () => {
           setNewPoint={setNewPoint}
           currentpoint={newEvent.point}
           allpoints={allpoints}
+          idmap={idmap}
         />
       )}
     </div>

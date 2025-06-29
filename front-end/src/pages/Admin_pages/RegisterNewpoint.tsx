@@ -234,6 +234,7 @@ export default function Registernewpoint() {
         setNewPoint={setNewPoint} 
         currentpoint={newPoint}
         allpoints={allpoints} 
+        idmap={idmap}
       />)}
     </div>
   );

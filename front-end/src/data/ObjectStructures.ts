@@ -74,3 +74,51 @@ export const emptyStandEvent: StandEventPost = {
     point: emptypoint
   };
 
+export interface Map {
+  id: string;
+  name: string;
+  svg: string;
+}
+
+export const FILTER_CONFIG = {
+  "EXPOSITORES": {
+    label: "Estande de Exposição",
+    color: "bg-red-600 hover:bg-red-700",
+    icon: "🏢"
+  },
+  "ESPACOSHOW": {
+    label: "Espaço de Shows",
+    color: "bg-purple-600 hover:bg-purple-700",
+    icon: "🎭"
+  },
+  "ESPACOPALESTRA": {
+    label: "Espaço de Palestras",
+    color: "bg-blue-600 hover:bg-blue-700",
+    icon: "🎤"
+  },
+  "RESTAURANTE": {
+    label: "Restaurante",
+    color: "bg-orange-600 hover:bg-orange-700",
+    icon: "🍽️"
+  },
+  "BANHEIROS": {
+    label: "Banheiros",
+    color: "bg-blue-400 hover:bg-blue-500",
+    icon: "🚻"
+  },
+  "ESPACORACKATON": {
+    label: "Espaço dos Rackatons",
+    color: "bg-green-600 hover:bg-green-700",
+    icon: "🏁"
+  },
+  "EMERGENCIA": {
+    label: "Posto de Atendimento Médico",
+    color: "bg-red-600 hover:bg-red-700",
+    icon: "🚑"
+  },
+  "PARQUEDIVERSAO": {
+    label: "Parque de Diversões",
+    color: "bg-yellow-600 hover:bg-yellow-700",
+    icon: "🎡"
+  }
+};

@@ -277,6 +277,7 @@ const RegisterNewStand: React.FC = () => {
           setNewPoint={setNewPoint}
           currentpoint={newStand.point}
           allpoints={allpoints}
+          idmap={idmap}
         />
       )}
     </div>
