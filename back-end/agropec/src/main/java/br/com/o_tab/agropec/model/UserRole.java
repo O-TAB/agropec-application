@@ -2,8 +2,7 @@ package br.com.o_tab.agropec.model;
 
 public enum UserRole {
     SUPER_ADMIN("super_admin"),
-    ADMIN("admin"),
-    USER("user");
+    ADMIN("admin");
 
     private String role;
 

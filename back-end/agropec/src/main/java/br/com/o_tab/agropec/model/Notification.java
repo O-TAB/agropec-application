@@ -1,5 +1,6 @@
 package br.com.o_tab.agropec.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,8 +11,18 @@ import java.time.Instant;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Notification {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long Id;
+
+    @Column(nullable = false)
     private String content;
+
+    @Column(nullable = false)
     private Instant createdAt;
+
+    @Column(nullable = false)
     private Instant expiresAt;
 }
