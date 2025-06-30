@@ -4,6 +4,7 @@ import br.com.o_tab.agropec.model.Map;
 import br.com.o_tab.agropec.model.Point;
 import br.com.o_tab.agropec.model.Stand;
 import br.com.o_tab.agropec.repository.MapRepository;
+import br.com.o_tab.agropec.repository.PointRepository;
 import br.com.o_tab.agropec.repository.StandRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class StandService {
     private StandRepository standRepository;
     private MapRepository mapRepository;
     private NotificationsService notificationsService;
+    private PointRepository pointRepository;
 
     @Transactional
     public ResponseEntity<?> cadastrateStand(Stand stand, String mapId) throws InterruptedException {
@@ -88,8 +90,14 @@ public class StandService {
             standToUpdate.setName(stand.getName());
             standToUpdate.setDescription(stand.getDescription());
             standToUpdate.setDescriptionCard(stand.getDescriptionCard());
-            standToUpdate.setPoint(stand.getPoint());
             standToUpdate.setImg(stand.getImg());
+
+            if(stand.getPoint() != null && stand.getPoint().getId() != 0){
+                Optional<Point> point = pointRepository.findById(stand.getPoint().getId());
+                Point pointToUpdate = point.get();
+                standToUpdate.setPoint(pointToUpdate);
+            }
+
             Stand updatedStand = standRepository.save(standToUpdate);
 
             notificationsService.newNotification("O Estande " + standToUpdate.getName() + " foi atualizado!");
