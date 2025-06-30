@@ -3,6 +3,7 @@ import { MapPin, Calendar, Users, Phone, Mail, Wheat, Code, Mic } from 'lucide-r
 import oximg from '../assets/ox_img.jpeg';
 import { useLocation, Link } from 'react-router-dom'; // O 'Link' foi importado aqui
 import { SvgDimensionReader } from '../components/Testconvertion';
+import { NotificationContainer } from '../components/NotificationComponent';
 
 
 export default function MainPage() {
@@ -53,6 +54,13 @@ export default function MainPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section id="notifications" className="py-8 bg-gray-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Colocamos o componente aqui, num ambiente neutro */}
+          <NotificationContainer />
         </div>
       </section>
 

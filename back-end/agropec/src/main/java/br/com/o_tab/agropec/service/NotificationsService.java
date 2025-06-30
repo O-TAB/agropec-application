@@ -1,5 +1,6 @@
 package br.com.o_tab.agropec.service;
 
+import br.com.o_tab.agropec.dto.NotificationDTO;
 import br.com.o_tab.agropec.model.Notification;
 import br.com.o_tab.agropec.model.NotificationMessage;
 import br.com.o_tab.agropec.repository.NotificationRepository;
@@ -31,8 +32,10 @@ public class NotificationsService {
 
             NotificationMessage message = new NotificationMessage("NOTIFICAÇÃO: " + modification);
             Notification notification = createNotification(message);
+            notificationRepository.save(notification);
 
-            messagingTemplate.convertAndSend("/topic/updates", notification);
+            NotificationDTO notificationDTO = new NotificationDTO(notification.getContent());
+            messagingTemplate.convertAndSend("/topic/updates", notificationDTO);
         } catch (Exception e) {
             System.err.println("Falha ao enviar a notificação: " + e.getMessage());
         }

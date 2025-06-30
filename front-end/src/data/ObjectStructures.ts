@@ -122,3 +122,7 @@ export const FILTER_CONFIG = {
     icon: "🎡"
   }
 };
+
+export interface Notification{
+  content: string
+}
