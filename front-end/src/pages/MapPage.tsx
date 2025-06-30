@@ -1,7 +1,6 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams, useParams } from "react-router-dom";
-import { MapPin } from "lucide-react";
+import { MapPin, Target } from "lucide-react";
 import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import DetailsPopup from '../components/DetailsPopup';
@@ -159,13 +158,13 @@ export default function MapPage() {
             </button>
           </div>
           
-          <div className="w-full h-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
+          <div className="w-full h-full border border-gray-300 rounded-lg shadow-lg overflow-hidden relative">
             {mapDimensions && (
               <div
                 className="relative w-full"
                 style={{ aspectRatio: `${mapDimensions.width} / ${mapDimensions.height}` }}
               >
-                <TransformWrapper ref={transformWrapperRef} initialScale={1} minScale={0.5} maxScale={8}>
+                <TransformWrapper ref={transformWrapperRef} initialScale={1} minScale={0.5} maxScale={8} limitToBounds={false}>
                   <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
                     <MapOverlay
                       svg={currentMap.svg}
@@ -176,6 +175,18 @@ export default function MapPage() {
                     />
                   </TransformComponent>
                 </TransformWrapper>
+                <button
+                  aria-label="Centralizar Mapa"
+                  className="absolute bottom-4 right-4 z-20 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                  onClick={() => {
+                    if (transformWrapperRef.current) {
+                      transformWrapperRef.current.resetTransform();
+                    }
+                  }}
+                >
+                  <Target className="w-5 h-5" />
+                  <span className="hidden md:inline">Centralizar Mapa</span>
+                </button>
               </div>
             )}
           </div>

@@ -15,7 +15,7 @@ const ItemCard: React.FC<ItemProps> = ({ item, setSelectedPin }) => (
         />
         <div className="p-4 flex flex-col flex-grow">
             <h2 className="text-xl font-semibold text-green-800">{item.name}</h2>
-            <p className="text-sm text-gray-600 mb-4 mt-1 flex-grow">{item.descriptionCard}</p>
+            <p className="text-sm text-gray-600 mb-4 mt-1 flex-grow overflow-hidden text-ellipsis whitespace-nowrap">{item.descriptionCard}</p>
             <button
                 onClick={() => setSelectedPin(item)}
                 className="mt-auto w-full py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
