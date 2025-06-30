@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Store, Calendar, Settings, LogOut, Upload } from 'lucide-react';
+import { getFirstMapId } from '../../functions/persistence/api';
 
 const AdminManagerPage: React.FC = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  // Verificar se existe um mapa ao carregar a página
+  useEffect(() => {
+    const checkMapExists = async () => {
+      try {
+        const mapId = await getFirstMapId();
+        if (!mapId) {
+          // Se não existe mapa, redireciona para upload
+          navigate('/uploadmap');
+        }
+      } catch (error) {
+        console.error('Erro ao verificar mapa:', error);
+        // Em caso de erro, também redireciona para upload
+        navigate('/uploadmap');
+      }
+    };
+
+    checkMapExists();
+  }, [navigate]);
 
   const adminPages = [
     {
