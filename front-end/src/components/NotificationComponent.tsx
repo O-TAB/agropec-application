@@ -7,13 +7,45 @@ interface Notification {
   content: string;
 }
 
+const API_URL = 'http://127.0.0.1:8080';
+
 export const NotificationContainer = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
   const clientRef = useRef<StompJs.Client | null>(null);
 
+
   useEffect(() => {
+    const fetchActiveNotifications = async () => {
+      try {
+        console.log("Buscando notificações ativas...");
+        const response = await fetch(`${API_URL}/notifications`);
+        
+        if (!response.ok) {
+          throw new Error(`Erro na rede: ${response.statusText}`);
+        }
+        
+        const activeNotifications: Notification[] = await response.json();
+        
+        if (activeNotifications.length > 0) {
+            console.log(`Encontradas ${activeNotifications.length} notificações ativas.`);
+            setNotifications(activeNotifications);
+        } else {
+            console.log("Nenhuma notificação ativa encontrada no momento.");
+        }
+
+      } catch (error) {
+        console.error("Falha ao buscar notificações ativas:", error);
+      }
+    };
+
+    fetchActiveNotifications();
+  }, []);
+
+
+  useEffect(() => {
+    console.log('%c PAINEL DE NOTIFICAÇÕES MONTADO ', 'background: #222; color: #bada55');
     const connect = () => {
       const client = new StompJs.Client({
         webSocketFactory: () => new SockJS('http://127.0.0.1:8080/agropec-notifications'),
@@ -74,7 +106,7 @@ export const NotificationContainer = () => {
         <table className="table-auto w-full">
           <thead>
             <tr className="bg-gray-200">
-              <th className="px-4 py-2 text-left">Ultimas Notificações</th>
+              <th className="px-4 py-2 text-left">Notificações recentes:</th>
             </tr>
           </thead>
           <tbody>
@@ -84,10 +116,9 @@ export const NotificationContainer = () => {
               </tr>
             )}
             
-            {/* O TypeScript infere automaticamente que 'notif' é do tipo 'Notification' aqui. */}
             {notifications.map((notif, index) => (
               <tr key={index} className="hover:bg-gray-100">
-                <td className="border px-4 py-2">{notif.content}</td>
+                <td className="border px-4 py-2" dangerouslySetInnerHTML={{ __html: notif.content }} />
               </tr>
             ))}
           </tbody>

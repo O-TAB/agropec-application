@@ -95,6 +95,7 @@ public class MapService {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+
     public ResponseEntity<?> getAllPoints(String mapId){
         List<Point> foundPoints = pointRepository.findAllByMapId(mapId);
 
