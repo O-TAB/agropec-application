@@ -39,7 +39,7 @@ public class StandService {
            point.setMap(map);
            stand.setPoint(point);
            standRepository.save(stand);
-           notificationsService.newNotificatoin("Um novo estande de nome" + stand.getName() + "foi adicionado!");
+           notificationsService.newNotification("Um novo estande de nome" + stand.getName() + "foi adicionado!");
 
            return ResponseEntity.status(HttpStatus.CREATED).body("Estande cadastrado com sucesso!");
        } else {
@@ -92,7 +92,7 @@ public class StandService {
             standToUpdate.setImg(stand.getImg());
             Stand updatedStand = standRepository.save(standToUpdate);
 
-            notificationsService.newNotificatoin("O Estande " + standToUpdate.getName() + " foi atualizado!");
+            notificationsService.newNotification("O Estande " + standToUpdate.getName() + " foi atualizado!");
             return ResponseEntity.ok(updatedStand);
         }catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -111,7 +111,7 @@ public class StandService {
             Stand standToDelete = foundStand.get();
             standRepository.deleteById(standToDelete.getId());
 
-            notificationsService.newNotificatoin("O Estande " + standToDelete.getName() + " foi deletado!");
+            notificationsService.newNotification("O Estande " + standToDelete.getName() + " foi deletado!");
             return ResponseEntity.ok().body("Estande deletado com sucesso");
         }catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

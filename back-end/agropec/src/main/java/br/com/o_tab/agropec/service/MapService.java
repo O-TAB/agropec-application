@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +34,7 @@ public class MapService {
 
             Map savedMap = mapRepository.save(newMap);
 
-            notificationsService.newNotificatoin("Um novo mapa foi adicionado!");
+            notificationsService.newNotification("Um novo mapa foi adicionado!");
             return ResponseEntity.status(HttpStatus.CREATED).body(savedMap);
         }catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -87,7 +86,7 @@ public class MapService {
             Point savedPoint = pointRepository.save(point);
 
             try {
-                notificationsService.newNotificatoin("Um novo ponto para " + point.getName() + " foi adicionado!");
+                notificationsService.newNotification("Um novo ponto para " + point.getName() + " foi adicionado!");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -131,7 +130,7 @@ public class MapService {
         pointToUpdate.setMap(existingMap);
 
         try {
-            notificationsService.newNotificatoin("O ponto de " + point.getName() + " foi atualizado!");
+            notificationsService.newNotification("O ponto de " + point.getName() + " foi atualizado!");
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -155,7 +154,7 @@ public class MapService {
                 pointRepository.delete(pointToDelete.get());
                 refreshPointList(foundMap.get());
                 try {
-                    notificationsService.newNotificatoin("O ponto de " + pointToDelete.get().getName() + " foi deletado!");
+                    notificationsService.newNotification("O ponto de " + pointToDelete.get().getName() + " foi deletado!");
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
