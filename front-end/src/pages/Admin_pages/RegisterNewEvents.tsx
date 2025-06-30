@@ -6,7 +6,6 @@ import { MousePointer, Save, PlusCircle, Calendar, MapPin, ArrowLeft } from 'luc
 import {
   StandEventPost,
   StandEventResponse,
-  emptypoint,
   emptyStandEvent,
   point,
   ResponsePoint
@@ -117,7 +116,7 @@ const RegisterNewEvents: React.FC = () => {
     setIsSubmitting(true);
     try {
       if (isEditing && itemSelected?.id !== undefined) {
-        const success = await UpdatePin(newEvent, itemSelected.id, 'events');
+        const success = await UpdatePin(newEvent, itemSelected.id, 'event');
         if (success) {
           alert("Evento atualizado com sucesso!");
           setItemSelected(null);
@@ -126,7 +125,7 @@ const RegisterNewEvents: React.FC = () => {
           alert("Erro ao atualizar o evento. Tente novamente.");
         }
       } else {
-        const success = await RegisterNewpin(newEvent, idmap, 'events');
+        const success = await RegisterNewpin(newEvent, idmap, 'event');
         if (success) {
           alert("Evento registrado com sucesso!");
           setNewEvent({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EVENTO'}});
@@ -365,7 +364,7 @@ const RegisterNewEvents: React.FC = () => {
           allItems={allEvents} 
           setSelectedPin={setItemSelected} 
           onRefresh={loadEvents}
-          type="events"
+          type="event"
         />
       </div>
 

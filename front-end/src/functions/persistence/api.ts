@@ -7,6 +7,19 @@ export const getAuthHeaders = () => {
   return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 };
 
+export const getDetailsById = async (id: number, typePoint: string): Promise<StandEventResponse | null> => {
+
+  const endpointType = typePoint === 'EXPOSITORES' ? 'stands' : 'event';
+
+  try {
+    const response = await axios.get(`${BASE_URL}/${endpointType}/${id}`, getAuthHeaders());
+    return response.data as StandEventResponse;
+  } catch (error) {
+    console.error(`Erro ao buscar detalhes para o item ${id}:`, error);
+    return null;
+  }
+};
+
 export const BASE_URL = 'http://localhost:8080';
 let cachedDataStands: StandEventResponse[] | null = null;
 let cachedDataEvents: StandEventResponse[] | null = null;

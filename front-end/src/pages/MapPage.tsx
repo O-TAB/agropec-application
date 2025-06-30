@@ -1,40 +1,31 @@
-//bibliotecas externas
+
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams, useParams } from "react-router-dom";
 import { MapPin } from "lucide-react";
 import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
-import { TransformWrapper, TransformComponent, useTransformContext } from "react-zoom-pan-pinch";
-//Utilitarios
-import EventPopup from '../components/EventPopup';
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import DetailsPopup from '../components/DetailsPopup';
 import { getSvgDimensions } from "../functions/SvgDimensionReader";
-
-//estruturas
-import { ResponsePoint, 
-         Map, 
-         FILTER_CONFIG
-        } from "../data/ObjectStructures";
-import { clearPointsCache, getFirstMapId, getMapById, getMypoints } from "../functions/persistence/api";
-import { SvgDimensions } from '../functions/SvgDimensionReader';
-import { FC } from 'react';
+import { ResponsePoint, StandEventResponse, Map, FILTER_CONFIG } from "../data/ObjectStructures";
+import { getFirstMapId, getMapById, getMypoints, getDetailsById } from "../functions/persistence/api";
 import MapOverlay from "../components/admin_pages_components/MapOverlay";
-
 
 export default function MapPage() {
   const transformWrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [visiblePins, setvisiblepins] = useState<ResponsePoint[]>([]);
+  const [visiblePins, setVisiblePins] = useState<ResponsePoint[]>([]);
   const [searchParams] = useSearchParams();
 
-  //new 
-  // Estados para dados da API
   const [currentMap, setCurrentMap] = useState<Map | null>(null);
   const [allPins, setAllPins] = useState<ResponsePoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mapDimensions, setMapDimensions] = useState<{ width: number; height: number; minX: number; minY: number } | null>(null);
+  
+  const [selectedPinId, setSelectedPinId] = useState<number | null>(null);
+  const [popupData, setPopupData] = useState<StandEventResponse | null>(null);
+  const [isPopupLoading, setIsPopupLoading] = useState(false);
 
-  //[PARQUEDIVERSAO, ESPACORACKATON, BANHEIROS, ESPACOPALESTRA, ESPACOSHOW, EMERGENCIA, RESTAURANTE]
-  // preparação para o futuro: lógica para obter o id do mapa dinamicamente da url
   const { mapId } = useParams<{ mapId: string }>();
   
   const loadMap = async (targetMapId: string) => {
@@ -42,161 +33,102 @@ export default function MapPage() {
       const map = await getMapById(targetMapId);
       if (map) {
         setCurrentMap(map);
-        // Calcular dimensões do SVG
         const dimensions = getSvgDimensions(map.svg);
         setMapDimensions(dimensions);
-      } else {
-        setError("Mapa não encontrado");
-      }
-    } catch (err: any) {
-      console.error("Erro ao carregar mapa:", err);
-      setError("Erro ao carregar mapa");
-    }
+      } else { setError("Mapa não encontrado"); }
+    } catch (err: any) { console.error("Erro ao carregar mapa:", err); setError("Erro ao carregar mapa"); }
   };
 
-  // Função para carregar os pontos
   const loadPoints = async (targetMapId: string) => {
     try {
-      // Limpa o cache para forçar recarregamento
-      clearPointsCache();
       const points = await getMypoints(targetMapId);
-      console.log('Pontos carregados:', points);
-      console.log('Tipo dos pontos:', points.map(p => ({ id: p.id, name: p.name, typePoint: p.typePoint })));
       setAllPins(points);
-      setvisiblepins(points);
-    } catch (err: any) {
-      console.error("Erro ao carregar pontos:", err);
-      setError("Erro ao carregar pontos");
-    }
+    } catch (err: any) { console.error("Erro ao carregar pontos:", err); setError("Erro ao carregar pontos"); }
   };
 
-  // Efeito para carregar dados quando o componente monta ou mapId muda
   useEffect(() => {
     const loadMapData = async () => {
       setLoading(true);
       setError(null);
-
       let targetMapId = mapId;
-      // Se não há mapId na URL, busca o primeiro mapa disponível
-      try{
-        if (!targetMapId){
-          targetMapId =  await getFirstMapId();
-        } else {
-          setError("Nenhum mapa disponível");
-          setLoading(false);
-          return;
+      try {
+        if (!targetMapId) { targetMapId = await getFirstMapId(); } 
+        if (!targetMapId) {
+            setError("Nenhum mapa disponível"); setLoading(false); return;
         }
       } catch (err: any) {
-          console.error("Erro ao buscar mapas:", err);
-          setError("Erro ao buscar mapas");
-          setLoading(false);
-          return;
+          setError("Erro ao buscar mapas"); setLoading(false); return;
       }
-      // Carrega mapa e pontos em paralelo
-      await Promise.all([
-        loadMap(targetMapId),
-        loadPoints(targetMapId)
-      ]);
-
+      await Promise.all([ loadMap(targetMapId), loadPoints(targetMapId) ]);
       setLoading(false);
     };
-
     loadMapData();
   }, [mapId]);
 
-  /*
-   efeito para buscar os pins da api assim que o componente é montado
-   atualmente, usa um id de mapa fixo para desenvolvimento
-   no futuro, quando o id for dinâmico (via useparams), a requisição se tornará
-   dependente da variável 'mapid', e o array de dependências deverá ser [mapid]
-   */
+  useEffect(() => {
+    if (activeCategory === null) {
+      setVisiblePins(allPins);
+    } else {
+      const filteredPins = allPins.filter(pin => pin.typePoint === activeCategory);
+      setVisiblePins(filteredPins);
+    }
+  }, [activeCategory, allPins]);
 
+  const handleClosePopup = () => {
+    setSelectedPinId(null);
+    setPopupData(null);
+    setIsPopupLoading(false);
+  };
 
-  // função para atualizar a categoria ativa e limpar qualquer evento selecionado
-  const handleShowPins = (category:string | null) => {
+  const handleShowPins = (category: string | null) => {
     setActiveCategory(category);
+    handleClosePopup(); 
+    if (category === null && transformWrapperRef.current) {
+      transformWrapperRef.current.resetTransform(600, "easeOut");
+    }
+  };
+
+  const handlePinClick = async (pinId: number) => {
+    if (pinId === selectedPinId) return;
+    const pin = allPins.find(p => p.id === pinId);
+    if (!pin) return;
+
+    setSelectedPinId(pinId);
+    setIsPopupLoading(true);
+    setPopupData(null); 
+
+    const details = await getDetailsById(pinId, pin.typePoint);
+    
+    if (pinId === selectedPinId) {
+      setPopupData(details);
+      setIsPopupLoading(false);
+    }
   };
   
-  // efeito para focar em um pin específico quando o id é passado via url 
-  useEffect(() => {
-    // garante que o código só execute após os pins serem carregados da api
-    if (allPins.length === 0) return; 
-
-    const pinIdFromUrl = searchParams.get('pinId');// para pegar id do pin caso exita
-    if (pinIdFromUrl && transformWrapperRef.current) {
-      const pinToFocus = allPins.find(p => p.id === Number(pinIdFromUrl));
-      if (pinToFocus) {
-        setActiveCategory(pinToFocus.typePoint);
-        setTimeout(() => {
-          if (transformWrapperRef.current) {
-            const { zoomToElement } = transformWrapperRef.current;
-            const elementId = `pin-${pinToFocus.id}`;
-            zoomToElement(elementId, 2.5, 800, "easeOut"); 
-          }
-        }, 200);
-      }
+  useEffect(() => { 
+    if (allPins.length === 0 || !searchParams.get('pinId')) return; 
+    const pinIdFromUrl = Number(searchParams.get('pinId'));
+    const pinToFocus = allPins.find(p => p.id === pinIdFromUrl);
+    if (pinToFocus && transformWrapperRef.current) {
+      setActiveCategory(pinToFocus.typePoint);
+      handlePinClick(pinToFocus.id); // Abre o popup também
+      setTimeout(() => {
+        if (transformWrapperRef.current) {
+          transformWrapperRef.current.zoomToElement(`pin-${pinToFocus.id}`, 2.5, 800, "easeOut"); 
+        }
+      }, 300);
     }
-  }, [searchParams]);
-
-  // efeito para controlar o zoom automático do mapa ao selecionar certas categorias
-  useEffect(() => {
-    if (!transformWrapperRef.current) return;
-    const { zoomToElement, resetTransform } = transformWrapperRef.current;
-    
-    // categorias que acionam o zoom automático ao serem selecionadas
-    const categoriesToZoom = ['ambulancia', 'pracaalimentacao'];
-
-    if (activeCategory && categoriesToZoom.includes(activeCategory)) {
-      const pinToZoom = visiblePins[0];
-      if (pinToZoom) {
-        const elementId = `pin-${pinToZoom.id}`;
-        setTimeout(() => {
-          if (typeof zoomToElement === "function") zoomToElement(elementId, 1.8, 600, "easeOut");
-        }, 100);
-      }
-    } else {
-      // reseta o zoom se nenhuma categoria especial estiver ativa
-      if (typeof resetTransform === "function") resetTransform(600, "easeOut");
-    }
-  }, [activeCategory, visiblePins]);
+  }, [searchParams, allPins]);
   
-
-
-  // Estados de loading e erro
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center mt-10">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-800 mx-auto mb-4"></div>
-          <p className="text-green-800">Carregando mapa...</p>
-        </div>
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="flex justify-center mt-10">
-        <div className="text-center text-red-600">
-          <p className="text-lg font-semibold">Erro ao carregar mapa</p>
-          <p className="text-sm">{error}</p>
-        </div>
-      </div>
-    );
-  }
-  if (!currentMap || !mapDimensions) {
-    return (
-      <div className="flex justify-center mt-10">
-        <div className="text-center text-gray-600">
-          <p>Nenhum mapa disponível</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) { return <div className="text-center p-10">Carregando...</div>; }
+  if (error) { return <div className="text-center p-10 text-red-600">{error}</div>; }
+  if (!currentMap || !mapDimensions) { return <div className="text-center p-10">Nenhum mapa disponível</div>; }
 
   return (
     <>
       <div className="flex justify-center mt-4 md:mt-10 px-4">
         <div className="bg-yellow-50 rounded-2xl shadow-lg p-4 md:p-6 w-full h-full">
+          
           <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
             <MapPin className="w-7 h-7 md:w-8 md:h-8 text-green-800" />
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-green-800">
@@ -210,20 +142,21 @@ export default function MapPage() {
             {Object.entries(FILTER_CONFIG).map(([type, config]) => (
               <button
                 key={type}
-                className={`px-3 py-1.5 text-xs md:text-sm text-white rounded transition-colors ${config.color} ${activeCategory === type ? 'ring-2 ring-offset-2 ring-white' : ''}`}
+                className={`flex items-center px-3 py-1.5 text-xs md:text-sm text-white rounded-lg transition-all duration-300 transform hover:scale-105 ${config.color} ${activeCategory === type ? 'ring-2 ring-offset-2 ring-white shadow-md' : 'opacity-80 hover:opacity-100'}`}
                 onClick={() => handleShowPins(activeCategory === type ? null : type)}
               >
-                <span className="mr-1">{config.icon}</span>
+                {config.icon && <span className="mr-1.5">{config.icon}</span>}
                 {config.label}
               </button>
             ))}
             <button 
-              className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors" 
+              className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors transform hover:scale-105" 
               onClick={() => handleShowPins(null)}
             >
               Limpar Filtro
             </button>
           </div>
+          
           <div className="w-full h-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
             {mapDimensions && (
               <div
@@ -237,6 +170,7 @@ export default function MapPage() {
                       pins={allPins}
                       visiblePins={visiblePins}
                       mapDimensions={mapDimensions}
+                      onPinClick={handlePinClick}
                     />
                   </TransformComponent>
                 </TransformWrapper>
@@ -245,13 +179,14 @@ export default function MapPage() {
           </div>
         </div>
       </div>
-      {/* <EventPopup 
-        eventData={selectedEvent} 
-        onClose={() => setSelectedEvent(null)}
-        imageMap={imgMapa} 
-      /> */}
+      
+      {selectedPinId && (
+        <DetailsPopup
+          isLoading={isPopupLoading}
+          itemData={popupData}
+          onClose={handleClosePopup}
+        />
+      )}
     </>
   );
 }
-
-

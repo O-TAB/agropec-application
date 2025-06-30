@@ -6,8 +6,10 @@ interface MapOverlayProps {
   pins: ResponsePoint[];
   visiblePins: ResponsePoint[];
   mapDimensions: SvgDimensions;
+  onPinClick: (pinId: number) => void;
 }
-const MapOverlay: React.FC<MapOverlayProps> = ({ svg, pins, visiblePins, mapDimensions }) => {
+
+const MapOverlay: React.FC<MapOverlayProps> = ({ svg, pins, visiblePins, mapDimensions, onPinClick }) => {
   const svgWidth = mapDimensions.width;
   const svgHeight = mapDimensions.height;
   const minX = mapDimensions.minX;
@@ -62,6 +64,7 @@ const MapOverlay: React.FC<MapOverlayProps> = ({ svg, pins, visiblePins, mapDime
                 pointerEvents: 'auto',
               }}
               title={pin.name}
+              onClick={() => onPinClick(pin.id)}
             />
           );
         })}

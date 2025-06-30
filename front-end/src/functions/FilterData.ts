@@ -18,3 +18,4 @@ export const useFilteredItems = (pins: StandEventResponse[],searchQuery: string)
     
   return filteredItems;
 }
+  
