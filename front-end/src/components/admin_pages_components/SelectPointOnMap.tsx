@@ -13,16 +13,22 @@ interface params {
   idmap: string;
 }
 
+interface TransformState {
+  scale: number;
+  positionX: number;
+  positionY: number;
+}
+
 const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewPoint, currentpoint, allpoints, idmap }) => {
   const [selectedPosition, setSelectedPosition] = useState<point | null>(null);
   const [mapSvg, setMapSvg] = useState<string | null>(null);
- const [mapDimensions, setMapDimensions] = useState<{ width: number; height: number; minX: number; minY: number } | null>(null);
+  const [mapDimensions, setMapDimensions] = useState<{ width: number; height: number; minX: number; minY: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [transformState, setTransformState] = useState({ scale: 1, positionX: 0, positionY: 0 });
+  const [transformState, setTransformState] = useState<TransformState>({ scale: 1, positionX: 0, positionY: 0 });
 
-  // Ref para o container do SVG (div que envolve o SVG)
-  const containerRef = useRef<HTMLDivElement>(null);
+  // Ref para o container transformado (envolve o SVG)
+  const svgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (currentpoint && (currentpoint.x !== 0 || currentpoint.y !== 0)) {
@@ -53,24 +59,27 @@ const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewPoint, curr
     if (idmap) fetchMap();
   }, [idmap]);
 
+  // Corrige a posição de clique com base no zoom e pan reais do DOM
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!mapDimensions || !containerRef.current) return;
+    if (!mapDimensions || !svgRef.current) return;
 
-    const rect = containerRef.current.getBoundingClientRect();
-    const { scale, positionX, positionY } = transformState;
+    const svgRect = svgRef.current.getBoundingClientRect();
+    const scale = transformState.scale;
+    const offsetX = e.clientX - svgRect.left;
+const offsetY = e.clientY - svgRect.top;
 
-    // Calcula posição relativa ao container do SVG
-    const relativeX = (e.clientX - rect.left - positionX) / scale;
-    const relativeY = (e.clientY - rect.top - positionY) / scale;
+const x = Math.round(offsetX / transformState.scale);
+const y = Math.round(offsetY / transformState.scale);
+
 
     // Limita para dentro do SVG
-    const x = Math.min(Math.max(0, Math.round(relativeX)), mapDimensions.width);
-    const y = Math.min(Math.max(0, Math.round(relativeY)), mapDimensions.height);
+    const limitedX = Math.min(Math.max(0, x), mapDimensions.width);
+    const limitedY = Math.min(Math.max(0, y), mapDimensions.height);
 
     const newPointData: point = {
       ...currentpoint,
-      x,
-      y,
+      x: limitedX,
+      y: limitedY,
     };
 
     setSelectedPosition(newPointData);
@@ -131,7 +140,14 @@ const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewPoint, curr
               <strong>Instruções:</strong> Clique no mapa para selecionar a posição do item. Use o zoom e arraste para navegar.
             </p>
           </div>
-          <div className="relative w-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
+          <div 
+            className="relative w-full border border-gray-300 rounded-lg shadow-lg"
+            style={{
+              height: '60vh',
+              overflow: 'auto',
+              touchAction: 'none'
+            }}
+          >
             {mapDimensions && (
               <div
                 className="relative w-full"
@@ -139,43 +155,67 @@ const SelectPointOnMap: React.FC<params> = ({ setShowMapModal, setNewPoint, curr
               >
                 <TransformWrapper
                   initialScale={1}
-                  minScale={0.5}
+                  minScale={0.2}
                   maxScale={8}
                   wheel={{ step: 0.1 }}
                   doubleClick={{ disabled: false }}
                   onTransformed={(_ref, state) => setTransformState(state)}
+                  limitToBounds={false}
+                  centerOnInit={true}
+                  panning={{
+                    velocityDisabled: true,
+                    lockAxisY: false
+                  }}
                 >
-                  <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
-                    <div
-                      ref={containerRef}
-                      style={{ width: mapDimensions.width, height: mapDimensions.height, position: 'relative' }}
-                      className="cursor-crosshair"
-                      onClick={handleMapClick}
-                    >
-                      <div
-                        style={{ width: mapDimensions.width, height: mapDimensions.height }}
-                        dangerouslySetInnerHTML={{ __html: mapSvg }}
-                      />
-                      <div
-                        style={{ position: 'absolute', top: 0, left: 0, width: mapDimensions.width, height: mapDimensions.height, pointerEvents: 'none' }}
-                      >
-                        {selectedPosition && (
-                          <div
-                            className="absolute w-4 h-4 bg-red-500 border-2 border-white rounded-full shadow-lg transform -translate-x-1/2 -translate-y-1/2 animate-pulse"
-                            style={{ left: `${selectedPosition.x}px`, top: `${selectedPosition.y}px`, pointerEvents: 'auto' }}
-                          />
-                        )}
-                        {allpoints.map((point) => (
-                          <div
-                            key={`point-${point.id}`}
-                            className="absolute w-2 h-2 rounded-full border border-white shadow-sm bg-gray-400 opacity-50"
-                            style={{ left: `${point.x}px`, top: `${point.y}px` }}
-                            title={point.name}
-                          />
-                        ))}
+                  {({ zoomIn, zoomOut, resetTransform }) => (
+                    <>
+                      <div className="absolute bottom-4 right-4 z-10 flex gap-2 sm:hidden">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); zoomIn(); }}
+                          className="p-2 bg-white rounded-full shadow-md"
+                        >
+                          +
+                        </button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); zoomOut(); }}
+                          className="p-2 bg-white rounded-full shadow-md"
+                        >
+                          -
+                        </button>
                       </div>
-                    </div>
-                  </TransformComponent>
+                      <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
+                        <div
+                          ref={svgRef}
+                          style={{ width: mapDimensions.width, height: mapDimensions.height, position: 'relative' }}
+                          className="cursor-crosshair"
+                          onClick={handleMapClick}
+                        >
+                          <div
+                            style={{ width: mapDimensions.width, height: mapDimensions.height }}
+                            dangerouslySetInnerHTML={{ __html: mapSvg }}
+                          />
+                          <div
+                            style={{ position: 'absolute', top: 0, left: 0, width: mapDimensions.width, height: mapDimensions.height, pointerEvents: 'none' }}
+                          >
+                            {selectedPosition && (
+                              <div
+                                className="absolute w-4 h-4 bg-red-500 border-2 border-white rounded-full shadow-lg transform -translate-x-1/2 -translate-y-1/2 animate-pulse"
+                                style={{ left: `${selectedPosition.x}px`, top: `${selectedPosition.y}px`, pointerEvents: 'auto' }}
+                              />
+                            )}
+                            {allpoints.map((point) => (
+                              <div
+                                key={`point-${point.id}`}
+                                className="absolute w-2 h-2 rounded-full border border-white shadow-sm bg-gray-400 opacity-50"
+                                style={{ left: `${point.x}px`, top: `${point.y}px` }}
+                                title={point.name}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </TransformComponent>
+                    </>
+                  )}
                 </TransformWrapper>
               </div>
             )}
