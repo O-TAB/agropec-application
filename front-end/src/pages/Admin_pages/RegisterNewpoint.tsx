@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 import { useAuth } from '../../context/AuthContext';
 import { MousePointer, Save, PlusCircle, ArrowLeft } from 'lucide-react';
-
-import {debugdata, getMypoints, getFirstMapId} from '../../functions/persistence/api';
 import { emptypoint, point, ResponsePoint } from '../../data/ObjectStructures';
 import SelectPointOnMap from '../../components/admin_pages_components/SelectPointOnMap';
 import { useNavigate} from 'react-router-dom';
 import { RegisterNewPoint, UpdatePoint } from '../../functions/persistence/CrudPins';
+import { getMypoints, getFirstMapId } from '../../functions/persistence/api';
 
 import NameToPin from '../../components/admin_pages_components/NameToPin';
 import ListPoints from '../../components/admin_pages_components/ListPoints';
@@ -110,7 +109,6 @@ export default function Registernewpoint() {
     setPointSelected(null);
   };
 
-  debugdata();
 
   return (
     <div className="container mx-auto p-4 md:p-8">
