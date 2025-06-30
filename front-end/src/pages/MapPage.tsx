@@ -15,19 +15,16 @@ export default function MapPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [visiblePins, setVisiblePins] = useState<ResponsePoint[]>([]);
   const [searchParams] = useSearchParams();
-
   const [currentMap, setCurrentMap] = useState<Map | null>(null);
   const [allPins, setAllPins] = useState<ResponsePoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mapDimensions, setMapDimensions] = useState<{ width: number; height: number; minX: number; minY: number } | null>(null);
-  
   const [selectedPinId, setSelectedPinId] = useState<number | null>(null);
   const [popupData, setPopupData] = useState<StandEventResponse | null>(null);
   const [isPopupLoading, setIsPopupLoading] = useState(false);
-
   const { mapId } = useParams<{ mapId: string }>();
-  
+
   const loadMap = async (targetMapId: string) => {
     try {
       const map = await getMapById(targetMapId);
@@ -52,7 +49,7 @@ export default function MapPage() {
       setError(null);
       let targetMapId = mapId;
       try {
-        if (!targetMapId) { targetMapId = await getFirstMapId(); } 
+        if (!targetMapId) { targetMapId = await getFirstMapId(); }
         if (!targetMapId) {
             setError("Nenhum mapa disponível"); setLoading(false); return;
         }
@@ -99,6 +96,7 @@ export default function MapPage() {
 
     const details = await getDetailsById(pinId, pin.typePoint);
     
+ 
     if (pinId === selectedPinId) {
       setPopupData(details);
       setIsPopupLoading(false);
@@ -106,19 +104,23 @@ export default function MapPage() {
   };
   
   useEffect(() => { 
-    if (allPins.length === 0 || !searchParams.get('pinId')) return; 
-    const pinIdFromUrl = Number(searchParams.get('pinId'));
+    if (allPins.length === 0) return;
+    const pinIdFromUrlParam = searchParams.get('pinId');
+    if (!pinIdFromUrlParam) return;
+
+    const pinIdFromUrl = Number(pinIdFromUrlParam);
     const pinToFocus = allPins.find(p => p.id === pinIdFromUrl);
-    if (pinToFocus && transformWrapperRef.current) {
+    
+    if (pinToFocus) {
       setActiveCategory(pinToFocus.typePoint);
-      handlePinClick(pinToFocus.id); // Abre o popup também
+      handlePinClick(pinToFocus.id);
       setTimeout(() => {
         if (transformWrapperRef.current) {
           transformWrapperRef.current.zoomToElement(`pin-${pinToFocus.id}`, 2.5, 800, "easeOut"); 
         }
       }, 300);
     }
-  }, [searchParams, allPins]);
+  }, [searchParams, allPins]); 
   
   if (loading) { return <div className="text-center p-10">Carregando...</div>; }
   if (error) { return <div className="text-center p-10 text-red-600">{error}</div>; }

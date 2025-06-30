@@ -126,7 +126,6 @@ const RegisterNewStand: React.FC = () => {
   
   return (
     <div className="container mx-auto p-4 md:p-8">
-      {/* ... (Todo o seu JSX do cabeçalho e do formulário continua aqui sem alterações) ... */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
           <button 

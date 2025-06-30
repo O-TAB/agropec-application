@@ -7,38 +7,15 @@ export const getAuthHeaders = () => {
   return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 };
 
-export const getDetailsById = async (id: number, typePoint: string): Promise<StandEventResponse | null> => {
-
-  const endpointType = typePoint === 'EXPOSITORES' ? 'stands' : 'event';
-
-  try {
-    const response = await axios.get(`${BASE_URL}/${endpointType}/${id}`, getAuthHeaders());
-    return response.data as StandEventResponse;
-  } catch (error) {
-    console.error(`Erro ao buscar detalhes para o item ${id}:`, error);
-    return null;
-  }
-};
-
 export const BASE_URL = 'http://localhost:8080';
 let cachedDataStands: StandEventResponse[] | null = null;
 let cachedDataEvents: StandEventResponse[] | null = null;
 let cachedPoints: ResponsePoint[] | null = null;
-let isLoadingData: boolean = false; // Para evitar requisições simultâneas
+let isLoadingData: boolean = false; 
 
-// Funções para limpar cache
-export const clearStandsCache = () => {
-  cachedDataStands = null;
-};
-
-export const clearEventsCache = () => {
-  cachedDataEvents = null;
-};
-
-export const clearPointsCache = () => {
-  cachedPoints = null;
-};
-
+export const clearStandsCache = () => { cachedDataStands = null; };
+export const clearEventsCache = () => { cachedDataEvents = null; };
+export const clearPointsCache = () => { cachedPoints = null; };
 export const clearAllCache = () => {
   cachedDataStands = null;
   cachedDataEvents = null;
@@ -48,22 +25,11 @@ export const clearAllCache = () => {
 export const uploadMap = async (svgContent: string, name = "Mapa") => {
   try {
     const formData = new FormData();
-    // Cria um arquivo Blob com o conteúdo SVG
     const svgFile = new Blob([svgContent], { type: 'image/svg+xml' });
-    formData.append('archive', svgFile, 'mapa.svg'); // 'archive' é o nome do parâmetro esperado no backend
-    formData.append('name', name); // se o backend espera o nome do mapa
+    formData.append('archive', svgFile, 'mapa.svg'); 
+    formData.append('name', name);
 
-    const response = await axios.post(
-      `${BASE_URL}/map`,
-      formData,
-      {
-        ...getAuthHeaders(),
-        headers: {
-          ...getAuthHeaders().headers,
-          // NÃO defina 'Content-Type', o axios faz isso automaticamente para FormData!
-        }
-      }
-    );
+    const response = await axios.post(`${BASE_URL}/map`, formData, { ...getAuthHeaders() });
     return response.data;
   } catch (error: any) {
     throw error;
@@ -73,7 +39,6 @@ export const uploadMap = async (svgContent: string, name = "Mapa") => {
 export const getMapById = async (mapId: string): Promise<Map | null> => {
   try {
     const response = await axios.get(`${BASE_URL}/map/${mapId}`, getAuthHeaders());
-    console.log('Resposta do servidor - mapa específico:', response.data);
     return response.data as Map;
   } catch (error: any) {
     console.error('Error fetching map by id: ', error);
@@ -84,7 +49,6 @@ export const getMapById = async (mapId: string): Promise<Map | null> => {
 export const getFirstMapId =  async (): Promise<string> => {
   try{
     const response = await axios.get(`${BASE_URL}/map`,getAuthHeaders());
-    console.log('Resposta do servidor:', response.data);
     const maps = response.data;
     if(Array.isArray(maps) && maps.length > 0 && maps[0].id){
       return maps[0].id
@@ -95,108 +59,48 @@ export const getFirstMapId =  async (): Promise<string> => {
     return '';
   }
 }
- 
 
 export async function getMyObjectsStands(): Promise<StandEventResponse[]> {
-  if (cachedDataStands) {
-    console.log('Dados recuperados do cache.');
-    return cachedDataStands;
-  }
-
-  if (isLoadingData) {
-    console.log('Dados já sendo carregados, aguardando...');
-    return new Promise(resolve => {
-      const checkInterval = setInterval(() => {
-        if (!isLoadingData && cachedDataStands) {
-          clearInterval(checkInterval);
-          resolve(cachedDataStands);
-        }
-      }, 100);
-    });
-  }
-  isLoadingData = true;
-  console.log('Buscando dados da API pela primeira vez ou cache vazio...');
+  if (cachedDataStands) return cachedDataStands;
   try {
     const data = await fetchAllStandsData();
-    cachedDataStands = data; // Armazena em cache
+    cachedDataStands = data;
     return data;
-  } finally {
-    isLoadingData = false;
+  } catch (error) {
+    return [];
   }
 }
 
 export async function getMyObjectsEvent(): Promise<StandEventResponse[]> {
-  if (cachedDataEvents) {
-    console.log('Dados recuperados do cache.');
-    return cachedDataEvents;
-  }
-
-  if (isLoadingData) {
-    console.log('Dados já sendo carregados, aguardando...');
-    return new Promise(resolve => {
-      const checkInterval = setInterval(() => {
-        if (!isLoadingData && cachedDataEvents) {
-          clearInterval(checkInterval);
-          resolve(cachedDataEvents);
-        }
-      }, 100);
-    });
-  }
-  isLoadingData = true;
-  console.log('Buscando dados da API pela primeira vez ou cache vazio...');
+  if (cachedDataEvents) return cachedDataEvents;
   try {
     const data = await fetchAllEventData();
-    cachedDataEvents = data; // Armazena em cache
+    cachedDataEvents = data;
     return data;
-  } finally {
-    isLoadingData = false;
+  } catch(error) {
+    return [];
   }
 }
 
 export async function getMypoints(idmap: string): Promise<ResponsePoint[]> {
-  // Se não temos um idmap válido, retorna array vazio
-  if (!idmap) {
-    return [];
-  }
-
-  // Se temos cache e não estamos carregando, retorna o cache
-  if (cachedPoints && !isLoadingData) {
-    console.log('Dados recuperados do cache.');
-    return cachedPoints;
-  }
-
-  if (isLoadingData) {
-    console.log('Dados já sendo carregados, aguardando...');
-    return new Promise(resolve => {
-      const checkInterval = setInterval(() => {
-        if (!isLoadingData && cachedPoints) {
-          clearInterval(checkInterval);
-          resolve(cachedPoints);
-        }
-      }, 100);
-    });
-  }
-  isLoadingData = true;
-  console.log('Buscando dados da API pela primeira vez ou cache vazio...');
-  
+  if (!idmap) return [];
+  if (cachedPoints) return cachedPoints;
   try {
     const data = await fetchAllPoints(idmap);
-    cachedPoints = data; // Armazena em cache
+    cachedPoints = data;
     return data;
-  } finally {
-    isLoadingData = false;
+  } catch (error) {
+    return [];
   }
 }
 
-
-
-export const debugdata = () => {
-  console.log('Dados de stands:', cachedDataStands);
-  console.log('Dados de eventos:', cachedDataEvents);
-  console.log('Dados de pontos:', cachedPoints);
-}
-
-
-
-
-
+export const getDetailsById = async (id: number, typePoint: string): Promise<StandEventResponse | null> => {
+  const endpointType = typePoint === 'EXPOSITORES' ? 'stands' : 'event'; // Simplificação, ajuste se tiver mais tipos
+  try {
+    const response = await axios.get(`${BASE_URL}/${endpointType}/${id}`, getAuthHeaders());
+    return response.data as StandEventResponse;
+  } catch (error) {
+    console.error(`Erro ao buscar detalhes para o item ${id}:`, error);
+    return null;
+  }
+};

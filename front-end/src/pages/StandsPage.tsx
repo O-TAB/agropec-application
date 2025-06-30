@@ -1,4 +1,3 @@
-// src/pages/StandsPage.tsx - CORREÇÃO FINAL
 
 import { useEffect, useState} from 'react';
 import { Search, Filter} from 'lucide-react';
@@ -17,6 +16,7 @@ export default function StandsPage() {
   const [allevents, setEvents]= useState<StandEventResponse[]>([]);
 
   useEffect(() => {
+
     getMyObjectsStands().then((data) => setStands(data));
     getMyObjectsEvent().then((data) => setEvents(data));
   }, []);
@@ -91,10 +91,6 @@ export default function StandsPage() {
         )}
       </div>
 
-      {/* ================================================================== */}
-      {/* O FEITIÇO ANTI-MALDIÇÃO */}
-      {/* Adicionamos a condição {selectedItem && ...} */}
-      {/* ================================================================== */}
       {selectedItem && (
         <DetailsPopup 
           itemData={selectedItem} 

@@ -36,26 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (!response.ok) {
         const errorBody = await response.text();
-        console.error('Login failed with status:', response.status);
-        console.error('Raw error response:', errorBody);
-
-        let errorMessage = 'Falha na autenticação. Tente novamente.';
-
-        try {
-          const errorJson = JSON.parse(errorBody);
-          errorMessage = errorJson.message || errorJson.error || errorMessage;
-        } catch (jsonParseError) {
-          if (response.status === 401) {
-            errorMessage = 'Credenciais inválidas.';
-          } else if (response.status === 400 && errorBody.includes('invalid credentials')) {
-             errorMessage = 'Usuário ou senha inválidos.';
-          } else if (response.status === 415) {
-             errorMessage = 'Erro de configuração: Tipo de conteúdo não suportado pelo servidor.';
-          } else {
-             errorMessage = `Erro do servidor (${response.status}): ${errorBody.substring(0, 100)}...`;
-          }
-        }
-        throw new Error(errorMessage);
+        throw new Error(`Falha no login: ${errorBody}`);
       }
 
       const data = await response.json();
@@ -67,12 +48,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem('jwt_token', jwtToken);
         return true;
       } else {
-        console.error('Login successful, but no JWT token received in the response:', data);
         throw new Error('Token JWT não recebido da API.');
       }
 
     } catch (error: any) {
-      console.error('Network or API error during login:', error.message);
+      console.error('Erro de rede ou API durante o login:', error.message);
       setIsAuthenticated(false);
       setToken(null);
       localStorage.removeItem('jwt_token');
@@ -92,26 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (!response.ok) {
         const errorBody = await response.text();
-        console.error('Login failed with status:', response.status);
-        console.error('Raw error response:', errorBody);
-
-        let errorMessage = 'Falha na autenticação. Tente novamente.';
-
-        try {
-          const errorJson = JSON.parse(errorBody);
-          errorMessage = errorJson.message || errorJson.error || errorMessage;
-        } catch (jsonParseError) {
-          if (response.status === 401) {
-            errorMessage = 'Credenciais inválidas.';
-          } else if (response.status === 400 && errorBody.includes('invalid credentials')) {
-             errorMessage = 'Usuário ou senha inválidos.';
-          } else if (response.status === 415) {
-             errorMessage = 'Erro de configuração: Tipo de conteúdo não suportado pelo servidor.';
-          } else {
-             errorMessage = `Erro do servidor (${response.status}): ${errorBody.substring(0, 100)}...`;
-          }
-        }
-        throw new Error(errorMessage);
+        throw new Error(`Falha no login de Super Admin: ${errorBody}`);
       }
 
       const data = await response.json();
@@ -123,12 +84,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem('jwt_token', jwtToken);
         return true;
       } else {
-        console.error('Login successful, but no JWT token received in the response:', data);
         throw new Error('Token JWT não recebido da API.');
       }
 
     } catch (error: any) {
-      console.error('Network or API error during login:', error.message);
+      console.error('Erro de rede ou API durante o login de Super Admin:', error.message);
       setIsAuthenticated(false);
       setToken(null);
       localStorage.removeItem('jwt_token');
@@ -140,7 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('jwt_token');
     setIsAuthenticated(false);
     setToken(null);
-    navigate('/');
+    navigate('/login');
   };
 
   return (

@@ -1,5 +1,3 @@
-// src/components/DetailsPopup.tsx - COMPLETO E CORRIGIDO
-
 import { Link } from 'react-router-dom';
 import { Map, Clock, X } from 'lucide-react';
 import { StandEventResponse } from '../data/ObjectStructures';
@@ -21,9 +19,6 @@ const DetailsPopup: React.FC<DetailsPopupProps> = ({ itemData, isLoading, onClos
         className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* ================================================================== */}
-        {/* LÓGICA DE RENDERIZAÇÃO PRINCIPAL */}
-        {/* ================================================================== */}
         {isLoading && (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-800"></div>
