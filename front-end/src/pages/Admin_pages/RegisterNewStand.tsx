@@ -90,8 +90,9 @@ const RegisterNewStand: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      const StandtoSend = {...newStand, point:{...newStand.point, name: newStand.name, typepoint: 'EXPOSITORES'}}
       if (isEditing && itemSelected?.id !== undefined) {
-        const success = await UpdatePin(newStand, itemSelected.id, 'stands');
+        const success = await UpdatePin(StandtoSend, itemSelected.id, 'stands');
         if (success) {
           alert("Stand atualizado com sucesso!");
           setItemSelected(null);
@@ -100,7 +101,7 @@ const RegisterNewStand: React.FC = () => {
           alert("Erro ao atualizar o stand. Tente novamente.");
         }
       } else {
-        const success = await RegisterNewpin(newStand, idmap, 'stands');
+        const success = await RegisterNewpin(StandtoSend, idmap, 'stands');
         if (success) {
           alert("Stand registrado com sucesso!");
           setNewStand({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EXPOSITORES'}});
