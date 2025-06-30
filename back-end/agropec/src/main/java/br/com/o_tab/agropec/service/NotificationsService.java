@@ -2,6 +2,7 @@ package br.com.o_tab.agropec.service;
 
 import br.com.o_tab.agropec.model.Notification;
 import br.com.o_tab.agropec.model.NotificationMessage;
+import br.com.o_tab.agropec.repository.NotificationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 public class NotificationsService {
 
     private SimpMessagingTemplate messagingTemplate;
+    private NotificationRepository notificationRepository;
 
     public Notification createNotification (NotificationMessage message){
         String content = "ATUALIZAÇÃO: " + HtmlUtils.htmlEscape(message.getMessage()) + "!";

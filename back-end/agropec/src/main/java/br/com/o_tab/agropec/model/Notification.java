@@ -25,4 +25,10 @@ public class Notification {
 
     @Column(nullable = false)
     private Instant expiresAt;
+
+    public Notification(String content, Instant createdAt, Instant expiresAt){
+        this.content = content;
+        this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
+    }
 }
