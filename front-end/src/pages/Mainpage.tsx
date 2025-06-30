@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { MapPin, Calendar, Users, Phone, Mail, Wheat, Code, Mic } from 'lucide-react';
 import oximg from '../assets/ox_img.jpeg';
 import { useLocation, Link } from 'react-router-dom'; // O 'Link' foi importado aqui
-import { SvgDimensionReader } from '../components/Testconvertion';
 import { NotificationContainer } from '../components/NotificationComponent';
 
 
@@ -25,7 +24,8 @@ export default function MainPage() {
 // e realiza um scroll suave até essa seção para melhorar a experiência do usuário.
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-yellow-50"
+    style={{ touchAction: 'manipulation' }}>{/*para impedir o zoom do dobble tap nas paginas */}
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-400 overflow-hidden">
@@ -77,7 +77,6 @@ export default function MainPage() {
                 É a maior feira agropecuária do Norte do Brasil, um evento que movimenta a economia local,
                 fortalece relações comerciais e atrai milhares de visitantes qualificados.
               </p>
-              <SvgDimensionReader/>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                 <div className="bg-green-50 p-6 rounded-lg">
                   <Users className="h-8 w-8 text-green-600 mb-3" />

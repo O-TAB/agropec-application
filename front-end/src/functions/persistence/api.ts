@@ -72,6 +72,7 @@ export async function getMyObjectsStands(): Promise<StandEventResponse[]> {
 }
 
 export async function getMyObjectsEvent(): Promise<StandEventResponse[]> {
+  console.log(cachedDataEvents);
   if (cachedDataEvents) return cachedDataEvents;
   try {
     const data = await fetchAllEventData();

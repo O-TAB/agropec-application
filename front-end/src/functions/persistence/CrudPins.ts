@@ -2,13 +2,12 @@
 
 import axios from 'axios';
 import { point, ResponsePoint, StandEventPost, StandEventResponse } from '../../data/ObjectStructures';
-import { getAuthHeaders, BASE_URL, clearPointsCache, clearStandsCache } from './api';
+import { getAuthHeaders, BASE_URL, clearPointsCache, clearAllCache } from './api';
 
 export const RegisterNewpin =  async (PinData: StandEventPost, mapid: string, type: string): Promise<boolean> => {
   try{
     const response = await axios.post(`${BASE_URL}/${type}/${mapid}`,PinData ,getAuthHeaders());
-    clearStandsCache();
-    clearPointsCache();
+    clearAllCache();
     return true;
   } catch (error: any) {
       console.error('Error fetching data (Registro): ', error);
@@ -17,20 +16,9 @@ export const RegisterNewpin =  async (PinData: StandEventPost, mapid: string, ty
 }
 
 export const UpdatePin =  async (PinData: StandEventResponse | StandEventPost, idpin: number, type: string): Promise<boolean> => {
-  const updatePayload = {
-    name: PinData.name,
-    description: PinData.description,
-    descriptionCard: PinData.descriptionCard,
-    img: PinData.img,
-    pointId: (PinData.point as ResponsePoint)?.id 
-  };
-  if (updatePayload.pointId === undefined) {
-    delete (updatePayload as Partial<typeof updatePayload>).pointId;
-  }
   try{
-    const response = await axios.put(`${BASE_URL}/${type}/${idpin}`, updatePayload, getAuthHeaders());
-    clearStandsCache();
-    clearPointsCache();
+    const response = await axios.put(`${BASE_URL}/${type}/${idpin}`, PinData, getAuthHeaders());
+    clearAllCache();
     return true;
   } catch (error: any) {
       console.error('Error fetching data (Update): ', error.response?.data || error.message);
@@ -41,8 +29,7 @@ export const UpdatePin =  async (PinData: StandEventResponse | StandEventPost, i
 export const DeletePin =  async (idpin: number, type: string): Promise<boolean> => {
   try{
     await axios.delete(`${BASE_URL}/${type}/${idpin}`,getAuthHeaders());
-    clearStandsCache();
-    clearPointsCache();
+    clearAllCache();
     return true;
   } catch (error: any) {
       console.error('Error fetching data (Delete): ', error);

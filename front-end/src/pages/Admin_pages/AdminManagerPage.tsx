@@ -83,8 +83,9 @@ const AdminManagerPage: React.FC = () => {
           {/* Navigation Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {adminPages.map((page, index) => {
+              {console.log(page.path)}
               const IconComponent = page.icon;
-              return (
+              return (                
                 <div
                   key={index}
                   className={`${page.bgColor} rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer group`}

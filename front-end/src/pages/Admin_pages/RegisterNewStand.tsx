@@ -57,6 +57,9 @@ const RegisterNewStand: React.FC = () => {
     loadStands();
   }, [idmap]);
 
+  //evitar de usuario poder editar e ao apgar o item que esta editando poder continar editando o item.
+  useEffect(()=>{setNewStand(emptyStandEvent), setIsEditing(false)},[allStands]);
+
   useEffect(() => {
     if (itemSelected) {
       setNewStand(itemSelected);
@@ -112,6 +115,8 @@ const RegisterNewStand: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+
 
   const handleCancelEdit = () => {
     setItemSelected(null);
@@ -234,7 +239,7 @@ const RegisterNewStand: React.FC = () => {
                   : 'bg-green-600 text-white hover:bg-green-700'
               } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {isSubmitting ? (<>...</>) : isEditing ? (<>...</>) : (<>...</>)}
+              {isSubmitting ? (<>...</>) : isEditing ? (<>Editar</>) : (<>Registrar</>)}
             </button>
           </div>
         </div>

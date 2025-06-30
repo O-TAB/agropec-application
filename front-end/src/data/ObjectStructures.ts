@@ -48,8 +48,8 @@ export interface StandEventPost{
     description: string;
     descriptionCard: string;
     img: string;
+    date?: string;
     point: point;
-    Date?: string;
 }
 
 export interface StandEventResponse extends StandEventPost {
