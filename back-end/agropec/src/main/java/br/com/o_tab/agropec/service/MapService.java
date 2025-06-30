@@ -41,6 +41,35 @@ public class MapService {
         }
     }
 
+    @Transactional
+    public ResponseEntity<?> updateMap(String mapId, Map mapUpdate) {
+        Optional<Map> foundMap = mapRepository.findById(mapId);
+
+        if (foundMap.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Mapa não encontrado.");
+        }
+
+        Map existingMap = foundMap.get();
+
+        // Atualiza apenas nome e svg
+        if (mapUpdate.getName() != null) {
+            existingMap.setName(mapUpdate.getName());
+        }
+        if (mapUpdate.getSvg() != null) {
+            existingMap.setSvg(mapUpdate.getSvg());
+        }
+
+        mapRepository.save(existingMap);
+
+        try {
+            notificationsService.newNotification("O mapa foi atualizado!");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        return ResponseEntity.ok(existingMap);
+    }
+
 
     public ResponseEntity<?> getAllMaps(){
         try {

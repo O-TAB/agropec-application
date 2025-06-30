@@ -105,3 +105,12 @@ export const getDetailsById = async (id: number, typePoint: string): Promise<Sta
     return null;
   }
 };
+
+export const updateMap = async (mapId: string, data: { name: string; svg: string }) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/map/${mapId}`, data, getAuthHeaders());
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};

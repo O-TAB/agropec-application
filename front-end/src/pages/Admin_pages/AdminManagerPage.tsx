@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Store, Calendar, Settings, LogOut } from 'lucide-react';
+import { MapPin, Store, Calendar, Settings, LogOut, Upload } from 'lucide-react';
 
 const AdminManagerPage: React.FC = () => {
   const { logout } = useAuth();
@@ -55,13 +55,22 @@ const AdminManagerPage: React.FC = () => {
                 <p className="text-gray-600">Gerencie pontos, stands e eventos do evento</p>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
-            >
-              <LogOut size={20} />
-              Sair
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate('/uploadmap')}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <Upload size={20} />
+                Atualizar Mapa
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <LogOut size={20} />
+                Sair
+              </button>
+            </div>
           </div>
         </div>
       </div>

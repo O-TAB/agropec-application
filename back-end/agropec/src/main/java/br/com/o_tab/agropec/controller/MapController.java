@@ -1,5 +1,6 @@
 package br.com.o_tab.agropec.controller;
 
+import br.com.o_tab.agropec.model.Map;
 import br.com.o_tab.agropec.model.Point;
 import br.com.o_tab.agropec.service.MapService;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,10 @@ public class MapController {
     @GetMapping()
     public ResponseEntity<?> getAllMaps(){
         return mapService.getAllMaps();
+    }
+    @PutMapping("/{mapId}")
+        public ResponseEntity<?> updateMap(@PathVariable String mapId, @RequestBody Map mapUpdate) {
+        return mapService.updateMap(mapId, mapUpdate);
     }
 
 

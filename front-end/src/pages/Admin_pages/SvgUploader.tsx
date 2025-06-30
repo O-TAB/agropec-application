@@ -1,23 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
-import { getFirstMapId } from '../../functions/persistence/api';
+import { getFirstMapId, updateMap, uploadMap} from '../../functions/persistence/api';
 import { useNavigate } from 'react-router-dom';
-import { uploadMap } from '../../functions/persistence/api';
 
 export default function SvgUploader() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [mapId, setMapId] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(()=>{
-   getFirstMapId().then((idmap) => {
-      if (idmap) {
-        console.log(idmap);
-        navigate(`/gerenciar`); // troque para a rota que quiser, ex: '/admin/mapas'
-      }
+  useEffect(() => {
+    getFirstMapId().then((id) => {
+      if (id) setMapId(id);
     });
-  }, [navigate]);
+  }, []);
 
   const handleFile = useCallback((file: File) => {
     setError(null);
@@ -39,10 +37,14 @@ export default function SvgUploader() {
     reader.onload = async (e) => {
       if (e.target?.result) {
         try {
-          await uploadMap(e.target.result as string, "Agropec Mapa");
+          if (mapId) {
+            await updateMap(mapId, { name: 'Agropec Mapa', svg: e.target.result as string });
+            setSuccess(true);
+          } else {
+            await uploadMap(e.target.result as string, 'Agropec Mapa');
+            setSuccess(true);
+          }
           setError(null);
-          alert('Mapa cadastrado com sucesso!');          
-          navigate('/uploadmap');
         } catch (err: any) {
           setError('Erro ao registrar o mapa: ' + (err?.response?.data?.message || err.message));
         }
@@ -54,8 +56,7 @@ export default function SvgUploader() {
       setIsLoading(false);
     };
     reader.readAsText(file);
-  }, [navigate]);
-
+  }, [mapId]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -98,6 +99,17 @@ export default function SvgUploader() {
           </p>
         </div>
 
+        {success ? (
+          <div className="flex flex-col items-center justify-center p-8 bg-green-50 border border-green-200 rounded-xl shadow">
+            <p className="text-green-700 text-lg font-semibold mb-4">Mapa atualizado com sucesso!</p>
+            <button
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition-colors"
+              onClick={() => navigate('/admin')}
+            >
+              Voltar ao Painel Admin
+            </button>
+          </div>
+        ) : (
         <div
           className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-300 ${
             isDragOver
@@ -145,6 +157,7 @@ export default function SvgUploader() {
             </>
           )}
         </div>
+        )}
 
         {error && (
           <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3">
