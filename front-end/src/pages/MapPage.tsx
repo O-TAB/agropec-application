@@ -8,6 +8,7 @@ import { getSvgDimensions } from "../functions/SvgDimensionReader";
 import { ResponsePoint, StandEventResponse, Map, FILTER_CONFIG } from "../data/ObjectStructures";
 import { getFirstMapId, getMapById, getMypoints, getDetailsById } from "../functions/persistence/api";
 import MapOverlay from "../components/admin_pages_components/MapOverlay";
+import DetailsOnMap from "../components/DetailsOnMap";
 
 export default function MapPage() {
   const transformWrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
@@ -94,13 +95,12 @@ export default function MapPage() {
     setIsPopupLoading(true);
     setPopupData(null); 
 
+    console.log(pin.typePoint);
     const details = await getDetailsById(pinId, pin.typePoint);
+
+    setPopupData(details);
+    setIsPopupLoading(false);
     
- 
-    if (pinId === selectedPinId) {
-      setPopupData(details);
-      setIsPopupLoading(false);
-    }
   };
   
   useEffect(() => { 
@@ -146,7 +146,7 @@ export default function MapPage() {
     className="flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-full shadow-md hover:bg-green-700 transition-all"
   >
     <MapPin className="w-5 h-5" />
-    {activeCategory ? FILTER_CONFIG[activeCategory]?.label : "Filtrar por categoria"}
+    {activeCategory ? FILTER_CONFIG[activeCategory as keyof typeof FILTER_CONFIG]?.label : "Filtrar por categoria"}
     <svg
       className={`w-4 h-4 transform transition-transform duration-200 ${showFilterBox ? 'rotate-180' : ''}`}
       xmlns="http://www.w3.org/2000/svg"
@@ -227,7 +227,7 @@ export default function MapPage() {
       </div>
       
       {selectedPinId && (
-        <DetailsPopup
+        <DetailsOnMap
           isLoading={isPopupLoading}
           itemData={popupData}
           onClose={handleClosePopup}

@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import { Map, Clock, X } from 'lucide-react';
+
+import { Clock, X } from 'lucide-react';
 import { StandEventResponse } from '../data/ObjectStructures';
 
 interface DetailsPopupProps {
@@ -8,7 +8,7 @@ interface DetailsPopupProps {
   onClose: () => void;
 }
 
-const DetailsPopup: React.FC<DetailsPopupProps> = ({ itemData, isLoading, onClose }) => {
+const DetailsOnMap: React.FC<DetailsPopupProps> = ({ itemData, isLoading, onClose }) => {
 
   return (
     <div 
@@ -53,18 +53,6 @@ const DetailsPopup: React.FC<DetailsPopupProps> = ({ itemData, isLoading, onClos
         )}
 
         <div className="p-4 bg-gray-50 border-t flex justify-between items-center">
-          {itemData?.point ? (
-            <Link
-              to={`/mapa?pinId=${itemData.id}`}
-              className="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors gap-2"
-            >
-              <Map size={18} />
-              Achar no Mapa
-            </Link>
-          ) : (
-            <div></div>
-          )}
-
           <button 
             onClick={onClose} 
             className="inline-flex items-center justify-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors gap-2"
@@ -78,4 +66,4 @@ const DetailsPopup: React.FC<DetailsPopupProps> = ({ itemData, isLoading, onClos
   );
 };
 
-export default DetailsPopup;
+export default DetailsOnMap;
