@@ -7,6 +7,7 @@ import SelectPointOnMap from '../../components/admin_pages_components/SelectPoin
 import { useNavigate} from 'react-router-dom';
 import { RegisterNewPoint, UpdatePoint } from '../../functions/persistence/CrudPins';
 import { getMypoints, getFirstMapId } from '../../functions/persistence/api';
+import { toast } from 'react-toastify';
 
 import NameToPin from '../../components/admin_pages_components/NameToPin';
 import ListPoints from '../../components/admin_pages_components/ListPoints';
@@ -68,7 +69,7 @@ export default function Registernewpoint() {
 
   const handleSubmit = async() => {
     if (!newPoint.name || !newPoint.typePoint) {
-      alert('Por favor, preencha todos os campos obrigatórios.');
+      toast.info('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
@@ -78,29 +79,29 @@ export default function Registernewpoint() {
         if ('id' in newPoint && newPoint.id !== undefined) {
           const success = await UpdatePoint(newPoint, newPoint.id, idmap);
           if (success) {
-            alert('Ponto atualizado com sucesso!');
+            toast.success('Ponto atualizado com sucesso!');
             setPointSelected(null);
             await loadPoints(); // Recarrega a lista
           } else {
-            alert('Erro ao atualizar o ponto. Tente novamente.');
+            toast.error('Erro ao atualizar o ponto. Tente novamente.');
           }
         } else {
-          alert("Não é possível editar: ponto sem ID.");
+          toast.error("Não é possível editar: ponto sem ID.");
         }
       } else if(idmap){
         const success = await RegisterNewPoint(newPoint, idmap);
         if (success) {
-          alert('Ponto registrado com sucesso!');
+          toast.success('Ponto registrado com sucesso!');
           setNewPoint(emptypoint);
           await loadPoints(); // Recarrega a lista
         } else {
-          alert('Erro ao registrar o ponto. Tente novamente.');
+          toast.error('Erro ao registrar o ponto. Tente novamente.');
         }
       }else{
-        alert("Erro: ID do mapa não encontrado.");
+        toast.error("Erro: ID do mapa não encontrado.");
       }
     } catch (error) {
-      alert('Erro inesperado. Tente novamente.');
+      toast.error('Erro inesperado. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }

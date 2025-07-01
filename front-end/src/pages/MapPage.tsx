@@ -23,6 +23,7 @@ export default function MapPage() {
   const [popupData, setPopupData] = useState<StandEventResponse | null>(null);
   const [isPopupLoading, setIsPopupLoading] = useState(false);
   const { mapId } = useParams<{ mapId: string }>();
+  const [showFilterBox, setShowFilterBox] = useState(false);
 
   const loadMap = async (targetMapId: string) => {
     try {
@@ -139,25 +140,57 @@ export default function MapPage() {
           <p className="text-sm text-green-700 italic mb-4">
             Selecione um filtro para explorar ou dê um zoom para melhor visualização.
           </p>
-          <div className="flex flex-wrap gap-2 md:gap-3 mb-4">
-            {Object.entries(FILTER_CONFIG).map(([type, config]) => (
-              <button
-                key={type}
-                className={`flex items-center px-3 py-1.5 text-xs md:text-sm text-white rounded-lg transition-all duration-300 transform hover:scale-105 ${config.color} ${activeCategory === type ? 'ring-2 ring-offset-2 ring-white shadow-md' : 'opacity-80 hover:opacity-100'}`}
-                onClick={() => handleShowPins(activeCategory === type ? null : type)}
-              >
-                {config.icon && <span className="mr-1.5">{config.icon}</span>}
-                {config.label}
-              </button>
-            ))}
-            <button 
-              className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors transform hover:scale-105" 
-              onClick={() => handleShowPins(null)}
-            >
-              Limpar Filtro
-            </button>
-          </div>
-          
+          <div className="relative mb-6 flex justify-center">
+  <button
+    onClick={() => setShowFilterBox(!showFilterBox)}
+    className="flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-full shadow-md hover:bg-green-700 transition-all"
+  >
+    <MapPin className="w-5 h-5" />
+    {activeCategory ? FILTER_CONFIG[activeCategory]?.label : "Filtrar por categoria"}
+    <svg
+      className={`w-4 h-4 transform transition-transform duration-200 ${showFilterBox ? 'rotate-180' : ''}`}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none" viewBox="0 0 24 24" stroke="currentColor"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  {showFilterBox && (
+    <div className="absolute z-10 mt-14 w-full max-w-2xl bg-white rounded-xl shadow-xl border border-gray-200 p-4 grid grid-cols-2 md:grid-cols-3 gap-3">
+      {Object.entries(FILTER_CONFIG).map(([type, config]) => {
+        const isActive = activeCategory === type;
+        return (
+          <button
+            key={type}
+            onClick={() => {
+              handleShowPins(isActive ? null : type);
+              setShowFilterBox(false);
+            }}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+              ${isActive
+                ? `${config.color} text-white`
+                : "bg-gray-100 text-gray-800 hover:bg-gray-200"}
+            `}
+          >
+            <span>{config.icon}</span>
+            <span>{config.label}</span>
+          </button>
+        );
+      })}
+      <button
+        onClick={() => {
+          handleShowPins(null);
+          setShowFilterBox(false);
+        }}
+        className="col-span-full mt-2 px-3 py-2 rounded-lg bg-gray-300 text-gray-800 hover:bg-gray-400 text-sm font-medium transition"
+      >
+        ❌ Limpar Filtro
+      </button>
+    </div>
+  )}
+</div>
+
           <div className="w-full h-full border border-gray-300 rounded-lg shadow-lg overflow-hidden relative">
             {mapDimensions && (
               <div

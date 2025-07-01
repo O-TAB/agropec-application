@@ -83,45 +83,46 @@ export interface Map {
 export const FILTER_CONFIG = {
   "EXPOSITORES": {
     label: "Estande de Exposição",
-    color: "bg-red-600 hover:bg-red-700",
-    icon: "🏢"
+    color: "bg-green-500 hover:bg-green-600 text-white shadow-md rounded-xl px-4 py-2 transition-all",
+    icon: ""
   },
   "ESPACOSHOW": {
     label: "Espaço de Shows",
-    color: "bg-purple-600 hover:bg-purple-700",
-    icon: "🎭"
+    color: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md rounded-xl px-4 py-2 transition-all",
+    icon: ""
   },
   "ESPACOPALESTRA": {
     label: "Espaço de Palestras",
-    color: "bg-blue-600 hover:bg-blue-700",
-    icon: "🎤"
+    color: "bg-lime-500 hover:bg-lime-600 text-black shadow-md rounded-xl px-4 py-2 transition-all",
+    icon: ""
   },
   "RESTAURANTE": {
     label: "Restaurante",
-    color: "bg-orange-600 hover:bg-orange-700",
-    icon: "🍽️"
+    color: "bg-green-700 hover:bg-green-800 text-white shadow-md rounded-xl px-4 py-2 transition-all",
+    icon: ""
   },
   "BANHEIROS": {
     label: "Banheiros",
-    color: "bg-blue-400 hover:bg-blue-500",
-    icon: "🚻"
+    color: "bg-teal-500 hover:bg-teal-600 text-white shadow-md rounded-xl px-4 py-2 transition-all",
+    icon: ""
   },
   "ESPACORACKATON": {
     label: "Espaço dos Rackatons",
-    color: "bg-green-600 hover:bg-green-700",
-    icon: "🏁"
+    color: "bg-green-400 hover:bg-green-500 text-black shadow-md rounded-xl px-4 py-2 transition-all",
+    icon: ""
   },
   "EMERGENCIA": {
     label: "Posto de Atendimento Médico",
-    color: "bg-red-600 hover:bg-red-700",
-    icon: "🚑"
+    color: "bg-green-800 hover:bg-green-900 text-white shadow-md rounded-xl px-4 py-2 transition-all",
+    icon: ""
   },
   "PARQUEDIVERSAO": {
     label: "Parque de Diversões",
-    color: "bg-yellow-600 hover:bg-yellow-700",
-    icon: "🎡"
+    color: "bg-lime-300 hover:bg-lime-400 text-black shadow-md rounded-xl px-4 py-2 transition-all",
+    icon: ""
   }
 };
+
 
 export interface Notification{
   content: string
