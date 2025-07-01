@@ -48,6 +48,12 @@ Desenvolver um **site responsivo, moderno e intuitivo** para a Feira Agropecuár
 
 ## ⚙️ Ambiente de Desenvolvimento
 
+### Pré-Requisitos para execução local:
+- Node.js instalado.
+- JDK 21 instalado.
+- IntelliJ IDEA, Eclipse ou qualquer IDE que suporte Maven/Gradle e Java.
+- SQLite configurado.
+
 ### Front-End
 - Editor: **Visual Studio Code**
 - Execução:
