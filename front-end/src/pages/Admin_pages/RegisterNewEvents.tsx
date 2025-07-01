@@ -70,8 +70,7 @@ const RegisterNewEvents: React.FC = () => {
     loadEvents();
   }, [idmap]);
 
-  //evitar de usuario poder editar e ao apgar o item que esta editando poder continar editando o item.
-    useEffect(()=>{setNewEvent(emptyStandEvent), setIsEditing(false)},[allEvents]);
+
 
   // é necessario ter uma segunda variavel para selecionar item para que não ocorra erros relacionados ao valor 'null'
   useEffect(() => {
@@ -82,7 +81,7 @@ const RegisterNewEvents: React.FC = () => {
       setNewEvent(emptyStandEvent);
       setIsEditing(false);
     }
-  }, [itemSelected]);
+  }, [itemSelected,allEvents]);
 
   const handleInputChange = ( e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
