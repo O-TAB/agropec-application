@@ -22,8 +22,7 @@ Desenvolver um **site responsivo, moderno e intuitivo** para a Feira Agropecuár
 | Banco de Dados | SQLite                                    |
 | Versionamento | Git + GitHub                               |
 | Design       | Canva, Bolt.New (Protótipos)                |
-| Hospedagem   | *[especifique aqui]*                        |
-
+                       |
 ---
 
 ## 💡 Funcionalidades
