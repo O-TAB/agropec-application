@@ -1,5 +1,4 @@
 import Logo from '../assets/Logo_Agropec.png'
-import React from 'react';
 
 type LogoProps = {
     classname?: string;

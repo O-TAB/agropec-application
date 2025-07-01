@@ -1,4 +1,4 @@
-import React from "react";
+
 import {NavLink} from "react-router-dom";
 
 type NavbarOptionProps = {
@@ -8,9 +8,9 @@ type NavbarOptionProps = {
 }
 
 export default function NavbarOptions
-    ({classActive="text-white hover:text-green-200 transition-colors font-medium border-b-2 border-transparent hover:border-white pb-1"
-    ,classInactive="text-green-100 hover:text-white transition-colors font-medium border-b-2 border-transparent hover:border-white"
-    ,ClassName="hidden md:flex space-x-8"}: NavbarOptionProps
+    ({classActive = "text-white hover:text-green-200 hover:border-b-2 hover:border-white transition-all font-medium pb-1",
+  classInactive = "text-green-100 hover:text-white hover:border-b-2 hover:border-white transition-all font-medium pb-1",
+  ClassName = "hidden md:flex space-x-8"}: NavbarOptionProps
     ) {
     return (
         <nav className={ClassName}>

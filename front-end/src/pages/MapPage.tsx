@@ -1,127 +1,238 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { allPins, imageMap } from "../data/pinsData"; 
-import imgMapa from "../assets/MAPA-A1.svg";
-import { MapPin } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { useSearchParams, useParams } from "react-router-dom";
+import { MapPin, Target } from "lucide-react";
+import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import EventPopup from '../components/EventPopup';
-
-//tamanho do mapa original em pixels
-const ORIGINAL_MAP_WIDTH = 3508;
-const ORIGINAL_MAP_HEIGHT = 2481;
+import DetailsPopup from '../components/DetailsPopup';
+import { getSvgDimensions } from "../functions/SvgDimensionReader";
+import { ResponsePoint, StandEventResponse, Map, FILTER_CONFIG } from "../data/ObjectStructures";
+import { getFirstMapId, getMapById, getMypoints, getDetailsById } from "../functions/persistence/api";
+import MapOverlay from "../components/admin_pages_components/MapOverlay";
+import DetailsOnMap from "../components/DetailsOnMap";
 
 export default function MapPage() {
-  const transformWrapperRef = useRef(null);
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const transformWrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [visiblePins, setVisiblePins] = useState<ResponsePoint[]>([]);
   const [searchParams] = useSearchParams();
+  const [currentMap, setCurrentMap] = useState<Map | null>(null);
+  const [allPins, setAllPins] = useState<ResponsePoint[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [mapDimensions, setMapDimensions] = useState<{ width: number; height: number; minX: number; minY: number } | null>(null);
+  const [selectedPinId, setSelectedPinId] = useState<number | null>(null);
+  const [popupData, setPopupData] = useState<StandEventResponse | null>(null);
+  const [isPopupLoading, setIsPopupLoading] = useState(false);
+  const { mapId } = useParams<{ mapId: string }>();
+  const [showFilterBox, setShowFilterBox] = useState(false);
 
-  const visiblePins = activeCategory
-    ? allPins.filter(pin => pin.category === activeCategory)
-    : [];
+  const loadMap = async (targetMapId: string) => {
+    try {
+      const map = await getMapById(targetMapId);
+      if (map) {
+        setCurrentMap(map);
+        const dimensions = getSvgDimensions(map.svg);
+        setMapDimensions(dimensions);
+      } else { setError("Mapa não encontrado"); }
+    } catch (err: any) { console.error("Erro ao carregar mapa:", err); setError("Erro ao carregar mapa"); }
+  };
 
-  const handleShowPins = (category) => {
-    setSelectedEvent(null);
+  const loadPoints = async (targetMapId: string) => {
+    try {
+      const points = await getMypoints(targetMapId);
+      setAllPins(points);
+    } catch (err: any) { console.error("Erro ao carregar pontos:", err); setError("Erro ao carregar pontos"); }
+  };
+
+  useEffect(() => {
+    const loadMapData = async () => {
+      setLoading(true);
+      setError(null);
+      let targetMapId = mapId;
+      try {
+        if (!targetMapId) { targetMapId = await getFirstMapId(); }
+        if (!targetMapId) {
+            setError("Nenhum mapa disponível"); setLoading(false); return;
+        }
+      } catch (err: any) {
+          setError("Erro ao buscar mapas"); setLoading(false); return;
+      }
+      await Promise.all([ loadMap(targetMapId), loadPoints(targetMapId) ]);
+      setLoading(false);
+    };
+    loadMapData();
+  }, [mapId]);
+
+  useEffect(() => {
+    if (activeCategory === null) {
+      setVisiblePins(allPins);
+    } else {
+      const filteredPins = allPins.filter(pin => pin.typePoint === activeCategory);
+      setVisiblePins(filteredPins);
+    }
+  }, [activeCategory, allPins]);
+
+  const handleClosePopup = () => {
+    setSelectedPinId(null);
+    setPopupData(null);
+    setIsPopupLoading(false);
+  };
+
+  const handleShowPins = (category: string | null) => {
     setActiveCategory(category);
+    handleClosePopup(); 
+    if (category === null && transformWrapperRef.current) {
+      transformWrapperRef.current.resetTransform(600, "easeOut");
+    }
+  };
+
+  const handlePinClick = async (pinId: number) => {
+    if (pinId === selectedPinId) return;
+    const pin = allPins.find(p => p.id === pinId);
+    if (!pin) return;
+
+    setSelectedPinId(pinId);
+    setIsPopupLoading(true);
+    setPopupData(null); 
+
+    console.log(pin.typePoint);
+    const details = await getDetailsById(pinId, pin.typePoint);
+
+    setPopupData(details);
+    setIsPopupLoading(false);
+    
   };
   
-  //logica de foco no pin
-  useEffect(() => {
-    const pinIdFromUrl = searchParams.get('pinId');
-    if (pinIdFromUrl && transformWrapperRef.current) {
-      const pinToFocus = allPins.find(p => p.id === Number(pinIdFromUrl));
-      if (pinToFocus) {
-        setActiveCategory(pinToFocus.category);
-        setTimeout(() => {
-          if (transformWrapperRef.current) {
-            const { zoomToElement } = transformWrapperRef.current;
-            const elementId = `pin-${pinToFocus.id}`;
-            zoomToElement(elementId, 2.5, 800, "easeOut"); 
-          }
-        }, 200);
-      }
-    }
-  }, []); 
+  useEffect(() => { 
+    if (allPins.length === 0) return;
+    const pinIdFromUrlParam = searchParams.get('pinId');
+    if (!pinIdFromUrlParam) return;
 
-  //logica de zoom 
-  useEffect(() => {
-    if (!transformWrapperRef.current) return;
-
-    const { zoomToElement, resetTransform } = transformWrapperRef.current;
-
-    const categoriesToZoom = ['ambulancia', 'pracaalimentacao'];
-
-    const pinsToZoom = visiblePins.filter(p => categoriesToZoom.includes(p.category));
-
-    if (pinsToZoom.length > 0) {
-      // pega o primeiro pino visível da categoria para dar o zoom
-      const firstPinToZoom = pinsToZoom[0]; 
-      const elementId = `pin-${firstPinToZoom.id}`;
+    const pinIdFromUrl = Number(pinIdFromUrlParam);
+    const pinToFocus = allPins.find(p => p.id === pinIdFromUrl);
+    
+    if (pinToFocus) {
+      setActiveCategory(pinToFocus.typePoint);
+      handlePinClick(pinToFocus.id);
       setTimeout(() => {
-        zoomToElement(elementId, 1.8, 600, "easeOut");
-      }, 100);
-    } else {
-      resetTransform(600, "easeOut");
+        if (transformWrapperRef.current) {
+          transformWrapperRef.current.zoomToElement(`pin-${pinToFocus.id}`, 2.5, 800, "easeOut"); 
+        }
+      }, 300);
     }
-  }, [activeCategory]); 
+  }, [searchParams, allPins]); 
   
+  if (loading) { return <div className="text-center p-10">Carregando...</div>; }
+  if (error) { return <div className="text-center p-10 text-red-600">{error}</div>; }
+  if (!currentMap || !mapDimensions) { return <div className="text-center p-10">Nenhum mapa disponível</div>; }
+
   return (
     <>
       <div className="flex justify-center mt-4 md:mt-10 px-4">
-        <div className="bg-yellow-50 rounded-2xl shadow-lg p-4 md:p-6 w-full max-w-5xl">
+        <div className="bg-yellow-50 rounded-2xl shadow-lg p-4 md:p-6 w-full h-full">
+          
           <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
             <MapPin className="w-7 h-7 md:w-8 md:h-8 text-green-800" />
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-green-800">
-              Mapa do Evento
+              {currentMap.name}
             </h1>
           </div>
           <p className="text-sm text-green-700 italic mb-4">
             Selecione um filtro para explorar ou dê um zoom para melhor visualização.
           </p>
-          <div className="flex flex-wrap gap-2 md:gap-3 mb-4">
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-red-600 text-white rounded hover:bg-red-700" onClick={() => handleShowPins("stand")}>Stands</button>
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-purple-600 text-white rounded hover:bg-purple-700" onClick={() => handleShowPins("event")}>Eventos</button>
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700" onClick={() => handleShowPins("banheiros")}>Banheiros</button>
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-green-600 text-white rounded hover:bg-green-700" onClick={() => handleShowPins("ambulancia")}>Ambulância</button>
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700" onClick={() => handleShowPins("pracaalimentacao")}>Praça de Alimentação</button>
-            <button className="px-3 py-1.5 text-xs md:text-sm bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => handleShowPins(null)}>Limpar Filtro</button>
-          </div>
-          <div className="w-full border border-gray-300 rounded-lg shadow-lg overflow-hidden">
-            <div className="relative w-full aspect-[3508/2481]">
-              <TransformWrapper ref={transformWrapperRef} initialScale={1} minScale={0.5} maxScale={8}>
-                <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
-                  <img src={imgMapa} alt="Mapa do Evento" className="w-full h-full" />
-                  {allPins.map((pin) => {
-                    const isVisible = visiblePins.some(visiblePin => visiblePin.id === pin.id);
-                    const baseClasses = "transition-opacity duration-500";
-                    const visibilityClass = isVisible ? "opacity-100" : "opacity-0 pointer-events-none";
-                    if (pin.type === 'main') {
-                      return (
-                        <div key={pin.id} id={`pin-${pin.id}`} className={`absolute text-green-800 animate-bounce ${baseClasses} ${visibilityClass}`} style={{ left: `${(pin.x / ORIGINAL_MAP_WIDTH) * 100}%`, top: `${(pin.y / ORIGINAL_MAP_HEIGHT) * 100}%` }}>
-                          <MapPin className="w-8 h-8 transform -translate-x-1/2 -translate-y-full" />
-                        </div>
-                      );
+          <div className="relative mb-6 flex justify-center">
+  <button
+    onClick={() => setShowFilterBox(!showFilterBox)}
+    className="flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-full shadow-md hover:bg-green-700 transition-all"
+  >
+    <MapPin className="w-5 h-5" />
+    {activeCategory ? FILTER_CONFIG[activeCategory as keyof typeof FILTER_CONFIG]?.label : "Filtrar por categoria"}
+    <svg
+      className={`w-4 h-4 transform transition-transform duration-200 ${showFilterBox ? 'rotate-180' : ''}`}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none" viewBox="0 0 24 24" stroke="currentColor"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  {showFilterBox && (
+    <div className="absolute z-10 mt-14 w-full max-w-2xl bg-white rounded-xl shadow-xl border border-gray-200 p-4 grid grid-cols-2 md:grid-cols-3 gap-3">
+      {Object.entries(FILTER_CONFIG).map(([type, config]) => {
+        const isActive = activeCategory === type;
+        return (
+          <button
+            key={type}
+            onClick={() => {
+              handleShowPins(isActive ? null : type);
+              setShowFilterBox(false);
+            }}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+              ${isActive
+                ? `${config.color} text-white`
+                : "bg-gray-100 text-gray-800 hover:bg-gray-200"}
+            `}
+          >
+            <span>{config.icon}</span>
+            <span>{config.label}</span>
+          </button>
+        );
+      })}
+      <button
+        onClick={() => {
+          handleShowPins(null);
+          setShowFilterBox(false);
+        }}
+        className="col-span-full mt-2 px-3 py-2 rounded-lg bg-gray-300 text-gray-800 hover:bg-gray-400 text-sm font-medium transition"
+      >
+        ❌ Limpar Filtro
+      </button>
+    </div>
+  )}
+</div>
+
+          <div className="w-full h-full border border-gray-300 rounded-lg shadow-lg overflow-hidden relative">
+            {mapDimensions && (
+              <div
+                className="relative w-full"
+                style={{ aspectRatio: `${mapDimensions.width} / ${mapDimensions.height}` }}
+              >
+                <TransformWrapper ref={transformWrapperRef} initialScale={1} minScale={0.5} maxScale={8} limitToBounds={false}>
+                  <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
+                    <MapOverlay
+                      svg={currentMap.svg}
+                      pins={allPins}
+                      visiblePins={visiblePins}
+                      mapDimensions={mapDimensions}
+                      onPinClick={handlePinClick}
+                    />
+                  </TransformComponent>
+                </TransformWrapper>
+                <button
+                  aria-label="Centralizar Mapa"
+                  className="absolute bottom-4 right-4 z-20 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                  onClick={() => {
+                    if (transformWrapperRef.current) {
+                      transformWrapperRef.current.resetTransform();
                     }
-                    if (pin.type === 'event') {
-                      const pinColor = pin.category === 'stand' ? 'bg-red-500' : 'bg-purple-500';
-                      return (
-                        <button key={pin.id} id={`pin-${pin.id}`} onClick={() => setSelectedEvent(pin)} className={`absolute w-3 h-3 ${pinColor} rounded-full border-2 border-white shadow-md transform -translate-x-1/2 -translate-y-1/2 hover:scale-125 transition-transform ${baseClasses} ${visibilityClass}`} style={{ left: `${(pin.x / ORIGINAL_MAP_WIDTH) * 100}%`, top: `${(pin.y / ORIGINAL_MAP_HEIGHT) * 100}%` }} title={pin.title} />
-                      );
-                    }
-                    return null;
-                  })}
-                </TransformComponent>
-              </TransformWrapper>
-            </div>
+                  }}
+                >
+                  <Target className="w-5 h-5" />
+                  <span className="hidden md:inline">Centralizar Mapa</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      {/* Passando o imageMap para o Pop-up */}
-      <EventPopup 
-        eventData={selectedEvent} 
-        onClose={() => setSelectedEvent(null)}
-        imageMap={imageMap} 
-      />
+      
+      {selectedPinId && (
+        <DetailsOnMap
+          isLoading={isPopupLoading}
+          itemData={popupData}
+          onClose={handleClosePopup}
+        />
+      )}
     </>
   );
 }

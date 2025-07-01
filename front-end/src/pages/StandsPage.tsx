@@ -1,54 +1,28 @@
-import React, { useState, useMemo } from 'react';
-import { allPins, imageMap } from '../data/pinsData';
-import { Search, Filter, Info } from 'lucide-react';
-import DetailsPopup from '../components/DetailsPopup'; // Importa o novo pop-up
 
-const normalizeText = (text = '') => 
-  text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+import { useEffect, useState} from 'react';
+import { Search, Filter} from 'lucide-react';
+
+import { useFilteredItems } from '../functions/FilterData';
+import ItemCard from '../components/ItemCard';
+import DetailsPopup from '../components/DetailsPopup';
+import { StandEventResponse } from '../data/ObjectStructures';
+import { getMyObjectsStands, getMyObjectsEvent } from '../functions/persistence/api';
 
 export default function StandsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentFilter, setCurrentFilter] = useState('todos');
-  const [selectedPin, setSelectedPin] = useState(null); // Estado para controlar o pop-up
+  const [selectedItem, setSelectedItem] = useState<StandEventResponse | null>(null);
+  const [allstands, setStands]= useState<StandEventResponse[]>([]);
+  const [allevents, setEvents]= useState<StandEventResponse[]>([]);
 
-  const filteredItems = useMemo(() => {
-    let items = allPins.filter(pin => pin.category === 'stand' || pin.category === 'event');
-    if (currentFilter !== 'todos') {
-      items = items.filter(item => item.category === currentFilter);
-    }
-    if (searchQuery.trim() !== '') {
-      const lowercasedQuery = normalizeText(searchQuery);
-      items = items.filter(item =>
-        normalizeText(item.title).includes(lowercasedQuery) ||
-        normalizeText(item.description).includes(lowercasedQuery)
-      );
-    }
-    return items;
-  }, [searchQuery, currentFilter]);
+  useEffect(() => {
 
-  const expositoresFiltrados = filteredItems.filter(item => item.category === 'stand');
-  const eventosFiltrados = filteredItems.filter(item => item.category === 'event');
+    getMyObjectsStands().then((data) => setStands(data));
+    getMyObjectsEvent().then((data) => setEvents(data));
+  }, []);
 
-  const ItemCard = ({ item }) => (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out flex flex-col h-full">
-      <img
-        src={imageMap[item.image] || 'https://via.placeholder.com/400x200?text=Sem+Imagem'}
-        alt={item.title}
-        className="w-full h-48 object-cover rounded-t-xl"
-      />
-      <div className="p-4 flex flex-col flex-grow">
-        <h2 className="text-xl font-semibold text-green-800">{item.title}</h2>
-        <p className="text-sm text-gray-600 mb-4 mt-1 flex-grow">{item.description}</p>
-        <button
-          onClick={() => setSelectedPin(item)} // Abre o pop-up ao clicar
-          className="mt-auto w-full py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
-        >
-          <Info size={18} />
-          Saber Mais
-        </button>
-      </div>
-    </div>
-  );
+  const StandsFiltrados = useFilteredItems(allstands, searchQuery);
+  const EventosFiltrados = useFilteredItems(allevents, searchQuery);
 
   return (
     <>
@@ -60,6 +34,7 @@ export default function StandsPage() {
           </p>
         </div>
 
+        {/* Barra de busca e filtro */}
         <div className="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-col md:flex-row gap-4 items-center sticky top-4 z-10">
           <div className="relative w-full md:flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -85,12 +60,15 @@ export default function StandsPage() {
           </div>
         </div>
 
+        {/* Seção de Expositores */}
         {(currentFilter === 'todos' || currentFilter === 'stand') && (
           <section id="expositores" className="mb-12">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 border-l-4 border-green-600 pl-4">Expositores</h2>
-            {expositoresFiltrados.length > 0 ? (
+            {StandsFiltrados.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {expositoresFiltrados.map((item) => <ItemCard key={item.id} item={item} />)}
+                {StandsFiltrados.map((stand) => 
+                    <ItemCard key={stand.id} item={stand} setSelectedPin={setSelectedItem} />
+                )}
               </div>
             ) : (
               <p className="text-gray-500 pl-4">Nenhum expositor encontrado para sua busca.</p>
@@ -98,12 +76,13 @@ export default function StandsPage() {
           </section>
         )}
 
+        {/* Seção de Eventos */}
         {(currentFilter === 'todos' || currentFilter === 'event') && (
           <section id="eventos">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 border-l-4 border-green-600 pl-4">Eventos</h2>
-            {eventosFiltrados.length > 0 ? (
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 border-l-4 border-purple-600 pl-4">Eventos</h2>
+            {EventosFiltrados.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {eventosFiltrados.map((item) => <ItemCard key={item.id} item={item} />)}
+                {EventosFiltrados.map((item) => <ItemCard key={item.id} item={item} setSelectedPin={setSelectedItem} />)}
               </div>
             ) : (
               <p className="text-gray-500 pl-4">Nenhum evento encontrado para sua busca.</p>
@@ -112,12 +91,13 @@ export default function StandsPage() {
         )}
       </div>
 
-      {/* Renderiza o novo pop-up quando um pino for selecionado */}
-      <DetailsPopup 
-        itemData={selectedPin} 
-        onClose={() => setSelectedPin(null)} 
-        imageMap={imageMap} 
-      />
+      {selectedItem && (
+        <DetailsPopup 
+          itemData={selectedItem} 
+          onClose={() => setSelectedItem(null)} 
+          isLoading={false}
+        />
+      )}
     </>
   );
 }
