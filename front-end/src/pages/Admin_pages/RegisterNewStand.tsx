@@ -59,8 +59,6 @@ const RegisterNewStand: React.FC = () => {
     loadStands();
   }, [idmap]);
 
-  //evitar de usuario poder editar e ao apgar o item que esta editando poder continar editando o item.
-  useEffect(()=>{setNewStand(emptyStandEvent), setIsEditing(false)},[allStands]);
 
   useEffect(() => {
     if (itemSelected) {
@@ -70,7 +68,7 @@ const RegisterNewStand: React.FC = () => {
       setNewStand({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EXPOSITORES'}});
       setIsEditing(false);
     }
-  }, [itemSelected]);
+  }, [itemSelected, allStands]);
 
   const handleInputChange = ( e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -103,6 +101,7 @@ const RegisterNewStand: React.FC = () => {
           toast.error("Erro ao atualizar o stand. Tente novamente.");
         }
       } else {
+        console.log(StandtoSend);
         const success = await RegisterNewpin(StandtoSend, idmap, 'stands');
         if (success) {
           toast.success("Stand registrado com sucesso!");

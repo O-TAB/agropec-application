@@ -48,8 +48,7 @@ export default function Registernewpoint() {
     loadPoints();
   }, [idmap]);
 
-  //evitar de usuario poder editar e ao apgar o item que esta editando poder continar editando o item.
-    useEffect(()=>{setNewPoint(emptypoint), setIsEditing(false)},[allpoints]);
+
   // é necessario ter uma segunda variavel para selecionar item para que não ocorra erros relacionados ao valor 'null'
   // ex: ao setar como null a função useEffect ativa e set como empty item e logo em seguida ativa como se tivesse editando um elemento.
   useEffect(() => {
@@ -60,7 +59,7 @@ export default function Registernewpoint() {
       setNewPoint(emptypoint);
       setIsEditing(false);
     }
-  }, [itemSelected]);
+  }, [itemSelected, allpoints]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
