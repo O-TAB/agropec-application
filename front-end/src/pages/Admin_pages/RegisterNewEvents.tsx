@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Save, PlusCircle, Calendar, MapPin, ArrowLeft } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 import {
   StandEventPost,
@@ -134,12 +135,12 @@ const RegisterNewEvents: React.FC = () => {
   const handleSubmit = async () => {
     if (!newEvent.name || !newEvent.description || !newEvent.descriptionCard || !newEvent.img || !newEvent.date) {
       console.log(newEvent);
-      alert("Preencha todos os campos obrigatórios.");
+      toast.info("Preencha todos os campos obrigatórios.");
       return;
     }
     //verifica se data é valida.
     if (!newEvent.date || isNaN(new Date(newEvent.date).getTime())) {
-      alert("Data do evento inválida ou vazia.");
+      toast.error("Data do evento inválida ou vazia.");
       return;
     }
 
@@ -149,25 +150,25 @@ const RegisterNewEvents: React.FC = () => {
         console.log(newEvent, newEvent.point);
         const success = await UpdatePin(newEvent, itemSelected.id, 'event');
         if (success) {
-          alert("Evento atualizado com sucesso!");
+          toast.success("Evento atualizado com sucesso!");
           setItemSelected(null);
           await loadEvents();
         } else {
-          alert("Erro ao atualizar o evento. Tente novamente.");
+          toast.error("Erro ao atualizar o evento. Tente novamente.");
         }
       } else {
         console.log(newEvent, newEvent.point);
         const success = await RegisterNewpin(newEvent, idmap, 'event');
         if (success) {
-          alert("Evento registrado com sucesso!");
+          toast.success("Evento registrado com sucesso!");
           setNewEvent(emptyStandEvent);
           await loadEvents();
         } else {
-          alert("Erro ao registrar o evento. Tente novamente.");
+          toast.error("Erro ao registrar o evento. Tente novamente.");
         }
       }
     } catch (err) {
-      alert("Erro inesperado. Tente novamente.");
+      toast.error("Erro inesperado. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }

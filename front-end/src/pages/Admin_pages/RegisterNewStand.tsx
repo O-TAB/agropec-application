@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { MousePointer,ArrowLeft } from 'lucide-react';
+import { toast } from 'react-toastify';
+
 
 import {
   StandEventPost,
@@ -84,7 +86,7 @@ const RegisterNewStand: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!newStand.name || !newStand.description || !newStand.descriptionCard || !newStand.img) {
-      alert("Preencha todos os campos.");
+      toast.info("Preencha todos os campos.");
       return;
     }
 
@@ -94,24 +96,24 @@ const RegisterNewStand: React.FC = () => {
       if (isEditing && itemSelected?.id !== undefined) {
         const success = await UpdatePin(StandtoSend, itemSelected.id, 'stands');
         if (success) {
-          alert("Stand atualizado com sucesso!");
+          toast.success("Stand atualizado com sucesso!");
           setItemSelected(null);
           await loadStands();
         } else {
-          alert("Erro ao atualizar o stand. Tente novamente.");
+          toast.error("Erro ao atualizar o stand. Tente novamente.");
         }
       } else {
         const success = await RegisterNewpin(StandtoSend, idmap, 'stands');
         if (success) {
-          alert("Stand registrado com sucesso!");
+          toast.success("Stand registrado com sucesso!");
           setNewStand({...emptyStandEvent, point:{...emptyStandEvent.point,typePoint: 'EXPOSITORES'}});
           await loadStands();
         } else {
-          alert("Erro ao registrar o stand. Tente novamente.");
+          toast.error("Erro ao registrar o stand. Tente novamente.");
         }
       }
     } catch (err) {
-      alert("Erro inesperado. Tente novamente.");
+      toast.error("Erro inesperado. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }

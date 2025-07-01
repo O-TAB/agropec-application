@@ -13,6 +13,8 @@ import SvgUploader from './pages/Admin_pages/SvgUploader';
 import RegisterNewpoint from './pages/Admin_pages/RegisterNewpoint';
 import RegisterNewStand from './pages/Admin_pages/RegisterNewStand';
 import RegisterNewEvents from './pages/Admin_pages/RegisterNewEvents';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function App() {
   return (
@@ -71,6 +73,18 @@ export default function App() {
         }/>
           
       </Routes>
+
+      <ToastContainer 
+    position="top-right"
+    autoClose={3000}
+    hideProgressBar={false}
+    newestOnTop
+    closeOnClick
+    pauseOnFocusLoss
+    draggable
+    pauseOnHover
+    theme="colored"
+  />
     </>
   );
 }
