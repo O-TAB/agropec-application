@@ -2,6 +2,7 @@ import { Edit, Trash2 } from "lucide-react";
 import { StandEventResponse } from "../../data/ObjectStructures";
 import { DeletePin } from "../../functions/persistence/CrudPins";
 import { useState } from "react";
+import { toast } from 'react-toastify';
 
 interface ListToStandsAndEventsProps {
     allItems: StandEventResponse[];
@@ -21,10 +22,10 @@ const ListToStandsAndEvents: React.FC<ListToStandsAndEventsProps> = ({allItems, 
                 if (success) {
                     onRefresh(); // Recarrega a lista após deletar
                 } else {
-                    alert(`Erro ao deletar o ${type === 'stands' ? 'stand' : 'evento'}. Tente novamente.`);
+                    toast.error(`Erro ao deletar o ${type === 'stands' ? 'stand' : 'evento'}. Tente novamente.`);
                 }
             } catch (error) {
-                alert(`Erro ao deletar o ${type === 'stands' ? 'stand' : 'evento'}. Tente novamente.`);
+                toast.error(`Erro ao deletar o ${type === 'stands' ? 'stand' : 'evento'}. Tente novamente.`);
             } finally {
                 setIsDeleting(null);
             }

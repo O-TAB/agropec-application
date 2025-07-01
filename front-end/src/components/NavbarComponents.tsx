@@ -60,24 +60,27 @@ export default function NavbarComponents() {
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-green-700 rounded-lg mb-4 p-4">
-            <Navbaroptions
-              classActive="text-white hover:text-green-200 transition-colors font-medium border-b-2 border-white pb-1"
-              classInactive="text-green-100 hover:text-white transition-colors font-medium"
-              ClassName="flex flex-col space-y-4"
-            />
-            <button
-              onClick={() => {
-                setIsMenuOpen(false);
-                goToContato();
-              }}
-              className="bg-white text-green-600 px-6 py-2 rounded-full font-semibold hover:bg-green-50 transition-colors shadow-md w-full mt-4"
-            >
-              Dúvidas?
-            </button>
-          </div>
-        )}
+       <div
+  className={`transition-all duration-300 ease-in-out transform origin-top md:hidden bg-green-700 rounded-lg mb-4 p-4 overflow-hidden ${
+    isMenuOpen ? 'opacity-100 scale-y-100 max-h-[500px]' : 'opacity-0 scale-y-0 max-h-0 pointer-events-none'
+  }`}
+  style={{ transitionProperty: 'opacity, transform, max-height' }}
+>
+  <Navbaroptions
+    classActive="text-white hover:text-green-200 transition-colors font-medium border-b-2 border-white pb-1"
+    classInactive="text-green-100 hover:text-white transition-colors font-medium"
+    ClassName="flex flex-col space-y-4"
+  />
+  <button
+    onClick={() => {
+      setIsMenuOpen(false);
+      goToContato();
+    }}
+    className="bg-white text-green-600 px-6 py-2 rounded-full font-semibold hover:bg-green-50 transition-colors shadow-md w-full mt-4"
+  >
+    Dúvidas?
+  </button>
+</div>
       </div>
     </header>
   );

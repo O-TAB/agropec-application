@@ -114,25 +114,33 @@ export default function Registernewpoint() {
 
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => navigate('/admin')}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <ArrowLeft size={20} />
-            Voltar ao Painel
-          </button>
-          <h1 className="text-4xl font-bold text-green-800">Gerenciar pontos</h1>
-        </div>
+  <div className="container mx-auto p-4 md:p-8">
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+
+      {/* TÍTULO – sozinho no topo no mobile */}
+      <h1 className="text-2xl sm:text-3xl font-bold text-green-800 text-center sm:text-left">
+        Gerenciar pontos
+      </h1>
+
+      {/* Botões – Voltar + Sair */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+        <button 
+          onClick={() => navigate('/admin')}
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors w-full sm:w-auto"
+        >
+          <ArrowLeft size={20} />
+          Voltar ao Painel
+        </button>
+
         <button 
           onClick={logout}
-          className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+          className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors w-full sm:w-auto"
         >
           Sair (Logout)
         </button>
       </div>
+
+    </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded-lg shadow-md">
