@@ -93,24 +93,20 @@ public class StandService {
             standToUpdate.setImg(stand.getImg());
 
             if(stand.getPoint() != null && stand.getPoint().getId() != 0){
-<<<<<<< Updated upstream
                 Optional<Point> pointOpt = pointRepository.findById(stand.getPoint().getId());
                 if (pointOpt.isPresent()) {
                     Point pointToUpdate = pointOpt.get();
-                    // Atualize os campos do ponto conforme necessário
                     pointToUpdate.setX(stand.getPoint().getX());
                     pointToUpdate.setY(stand.getPoint().getY());
                     pointToUpdate.setTypePoint(stand.getPoint().getTypePoint());
-                    pointToUpdate.setMap(pointToUpdate.getMap()); // mantém o mesmo mapa ou atualize se necessário
-
+                    pointToUpdate.setMap(pointToUpdate.getMap());
                     pointRepository.save(pointToUpdate);
                     standToUpdate.setPoint(pointToUpdate);
                 }
-=======
+
                 Optional<Point> point = pointRepository.findById(stand.getPoint().getId());
                 Point pointToUpdate = point.get();
                 standToUpdate.setPoint(pointToUpdate);
->>>>>>> Stashed changes
             }
 
             Stand updatedStand = standRepository.save(standToUpdate);

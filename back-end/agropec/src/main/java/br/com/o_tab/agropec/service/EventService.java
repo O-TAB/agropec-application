@@ -83,11 +83,10 @@ public class EventService {
                 Optional<Point> pointOpt = pointRepository.findById(event.getPoint().getId());
                 if (pointOpt.isPresent()) {
                     Point pointToUpdate = pointOpt.get();
-                    // Atualize os campos do ponto conforme necessário
                     pointToUpdate.setX(event.getPoint().getX());
                     pointToUpdate.setY(event.getPoint().getY());
                     pointToUpdate.setTypePoint(event.getPoint().getTypePoint());
-                    pointToUpdate.setMap(pointToUpdate.getMap()); // mantém o mesmo mapa ou atualize se necessário
+                    pointToUpdate.setMap(pointToUpdate.getMap());
 
                     pointRepository.save(pointToUpdate);
                     eventToUpdate.setPoint(pointToUpdate);
