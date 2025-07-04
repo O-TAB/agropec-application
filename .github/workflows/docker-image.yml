@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build agropec-application/back-end/agropec/Dockerfile --file Dockerfile --tag agropec_api_img:$(date +%s)
+      run: docker build -f agropec-application/back-end/agropec/Dockerfile agropec-application/back-end/agropec --tag agropec_api_img:$(date +%s)
